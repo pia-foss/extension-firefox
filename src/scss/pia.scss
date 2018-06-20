@@ -34,6 +34,10 @@ body {
     .error-boundary {
         color: red;
     }
+
+    input[type=text] {
+        background-color: white;
+    }
 }
 
 body a, body a:active, body a:focus, body a:hover {
@@ -402,10 +406,7 @@ box-shadow:none;
         font-weight: normal;
     }
 }
-// .remember-me-container label {
-//     font-weight:normal;
-//     padding-left:10px;
-// }
+
 .errorcontainer {
     max-width: 550px;
     margin:auto;
