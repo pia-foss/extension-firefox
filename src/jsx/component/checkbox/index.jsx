@@ -1,11 +1,11 @@
 import React from 'react';
 import PropType from 'prop-types';
 
-import remove from '../../js/helpers/remove';
-import ErrorBoundary from '../hoc/errorboundary';
+import remove from '../../../js/helpers/remove';
+import ErrorBoundary from '../../hoc/errorboundary';
 
 const extractInputProps = (props) => {
-  return remove(props, 'id', 'labelLocaleKey', 'className')
+  return remove(props, 'id', 'className')
 }
 
 const buildClassName = (postfix, id, ...others) => {
@@ -20,8 +20,7 @@ const buildClassName = (postfix, id, ...others) => {
 
 const Checkbox = (props) => {
 
-  const {id, labelLocaleKey, className, onChange} = props;
-  const message = typeof labelLocaleKey === 'string' ? t(labelLocaleKey) : '';
+  const {id, className, onChange} = props;
 
   return (
     <div className={buildClassName('container', id, className)}>
@@ -36,14 +35,13 @@ const Checkbox = (props) => {
       <label
         htmlFor={id}
         className={buildClassName('label', id)}
-      >{message}</label>
+      />
     </div>
   );
 }
 
 Checkbox.propTypes = {
   id: PropType.string.isRequired,
-  labelLocaleKey: PropType.string,
   className: PropType.string,
   onChange: PropType.func.isRequired,
   checked: PropType.bool.isRequired,

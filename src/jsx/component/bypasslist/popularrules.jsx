@@ -1,11 +1,10 @@
-import initPopularRule from "component/bypasslist/popularrule"
+import PopularRule from 'component/bypasslist/popularrule';
 
 export default function(renderer, app, window, document) {
   const React = renderer.react;
   const {bypasslist} = app.util;
-  const PopularRule = initPopularRule(renderer, app, window, document);
 
-  return class extends React.Component {
+  return class PopularRules extends React.Component {
     constructor(props) {
       super(props);
       this.state = {popularRulesByName: bypasslist.popularRulesByName()};
@@ -19,7 +18,7 @@ export default function(renderer, app, window, document) {
           <div className="popular">
             <div>
               {popularRulesByName.map((name, i) => {
-                return (<PopularRule name={name}/>);
+                return (<PopularRule defaultName={name} key={name} app={app}/>);
               })}
             </div>
           </div>

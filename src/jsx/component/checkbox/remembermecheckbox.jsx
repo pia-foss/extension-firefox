@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import PropType from 'prop-types';
 
-import Checkbox from './checkbox';
-import bind from '../../js/helpers/bind';
-import remove from '../../js/helpers/remove';
+import ManagedCheckbox from './managedcheckbox';
+import bind from '../../../js/helpers/bind';
+import remove from '../../../js/helpers/remove';
 
 class RememberMeCheckbox extends Component {
   constructor (props) {
@@ -14,21 +14,18 @@ class RememberMeCheckbox extends Component {
 
     // Init
     const {remember, name, app: {util: {settings}}} = props;
-    this.state = {
-      checked: remember && settings.getItem(name),
-    };
+    this.defaultChecked = remember && settings.getItem(name);
   }
 
-  onChange () {
+  onChange (checked) {
     const {storage, settings} = this.props.app.util;
-    if(e.target.checked) {
+    if(checked) {
       /* Copy the username and password stored in memory to localStorage */
       storage.setItem("form:username", storage.getItem("form:username", "memoryStorage"), "localStorage")
       storage.setItem("form:password", storage.getItem("form:password", "memoryStorage"), "localStorage")
       /* Forget the username and password stored in memory */
       storage.removeItem("form:username", "memoryStorage")
       storage.removeItem("form:password", "memoryStorage")
-      this.setState(() => ({checked: true}))
       settings.setItem("rememberme", true)
     }
     else {
@@ -42,21 +39,25 @@ class RememberMeCheckbox extends Component {
       /* Forget the username and password stored in localStorage */
       storage.removeItem("form:username", "localStorage")
       storage.removeItem("form:password", "localStorage")
-      this.setState(() => ({checked: false}))
       settings.setItem("rememberme", false)
     }
   }
 
-  extractCheckboxProps () {
-    return remove(this.props, 'remember', 'app');
+  extractCheckboxProps (props) {
+    return remove(props, 'remember', 'app', 'labelLocaleKey');
   }
 
   render () {
     return (
-      <Checkbox
-        onChange={this.onChange}
-        {...this.extractCheckboxProps()}
-      />
+      <div className={`remember-me-container`}>
+        <ManagedCheckbox
+          {...this.extractCheckboxProps(this.props)}
+          defaultChecked={this.defaultChecked}
+          onChange={this.onChange}
+          id="remember-checkbox"
+        />
+        <label htmlFor="remember-checkbox">{t(this.props.labelLocaleKey)}</label>
+      </div>
     )
   }
 }
@@ -65,7 +66,7 @@ RememberMeCheckbox.propTypes = {
   remember: PropType.bool,
   name: PropType.string,
   app: PropType.object.isRequired,
-  labelLocaleKey: PropType.string,
+  labelLocaleKey: PropType.string.isRequired,
 }
 
 export default RememberMeCheckbox;

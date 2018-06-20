@@ -388,14 +388,24 @@ box-shadow:none;
 #pluginleak-protection, #webrtc-protection, #maceprotection {
     margin-left:10px;
 }
-.rememberme input, .rememberme span{
-    float:left;
-    margin-right: 10px;
+
+.remember-me-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+
+    .remember-checkbox-container {
+        margin-right: 10px;
+    }
+
+    > label {
+        font-weight: normal;
+    }
 }
-.rememberme span {
-    font-weight:normal;
-    padding-left:10px;
-}
+// .remember-me-container label {
+//     font-weight:normal;
+//     padding-left:10px;
+// }
 .errorcontainer {
     max-width: 550px;
     margin:auto;
@@ -850,17 +860,29 @@ div#debuglog-template ul time {
     padding: 15px;
 }
 
-.popular-rule .checkbox-container {
-    margin-right: 0px;
+.popular-rule {
+    .checkbox-container {
+        margin-right: 0px;
+    }
+}
+
+.settingitem {
+    .checkbox-container {
+        margin-right: 15px;
+    }
+}
+
+.popular-rule,.settingitem {
+    .checkbox-container {
+        text-align: right;
+        padding-right: 20px;
+        float: right;
+    }
 }
 
 .checkbox-container {
-    text-align:right;
-    padding-right:20px;
     width: 18px;
     position: relative;
-    float: right;
-    margin-right: 15px;
     cursor: pointer;
 
     label.checkbox-label {

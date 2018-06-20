@@ -1,4 +1,4 @@
-import RememberMeCheckbox from 'component/remembermecheckbox';
+import RememberMeCheckbox from './checkbox/remembermecheckbox';
 import initInputField     from 'component/inputfield';
 import onSubmit           from 'eventhandler/templates/login/onsubmit';
 
@@ -31,7 +31,6 @@ export default function(renderer, app, window, document) {
             <div className="form-group">
               <RememberMeCheckbox
                 remember={true}
-                id="rememberme"
                 labelLocaleKey="RememberMe"
                 app={app}
               />
