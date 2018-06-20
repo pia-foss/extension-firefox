@@ -1,6 +1,8 @@
+import Checkbox from './checkbox';
+import bind from '../../js/util/bind';
+
 export default function(renderer, app) {
-  const self   = this,
-        React  = renderer.react,
+  const React  = renderer.react,
         {chromesettings} = app,
         {proxy} = app,
         {settings, regionlist} = app.util
@@ -8,6 +10,10 @@ export default function(renderer, app) {
   return class SettingItem extends React.Component {
     constructor(props) {
       super(props)
+
+      // Bindings
+      this.toggle = bind(this.toggle, this);
+
       this.state = props
     }
 
@@ -20,10 +26,13 @@ export default function(renderer, app) {
           <div className='col-xs-10 settingblock'>
             {this.label()}
           </div>
-          <div className="col-xs-2 checkmarkcontainer">
-            <input onChange={(this.toggle).bind(this)} disabled={!controllable} checked={isChecked} type="checkbox" id={id}/>
-            <label className="checkboxlabel" for={id}></label>
-          </div>
+          <Checkbox
+            className="col-xs-2"
+            onChange={this.toggle}
+            disabled={!controllable}
+            checked={isChecked}
+            id={id}
+          />
         </div>
       )
     }

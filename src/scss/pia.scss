@@ -381,10 +381,6 @@ box-shadow:none;
         cursor: pointer;
     }
 }
-.checkmarkcontainer {
-    text-align:right;
-    padding-right:20px;
-}
 #pluginleak-protection, #webrtc-protection, #maceprotection {
     margin-left:10px;
 }
@@ -850,69 +846,95 @@ div#debuglog-template ul time {
     padding: 15px;
 }
 
-.checkmarkcontainer input[type=checkbox] {
-    width: 18px;
-    height: 18px;
-    margin: 0px !important;
+.popular-rule .checkbox-container {
+    margin-right: 0px;
 }
 
-.checkmarkcontainer {
+.checkbox-container {
+    text-align:right;
+    padding-right:20px;
     width: 18px;
     position: relative;
     float: right;
     margin-right: 15px;
-}
 
-.popular-rule .checkmarkcontainer {
-    margin-right: 0px;
-}
+    label.checkbox-label {
+        cursor: pointer;
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        top: 0;
+        left: 0;
+        background: #fff;
+        border:1px solid #ccc;
+        border-radius: 2px;
+        pointer-events:none
+    }
 
-.checkmarkcontainer label.checkboxlabel {
-    cursor: pointer;
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    top: 0;
-    left: 0;
-    background: #fff;
-    border:1px solid #ccc;
-    border-radius: 2px;
-    pointer-events:none
-}
+    &:after {
+        content: '';
+        display: block;
+        width: 5px;
+        height: 10px;
+        border: 1px solid #5cb85c;
+        border-width: 0 1px 1px 0;
+        transform: rotate(45deg);
+        position: absolute;
+        top: 1px;
+        left: 6px;
+        opacity: 0;
+    }
 
-.checkmarkcontainer label.checkboxlabel:after {
-    content: '';
-    display: block;
-    width: 5px;
-    height: 10px;
-    border: 1px solid #5cb85c;
-    border-width: 0 1px 1px 0;
-    transform: rotate(45deg);
-    position: absolute;
-    top: 1px;
-    left: 6px;
-    opacity: 0;
-}
+    &:hover {
+        label.checkbox-label {
+            border:1px solid #5cb85c;
+            opacity: 1;
+        }
+    }
 
-.checkmarkcontainer input[type=checkbox]:checked + label.checkboxlabel:after {
-    opacity: 1;
-}
+    input[type=checkbox] {
+        width: 18px;
+        height: 18px;
+        margin: 0px !important;
+    }
 
-.checkmarkcontainer input[type=checkbox]:checked + label.checkboxlabel {
-    border: 1px solid #5cb85c;
-}
+    input[type=checkbox]:checked + label.checkbox-label:after {
+        opacity: 1;
+    }
 
-.checkmarkcontainer:hover label.checkboxlabel {
-    border:1px solid #5cb85c;
-    opacity: 1;
-}
+    input[type=checkbox]:checked + label.checkbox-label {
+        border: 1px solid #5cb85c;
+    }
 
-.checkmarkcontainer .dropdown {
-    overflow: hidden;
-    width: 138px;
-    height: 30px;
-    float: right;
-    margin-right: -20px;
+    .dropdown {
+        overflow: hidden;
+        width: 138px;
+        height: 30px;
+        float: right;
+        margin-right: -20px;
+
+        &:before {
+            content: '';
+            display: block;
+            width: 13px;
+            height: 11px;
+            position: absolute;
+            right: 7px;
+            top: 9px;
+            background-image: url(../images/expand_2x.png);
+            background-size: 25px;
+            background-position: -14px -11px;
+            background-repeat: no-repeat;
+        }
+    }
+
+    .dropdown:hover::before {
+        background-position: -14px 0px;
+    }
+
+    input {
+        cursor: pointer;
+    }
 }
 
 #languages {
@@ -936,28 +958,6 @@ div#debuglog-template ul time {
 
 #languages:hover {
     border: 1px solid #5cb85c;
-}
-
-.checkmarkcontainer .dropdown:before {
-    content: '';
-    display: block;
-    width: 13px;
-    height: 11px;
-    position: absolute;
-    right: 7px;
-    top: 9px;
-    background-image: url(../images/expand_2x.png);
-    background-size: 25px;
-    background-position: -14px -11px;
-    background-repeat: no-repeat;
-}
-
-.checkmarkcontainer .dropdown:hover::before {
-    background-position: -14px 0px;
-}
-
-.checkmarkcontainer input {
-    cursor: pointer;
 }
 
 .resetpw {

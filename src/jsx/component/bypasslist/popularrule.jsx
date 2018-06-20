@@ -1,8 +1,10 @@
+import Checkbox from '../checkbox';
+
 export default function(renderer, app, window, document) {
   const React = renderer.react;
   const {bypasslist} = app.util;
 
-  return class extends React.Component {
+  return class PopularRule extends React.Component {
     constructor(props) {
       super(props);
       this.state = {name: props.name, checked: bypasslist.isRuleEnabled(props.name)};
@@ -18,15 +20,11 @@ export default function(renderer, app, window, document) {
               className="noselect col-xs-8">
             {name}
           </label>
-           <div className="col-xs-2 checkmarkcontainer">
-            <input
-              onChange={this.toggleCheckbox.bind(this)}
-              id={name}
+            <Checkbox
+              className="col-xs-2"
               checked={checked}
-              type="checkbox"
+              id={name}
             />
-            <label className="checkboxlabel" for={name}></label>
-          </div>
         </li>
       );
     }
