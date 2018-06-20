@@ -1,6 +1,8 @@
 import React from 'react';
 import PropType from 'prop-types';
 
+import remove from '../../js/helpers/remove';
+
 const buildClassName = function (postfix, name, ...others) {
   let classNames = [`checkbox-${postfix}`];
   if (name) {
@@ -12,9 +14,7 @@ const buildClassName = function (postfix, name, ...others) {
 }
 
 const extractInputProps = function (props) {
-  const {id, labelLocaleKey, className, ...inputProps} = props;
-
-  return inputProps;
+  return remove(props, 'id', 'labelLocaleKey', 'className')
 }
 
 const Checkbox = ({id, labelLocaleKey, className}) => (

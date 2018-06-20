@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import PropType from 'prop-types';
 
 import Checkbox from './checkbox';
-import bind from '../../js/util/bind';
+import bind from '../../js/helpers/bind';
+import remove from '../../js/helpers/remove';
 
 class RememberMeCheckbox extends Component {
   constructor (props) {
@@ -47,9 +48,7 @@ class RememberMeCheckbox extends Component {
   }
 
   extractCheckboxProps () {
-    const {remember, app, ...checkboxProps} = this.props;
-
-    return checkboxProps;
+    return remove(this.props, 'remember', 'app');
   }
 
   render () {

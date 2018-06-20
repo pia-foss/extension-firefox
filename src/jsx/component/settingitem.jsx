@@ -1,5 +1,5 @@
 import Checkbox from './checkbox';
-import bind from '../../js/util/bind';
+import bind from '../../js/helpers/bind';
 
 export default function(renderer, app) {
   const React  = renderer.react,

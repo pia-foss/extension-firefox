@@ -39,6 +39,7 @@
     "tinyhttp": "https://github.com/r-obert/tinyhttp.js"
   },
   "devDependencies": {
+    "babel-plugin-syntax-object-rest-spread": "^6.13.0",
     "eslint": "^4.19.1",
     "eslint-plugin-react": "^7.8.2"
   }
