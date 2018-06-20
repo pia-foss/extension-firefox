@@ -1,11 +1,10 @@
 import RememberMeCheckbox from 'component/remembermecheckbox';
-import initInputField     from 'component/inputfield'
-import onSubmit           from 'eventhandler/templates/login/onsubmit'
+import initInputField     from 'component/inputfield';
+import onSubmit           from 'eventhandler/templates/login/onsubmit';
 
 export default function(renderer, app, window, document) {
   const React           = renderer.react,
-        InputField      = initInputField(renderer, app),
-        RememberMeField = initRememberMeField(renderer, app)
+        InputField      = initInputField(renderer, app);
 
   class LoginForm extends React.Component {
     handleSubmit(event) {
@@ -30,7 +29,12 @@ export default function(renderer, app, window, document) {
               <InputField autocomplete="off" remember={true} storageKey="form:password" localeKey="PasswordPlaceholder" type="password"/>
             </div>
             <div className="form-group">
-              <RememberMeCheckbox remember={true} name="rememberme" labelLocaleKey="RememberMe"/>
+              <RememberMeCheckbox
+                remember={true}
+                id="rememberme"
+                labelLocaleKey="RememberMe"
+                app={app}
+              />
             </div>
             <div className="form-group text-center">
               <button id="submit-form-button" type="submit" className="upcase-bold btn-success form-control">

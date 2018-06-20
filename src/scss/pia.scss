@@ -30,6 +30,10 @@
 
 body {
     font-family: "Roboto", Helvetica, Arial, sans-serif;
+
+    .error-boundary {
+        color: red;
+    }
 }
 
 body a, body a:active, body a:focus, body a:hover {
@@ -857,9 +861,9 @@ div#debuglog-template ul time {
     position: relative;
     float: right;
     margin-right: 15px;
+    cursor: pointer;
 
     label.checkbox-label {
-        cursor: pointer;
         position: absolute;
         width: 18px;
         height: 18px;
@@ -868,21 +872,21 @@ div#debuglog-template ul time {
         background: #fff;
         border:1px solid #ccc;
         border-radius: 2px;
-        pointer-events:none
-    }
+        pointer-events:none;
 
-    &:after {
-        content: '';
-        display: block;
-        width: 5px;
-        height: 10px;
-        border: 1px solid #5cb85c;
-        border-width: 0 1px 1px 0;
-        transform: rotate(45deg);
-        position: absolute;
-        top: 1px;
-        left: 6px;
-        opacity: 0;
+        &:after {
+            content: '';
+            display: block;
+            width: 5px;
+            height: 10px;
+            border: 1px solid #5cb85c;
+            border-width: 0 1px 1px 0;
+            transform: rotate(45deg);
+            position: absolute;
+            top: 1px;
+            left: 6px;
+            opacity: 0;
+        }
     }
 
     &:hover {

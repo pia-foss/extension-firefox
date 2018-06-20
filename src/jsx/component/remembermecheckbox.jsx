@@ -13,7 +13,7 @@ class RememberMeCheckbox extends Component {
     this.onChange = bind(this.onChange, this);
 
     // Init
-    const {remember, name, app: {settings}} = props;
+    const {remember, name, app: {util: {settings}}} = props;
     this.state = {
       checked: remember && settings.getItem(name),
     };
@@ -64,7 +64,7 @@ class RememberMeCheckbox extends Component {
 RememberMeCheckbox.propTypes = {
   remember: PropType.bool,
   name: PropType.string,
-  app: PropType.object,
+  app: PropType.object.isRequired,
   labelLocaleKey: PropType.string,
 }
 

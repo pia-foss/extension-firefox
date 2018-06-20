@@ -9,7 +9,7 @@
  */
 module.exports = function (obj, ...removals) {
   return Object.keys(obj)
-    .filter(key => removals.includes(key))
+    .filter(key => !removals.includes(key))
     .map(key => ({key, value: obj[key]}))
     .reduce((accum, {key, value}) => {
       return {
