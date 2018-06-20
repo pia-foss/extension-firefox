@@ -5,7 +5,7 @@ import remove from '../../../js/helpers/remove';
 import ErrorBoundary from '../../hoc/errorboundary';
 
 const extractInputProps = (props) => {
-  return remove(props, 'id', 'className')
+  return remove(props, 'className')
 }
 
 const buildClassName = (postfix, id, ...others) => {
@@ -20,17 +20,15 @@ const buildClassName = (postfix, id, ...others) => {
 
 const Checkbox = (props) => {
 
-  const {id, className, onChange} = props;
+  const {id, className} = props;
 
   return (
     <div className={buildClassName('container', id, className)}>
       <input
+        {...extractInputProps(props)}
         name={id}
         className={buildClassName('input', id)}
         type="checkbox"
-        id={id}
-        onChange={onChange}
-        {...extractInputProps(props)}
       />
       <label
         htmlFor={id}
