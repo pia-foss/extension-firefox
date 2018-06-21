@@ -1,13 +1,12 @@
-import initPageTitle    from 'component/pagetitle'
-import initPopularRules from 'component/bypasslist/popularrules'
-import initUserRules    from 'component/bypasslist/userrules'
+import initPageTitle    from 'component/pagetitle';
+import initUserRules    from 'component/bypasslist/userrules';
+import PopularRules     from 'component/bypasslist/popularrules';
 
 export default function(renderer, app, window, document) {
   const React   = renderer.react,
         {proxy} = app,
         {regionlist} = app.util,
         PageTitle = initPageTitle(renderer, app, window, document),
-        PopularRules = initPopularRules(renderer, app, window, document),
         UserRules    = initUserRules(renderer, app, window, document)
 
   return class extends React.Component {
@@ -20,7 +19,7 @@ export default function(renderer, app, window, document) {
           </div>
           <div className="bypass-wrap">
             <p className="introtext" dangerouslySetInnerHTML={{__html: t("BypassWarning")}} />
-            <PopularRules/>
+            <PopularRules app={app}/>
             <UserRules/>
           </div>
         </div>
