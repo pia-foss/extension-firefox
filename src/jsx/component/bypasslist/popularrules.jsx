@@ -1,29 +1,27 @@
+import React from 'react';
+import PropType from 'prop-types';
+
 import PopularRule from 'component/bypasslist/popularrule';
 
-export default function(renderer, app, window, document) {
-  const React = renderer.react;
-  const {bypasslist} = app.util;
+const PopularRules = ({app}) => {
+  const popularRulesByName = app.util.bypasslist.popularRulesByName();
 
-  return class PopularRules extends React.Component {
-    constructor(props) {
-      super(props);
-      this.state = {popularRulesByName: bypasslist.popularRulesByName()};
-    }
-
-    render() {
-      const {popularRulesByName} = this.state;
-      return (
+  return (
+    <div>
+      <h3 className="bl_sectionheader">{t("PopularWebsites")}</h3>
+      <div className="popular">
         <div>
-          <h3 className="bl_sectionheader">{t("PopularWebsites")}</h3>
-          <div className="popular">
-            <div>
-              {popularRulesByName.map((name, i) => {
-                return (<PopularRule defaultName={name} key={name} app={app}/>);
-              })}
-            </div>
-          </div>
+          {popularRulesByName.map((name, i) => {
+            return (<PopularRule defaultName={name} key={name} app={app}/>);
+          })}
         </div>
-      );
-    }
-  }
+      </div>
+    </div>
+  );
 }
+
+PopularRules.propTypes = {
+  app: PropType.object.isRequired,
+}
+
+export default PopularRules;

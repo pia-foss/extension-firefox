@@ -2,6 +2,7 @@
   "private": true,
   "dependencies": {
     "babel-core": "^6.26.3",
+    "babel-plugin-syntax-object-rest-spread": "^6.13.0",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-polyfill": "^6.26.0",
     "babel-preset-es2015": "^6.9.0",
@@ -39,7 +40,6 @@
     "tinyhttp": "https://github.com/r-obert/tinyhttp.js"
   },
   "devDependencies": {
-    "babel-plugin-syntax-object-rest-spread": "^6.13.0",
     "eslint": "^4.19.1",
     "eslint-plugin-react": "^7.8.2"
   }

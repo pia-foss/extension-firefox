@@ -3,14 +3,13 @@ import PropType from 'prop-types';
 
 import ErrorBoundary from '../../hoc/errorboundary';
 import Checkbox from '../checkbox';
-import bind from '../../../js/helpers/bind';
 
 class PopularRule extends Component {
   constructor(props) {
     super(props);
 
     // Bindings
-    this.onChange = bind(this.onChange, this);
+    this.onChange = this.onChange.bind(this);
 
     // Init
     const {defaultName, app: {util: {bypasslist}}} = props;

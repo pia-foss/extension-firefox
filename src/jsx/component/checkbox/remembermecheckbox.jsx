@@ -1,20 +1,23 @@
 import React, {Component} from 'react';
 import PropType from 'prop-types';
 
-import ManagedCheckbox from './managedcheckbox';
-import bind from '../../../js/helpers/bind';
-import remove from '../../../js/helpers/remove';
+import UncontrolledCheckbox from './uncontrolledcheckbox';
 
+/**
+ * Checkbox to toggle where user credentials are stored (memory/localStorage)
+ *
+ * Only one of these should exist on the view at a time
+ */
 class RememberMeCheckbox extends Component {
   constructor (props) {
     super(props);
 
     // Bindings
-    this.onChange = bind(this.onChange, this);
+    this.onChange = this.onChange.bind(this);
 
     // Init
-    const {remember, name, app: {util: {settings}}} = props;
-    this.defaultChecked = remember && settings.getItem(name);
+    const {remember, app: {util: {settings}}} = props;
+    this.defaultChecked = remember && settings.getItem('rememberme');
   }
 
   onChange (checked) {
@@ -43,15 +46,10 @@ class RememberMeCheckbox extends Component {
     }
   }
 
-  extractCheckboxProps (props) {
-    return remove(props, 'remember', 'app', 'labelLocaleKey');
-  }
-
   render () {
     return (
       <div className={`remember-me-container`}>
-        <ManagedCheckbox
-          {...this.extractCheckboxProps(this.props)}
+        <UncontrolledCheckbox
           defaultChecked={this.defaultChecked}
           onChange={this.onChange}
           id="remember-checkbox"
@@ -64,7 +62,6 @@ class RememberMeCheckbox extends Component {
 
 RememberMeCheckbox.propTypes = {
   remember: PropType.bool,
-  name: PropType.string,
   app: PropType.object.isRequired,
   labelLocaleKey: PropType.string.isRequired,
 }

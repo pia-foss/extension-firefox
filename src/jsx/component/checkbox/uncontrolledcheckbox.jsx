@@ -2,15 +2,20 @@ import React, {Component} from 'react';
 import PropType from 'prop-types';
 
 import Checkbox from '.';
-import bind from '../../../js/helpers/bind';
-import remove from '../../../js/helpers/remove';
 
-class ManagedCheckbox extends Component {
+/**
+ * Uncontrolled version of Checkbox
+ *
+ * Manages checked status internally. Used instead of
+ * uncontrolled <input type="checkbox" /> in order to
+ * share same style as other checkboxes in application.
+ */
+class UncontrolledCheckbox extends Component {
   constructor (props) {
     super(props);
 
     // Bindings
-    this.onChange = bind(this.onChange, this);
+    this.onChange = this.onChange.bind(this);
 
     // Init
     const checked = typeof props.defaultChecked === 'undefined' ? false : props.defaultChecked;
@@ -19,10 +24,6 @@ class ManagedCheckbox extends Component {
 
   onChange () {
     this.setState(({checked}) => ({checked: !checked}));
-  }
-
-  extractCheckboxProps (props) {
-    return remove(props, 'onChange', 'defaultChecked');
   }
 
   componentDidUpdate (prevState) {
@@ -34,13 +35,27 @@ class ManagedCheckbox extends Component {
   }
 
   render () {
-    return <Checkbox {...this.extractCheckboxProps(this.props)} checked={this.state.checked} onChange={this.onChange} />;
+    const {
+      id,
+      className,
+    } = this.props;
+
+    return (
+      <Checkbox
+        id={id}
+        className={className}
+        checked={this.state.checked}
+        onChange={this.onChange}
+      />
+    );
   }
 }
 
-ManagedCheckbox.propTypes = {
+UncontrolledCheckbox.propTypes = {
+  id: PropType.string.isRequired,
+  className: PropType.string,
   defaultChecked: PropType.bool,
   onChange: PropType.func,
 }
 
-export default ManagedCheckbox;
+export default UncontrolledCheckbox;

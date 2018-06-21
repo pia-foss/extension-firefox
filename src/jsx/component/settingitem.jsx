@@ -1,5 +1,4 @@
 import Checkbox from './checkbox';
-import bind from '../../js/helpers/bind';
 
 export default function(renderer, app) {
   const React  = renderer.react,
@@ -12,8 +11,7 @@ export default function(renderer, app) {
       super(props)
 
       // Bindings
-      this.toggle = bind(this.toggle, this);
-
+      this.toggle = this.toggle.bind(this);
       this.state = props
     }
 
