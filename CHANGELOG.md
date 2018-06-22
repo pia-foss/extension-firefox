@@ -12,6 +12,12 @@ __v1.1.0__
 
 * Add Favorite Region view
 
+__v1.0.13__
+
+* Update helpdesk links
+
+* Update translations for new Berlin region.
+
 __v1.0.11__
 
 * Fixed a bug where choosing a popular rule in the bypass list kills the proxy.
