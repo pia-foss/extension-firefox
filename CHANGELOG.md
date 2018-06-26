@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.1.6__
+
+* Fixed input & checkbox styling on linux
+
 __v1.1.2__
 
 * Update project dependencies
