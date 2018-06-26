@@ -25,6 +25,7 @@
     "proxy",
     "privacy",
     "alarms",
+    "downloads",
     "<all_urls>"
   ],
   "content_scripts": [

@@ -2,7 +2,7 @@ export default function(renderer, app, window, document) {
   const React = renderer.react;
   const {bypasslist} = app.util;
 
-  return class extends React.Component {
+  return class PopularRule extends React.Component {
     constructor(props) {
       super(props);
       this.state = {name: props.name, checked: bypasslist.isRuleEnabled(props.name)};
@@ -25,7 +25,7 @@ export default function(renderer, app, window, document) {
               checked={checked}
               type="checkbox"
             />
-            <label className="checkboxlabel" for={name}></label>
+            <label className="checkboxlabel" htmlFor={name}></label>
           </div>
         </li>
       );

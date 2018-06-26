@@ -15,26 +15,28 @@ export default function(app) {
         listeners.get("NewMessage").forEach((func) => func(stringify(message)));
       }
     }
-  }
+
+    return message;
+  };
 
   this.getEntries = () => {
     return Array.from(entries).reverse();
-  }
+  };
 
   this.removeEntries = () => {
     entries = [];
-  }
+  };
 
   this.addEventListener = (event, func) => {
     listeners.get(event).push(func);
-  }
+  };
 
   this.removeEventListener = (event, func) => {
     const funcs = listeners.get(event);
     Array.from(funcs).forEach((f, index) => {
       if (f === func) { delete(funcs[index]); }
     });
-  }
+  };
 
   return this;
 }
