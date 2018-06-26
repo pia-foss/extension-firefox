@@ -27,7 +27,7 @@ import BrowserProxy          from "chromesettings/proxy";
 
 import eventhandler from "eventhandler/eventhandler";
 
-(new function(window) {
+(function (window) {
   const self = Object.create(null);
 
   self.frozen = @@freezeApp;
@@ -93,4 +93,4 @@ import eventhandler from "eventhandler/eventhandler";
       debug(`Proxy error: ${error.message}`);
     });
   }
-}(window, document))
+}(window))

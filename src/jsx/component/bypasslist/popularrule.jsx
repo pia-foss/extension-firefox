@@ -28,7 +28,7 @@ class PopularRule extends Component {
   }
 
   render() {
-    const {defaultName} = this.props
+    const {defaultName} = this.props;
     return (
       <li style={{padding: "5px"}} className="list-group-item col-xs-4 popular-rule">
         <label
