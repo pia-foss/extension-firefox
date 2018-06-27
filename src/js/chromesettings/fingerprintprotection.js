@@ -23,11 +23,11 @@ export default function(app) {
     .catch((error) => {
       debug(`fingerprintprotection.js: block failed (${error})`);
       return self;
-    })
+    });
   }
 
   self.clearSetting = () => {
-    return self._clear({})
+    return self._set({value: false}, {applyValue: true})
     .then(() => {
       debug("fingerprintprotection.js: unblock ok");
       return self;
@@ -35,7 +35,7 @@ export default function(app) {
     .catch((error) => {
       debug(`fingerprintprotection.js: unblock failed (${error})`);
       return self;
-    })
+    });
   }
 
   return self;

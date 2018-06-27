@@ -47,11 +47,21 @@ export default class MockAppAdapter {
         return resolve({});
       }
       else if (message.type === 'enablePopularRule') {
-        app.util.bypasslist.enablePopularRule(message.data, true);
+        if (message.data.restartProxy === false) {
+          app.util.bypasslist.enablePopularRule(message.data.name, true, false);
+        }
+        else {
+          app.util.bypasslist.enablePopularRule(message.data.name, true);
+        }
         return resolve({});
       }
       else if (message.type === 'disablePopularRule') {
-        app.util.bypasslist.disablePopularRule(message.data, true);
+        if (message.data.restartProxy === false) {
+          app.util.bypasslist.disablePopularRule(message.data.name, true, false);
+        }
+        else {
+          app.util.bypasslist.disablePopularRule(message.data.name, true);
+        }
         return resolve({});
       }
       else if (message.type === 'setUserRules') {
