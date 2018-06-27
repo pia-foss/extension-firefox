@@ -67,6 +67,8 @@ import eventhandler from "eventhandler/eventhandler";
   self.chromesettings.fingerprintprotection = new fingerprintprotection(self);
   self.chromesettings = Object.freeze(self.chromesettings);
 
+  self.util.bypasslist.init();
+  
   (() => {
     const {proxy} = self;
     const {user,settings,storage,regionlist} = self.util;
