@@ -27,7 +27,7 @@ export default function(app) {
   }
 
   self.clearSetting = () => {
-    return self._clear()
+    return self._set({value: false}, {applyValue: true})
     .then(() => {
       debug(`trackingprotection.js: unblock ok`);
       return self;
