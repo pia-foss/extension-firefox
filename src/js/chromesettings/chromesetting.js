@@ -27,12 +27,13 @@ export default function(chromeSetting, blockedPredicate) {
   self.isBlocked = () => blocked;
   self.isApplied = () => applied;
 
-  self._set = (options) => {
+  self._set = (options, override) => {
     return new Promise((resolve, reject) => {
       if(self.isControllable()) {
         chromeSetting.set(Object.assign({}, defaultSetOptions, options), () => {
           if(chrome.runtime.lastError === null) {
-            applied = true;
+            if (override && override.applyValue) { applied = options.value; }
+            else { applied = true; }
             resolve();
           }
           else { reject(chrome.runtime.lastError); }
