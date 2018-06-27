@@ -61,6 +61,9 @@ export default class MockApp {
     this.util.errorinfo = new errorinfo(self);
     this.util = Object.freeze(this.util);
 
+    // NOTE: Do not initialize the bypass list here,
+    // it will be taken care of in the initialize function below
+
     // TODO: doesn't work because of babel running too late
     // this.eventhandler = new eventhandler(self);
 
@@ -92,8 +95,8 @@ export default class MockApp {
       }
 
       // set bypasslist rules
-      const userRuleKey = this.util.bypasslist.userRulesStorageKey;
-      const popRuleKey = this.util.bypasslist.popularRulesStorageKey;
+      const userRuleKey = this.util.bypasslist._storageKeys.userrk;
+      const popRuleKey = this.util.bypasslist._storageKeys.poprk;
       this.util.storage.setItem(userRuleKey, app.util.bypasslist.user);
       this.util.storage.setItem(popRuleKey, app.util.bypasslist.popular);
       this.util.bypasslist.resetPopularRules();
