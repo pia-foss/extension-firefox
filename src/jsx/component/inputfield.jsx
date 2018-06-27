@@ -3,21 +3,21 @@ export default function(renderer, app) {
         storage  = app.util.storage,
         settings = app.util.settings,
         user     = app.util.user,
-        i18n     = chrome.i18n
+        i18n     = chrome.i18n;
 
   class InputField extends React.Component {
     constructor(props) {
-      super(props)
+      super(props);
       this.state = {
         storageKey: this.props.storageKey,
         localeKey: this.props.localeKey,
         type: this.props.type,
         autocomplete: this.props.autocomplete || "on"
-      }
+      };
     }
 
     handleKeyPress(e) {
-      storage.setItem(this.state.storageKey, e.target.value, user.storageBackend())
+      storage.setItem(this.state.storageKey, e.target.value, user.storageBackend());
     }
 
     render() {
@@ -25,7 +25,7 @@ export default function(renderer, app) {
             storageKey      = this.state.storageKey,
             localeKey       = this.state.localeKey,
             type            = this.state.type,
-            autocomplete    = this.state.autocomplete
+            autocomplete    = this.state.autocomplete;
       return (
         <input name={storageKey}
                autoComplete={autocomplete}
@@ -34,9 +34,10 @@ export default function(renderer, app) {
                placeholder={i18n.getMessage(localeKey)}
                className="pia-form-control form-control"
                type={type}
-        />)
+        />
+      );
     }
   }
 
-  return InputField
+  return InputField;
 }
