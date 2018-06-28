@@ -38,6 +38,25 @@ export default class MockAppAdapter {
         app.util.user.authing = message.data;
         return resolve({});
       }
+      else if (message.type === 'util.user.setUsername') {
+        const {username} = message.data;
+        app.util.user.setUsername(username, true);
+        return resolve({});
+      }
+      else if (message.type === 'util.user.setPassword') {
+        const {password} = message.data;
+        app.util.user.setPassword(password, true);
+        return resolve({});
+      }
+      else if (message.type === 'util.user.setRememberMe') {
+        const {rememberMe} = message.data;
+        app.util.user.setRememberMe(rememberMe, true);
+        return resolve({});
+      }
+      else if (message.type === 'util.user.removeUsernameAndPasswordFromStorage') {
+        app.util.user.removeUsernameAndPasswordFromStorage(true);
+        return resolve({});
+      }
       else if (message.type === 'util.regionlist.region') {
         app.util.regionlist.setSelectedRegion(message.data, true);
         return resolve({});

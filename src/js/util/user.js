@@ -6,7 +6,9 @@ TODO: setUsername and setPassword must propagate changes to backend
 TODO: All calls to change rememberme should be done via user util
 TODO: All calls to retrieve password/username should use user util
 TODO: Handle messages to adapter
-FIXME: Broke logging out
+TODO: Make sure it's okay to set settings before user/proxy etc
+FIXME: Memory storage isn't working?
+FIXME: Can't reproduce session logging out
 */
 
 class User {
@@ -23,6 +25,7 @@ class User {
     this.inStorage = this.inStorage.bind(this);
     this.auth = this.auth.bind(this);
     this.logout = this.logout.bind(this);
+    this.getRememberMe = this.getRememberMe.bind(this);
 
     // init
     ({
@@ -44,35 +47,77 @@ class User {
     return this._settings.getItem('rememberme') ? 'localStorage' : 'memoryStorage';
   }
 
+  unusedBackend () {
+    return this.settings.getItem('rememberme') ? 'memoryStorage' : 'localStorage';
+  }
+
+  /**
+   * Set the value of remember me, and swap credentials over to new storage medium
+   *
+   * @param {boolean} rememberMe Whether the user should be remembered past the current session
+   * @param {boolean} bridged Whether this should trigger changes on the backend
+   *
+   * @returns {void}
+   */
   setRememberMe(rememberMe, bridged) {
-    this._settings.setItem('rememberme', Boolean(rememberMe), bridged);
+    const prevRememberMe = this.getRememberMe();
+    if (rememberMe !== prevRememberMe) {
+      // Get username and password and remove from previous storage
+      const username = this.getUsername();
+      const password = this.getPassword();
+      this.removeUsernameAndPasswordFromStorage(true);
+
+      // Swap storage
+      this._settings.setItem('rememberme', Boolean(rememberMe), true);
+
+      // Set username and password in new storage
+      this.setUsername(username, true);
+      this.setPassword(password, true);
+      if (!bridged) {
+        this._adapter.sendMessage('util.user.setRememberMe', { rememberMe });
+      }
+    }
+  }
+
+  getRememberMe() {
+    return this._settings.getItem('rememberme');
   }
 
   inLocalStorage() {
     return this.storageBackend() === 'localStorage';
   }
 
-  username() {
+  getUsername() {
     const username = this._storage.getItem('form:username', this.storageBackend());
     return typeof username === 'string' ? username.trim() : '';
   }
 
-  password() {
+  getPassword() {
     const password = this._storage.getItem('form:password', this.storageBackend());
     return password || '';
+  }
+
+  password() {
+    console.log('user.password() is deprecated, please use user.getPassword() instead');
+    return this.getPassword();
+  }
+
+  username() {
+    console.log('user.username() is deprecated, please use user.getUsername() instead');
+    return this.getUsername();
   }
 
   setUsername(username, bridged) {
     this._storage.setItem('form:username', username, this.storageBackend());
     if (!bridged) {
-      this._adapter.sendMessage('user.setUsername', {username});
+      this._adapter.sendMessage('util.user.setUsername', {username});
     }
   }
 
   setPassword(password, bridged) {
     this._storage.setItem('form:password', password, this.storageBackend());
     if (!bridged) {
-      this._adapter.sendMessage('user.setPassword', {password});
+      this._adapter.sendMessage('util.user.setPassword', {password});
     }
   }
 
@@ -80,7 +125,7 @@ class User {
     this._storage.removeItem('form:username', this.storageBackend());
     this._storage.removeItem('form:password', this.storageBackend());
     if (!bridged) {
-      this._adapter.sendMessage('user.removeUsernameAndPasswordFromStorage');
+      this._adapter.sendMessage('util.user.removeUsernameAndPasswordFromStorage');
     }
   }
 
@@ -93,7 +138,7 @@ class User {
           password = this.password(),
           headers  = {'Authorization': `Basic ${btoa(unescape(encodeURIComponent(`${username}:${password}`)))}`};
     debug('user.js: start auth');
-    return http.head("/api/client/auth", {headers, timeout: this.authTimeout}).then((xhr) => {
+    return this._http.head("/api/client/auth", {headers, timeout: this.authTimeout}).then((xhr) => {
       this.authing = false;
       this._adapter.sendMessage('util.user.authing', false);
       this.authed = true;
