@@ -1,5 +1,5 @@
 export default function(app) {
-  const {storage} = app.util
+  const {storage} = app.util;
 
   this.setDefaults = () => {
     const {chromesettings} = app,
@@ -7,40 +7,40 @@ export default function(app) {
             "blockutm":              true,
             "maceprotection":        true,
             "debugmode":             false,
-            "rememberme":            true
-          }
+            "rememberme":            true,
+          };
     for(let k in chromesettings) {
-      let s = chromesettings[k]
-      defaults[s.settingID] = s.settingDefault
+      let s = chromesettings[k];
+      defaults[s.settingID] = s.settingDefault;
     }
     Object.keys(defaults).forEach((key) => {
       if(!this.hasItem(key))
-        this.setItem(key, defaults[key])
-    })
-  }
+        this.setItem(key, defaults[key]);
+    });
+  };
 
   this.hasItem = (key) => {
-    return storage.hasItem(`settings:${key}`)
-  }
+    return storage.hasItem(`settings:${key}`);
+  };
 
   this.getItem = (key) => {
-    return storage.getItem(`settings:${key}`) === "true"
-  }
+    return storage.getItem(`settings:${key}`) === "true";
+  };
 
   this.setItem = (key, value, bridged) => {
     if(value === true || value === "true") {
-      storage.setItem(`settings:${key}`, "true")
+      storage.setItem(`settings:${key}`, "true");
       if (!bridged) {
-        app.adapter.sendMessage('updateSettings', {key:`${key}`, value: 'true'})
+        app.adapter.sendMessage('updateSettings', {key:`${key}`, value: 'true'});
       }
     }
     else{
-      storage.setItem(`settings:${key}`, "false")
+      storage.setItem(`settings:${key}`, "false");
       if (!bridged) {
-        app.adapter.sendMessage('updateSettings', {key:`${key}`, value: 'false'})
+        app.adapter.sendMessage('updateSettings', {key:`${key}`, value: 'false'});
       }
     }
-  }
+  };
 
-  return this
+  return this;
 }
