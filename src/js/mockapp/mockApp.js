@@ -147,12 +147,6 @@ export default class MockApp {
         this.util.regionlist.setSelectedRegion(message.data, true);
         return resolve({});
       }
-      else if (message.type === 'requestAuthTransfer') {
-        return resolve({
-          username: this.util.user.username(),
-          password: this.util.user.password()
-        });
-      }
       else { return resolve({}); }
     })
     .then(response) // eslint-disable-line dot-location

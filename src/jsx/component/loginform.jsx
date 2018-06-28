@@ -56,7 +56,7 @@ export default function(renderer, app, window, document) {
                 name="username"
                 type="text"
                 localeKey="UsernamePlaceholder"
-                defaultValue={user.username()}
+                defaultValue={user.getUsername()}
                 onChange={this.onInputChange}
               />
             </div>
@@ -66,7 +66,7 @@ export default function(renderer, app, window, document) {
                 name="password"
                 type="password"
                 localeKey="PasswordPlaceholder"
-                defaultValue={user.password()}
+                defaultValue={user.getPassword()}
                 onChange={this.onInputChange}
               />
             </div>

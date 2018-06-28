@@ -19,6 +19,8 @@ class User {
     this.inLocalStorage = this.inLocalStorage.bind(this);
     this.username = this.username.bind(this);
     this.password = this.password.bind(this);
+    this.getUsername = this.getUsername.bind(this);
+    this.getPassword = this.getPassword.bind(this);
     this.setUsername = this.setUsername.bind(this);
     this.setPassword = this.setPassword.bind(this);
     this.removeUsernameAndPasswordFromStorage = this.removeUsernameAndPasswordFromStorage.bind(this);
@@ -99,11 +101,13 @@ class User {
 
   password() {
     console.log('user.password() is deprecated, please use user.getPassword() instead');
+    console.trace && console.trace();
     return this.getPassword();
   }
 
   username() {
     console.log('user.username() is deprecated, please use user.getUsername() instead');
+    console.trace && console.trace();
     return this.getUsername();
   }
 
@@ -130,12 +134,12 @@ class User {
   }
 
   inStorage() {
-    return this.username().length > 0 && this.password().length > 0;
+    return this.getUsername().length > 0 && this.getPassword().length > 0;
   }
 
   auth() {
-    const username = this.username(),
-          password = this.password(),
+    const username = this.getUsername(),
+          password = this.getPassword(),
           headers  = {'Authorization': `Basic ${btoa(unescape(encodeURIComponent(`${username}:${password}`)))}`};
     debug('user.js: start auth');
     return this._http.head("/api/client/auth", {headers, timeout: this.authTimeout}).then((xhr) => {
@@ -144,7 +148,6 @@ class User {
       this.authed = true;
       this._adapter.sendMessage('util.user.authed', true);
       this._icon.updateTooltip();
-      this._adapter.sendMessage('initAuthTransfer');
       debug("user.js: auth ok");
       return xhr;
     }).catch((xhr) => {
