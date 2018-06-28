@@ -6,7 +6,7 @@ TODO: setUsername and setPassword must propagate changes to backend
 TODO: All calls to change rememberme should be done via user util
 TODO: All calls to retrieve password/username should use user util
 TODO: Handle messages to adapter
-TODO: Fix references to app
+FIXME: Broke logging out
 */
 
 class User {
@@ -29,7 +29,10 @@ class User {
       util: {
         storage: this._storage,
         settings: this._settings,
-      }
+        icon: this._icon,
+      },
+      adapter: this._adapter,
+      proxy: this._proxy,
     } = app);
     this._http = tinyhttp('https://www.privateinternetaccess.com');
     this.authed = false;
@@ -38,11 +41,11 @@ class User {
   }
 
   storageBackend() {
-    return settings.getItem('rememberme') ? 'localStorage' : 'memoryStorage';
+    return this._settings.getItem('rememberme') ? 'localStorage' : 'memoryStorage';
   }
 
   setRememberMe(rememberMe, bridged) {
-    settings.setItem('rememberme', Boolean(rememberMe), bridged);
+    this._settings.setItem('rememberme', Boolean(rememberMe), bridged);
   }
 
   inLocalStorage() {
@@ -50,34 +53,34 @@ class User {
   }
 
   username() {
-    const username = storage.getItem('form:username', this.storageBackend());
+    const username = this._storage.getItem('form:username', this.storageBackend());
     return typeof username === 'string' ? username.trim() : '';
   }
 
   password() {
-    const password = storage.getItem('form:password', this.storageBackend());
+    const password = this._storage.getItem('form:password', this.storageBackend());
     return password || '';
   }
 
   setUsername(username, bridged) {
-    storage.setItem('form:username', username, this.storageBackend());
+    this._storage.setItem('form:username', username, this.storageBackend());
     if (!bridged) {
-      app.adapter.sendMessage('user.setUsername', {username});
+      this._adapter.sendMessage('user.setUsername', {username});
     }
   }
 
   setPassword(password, bridged) {
-    storage.setItem('form:password', password, this.storageBackend());
+    this._storage.setItem('form:password', password, this.storageBackend());
     if (!bridged) {
-      app.adapter.sendMessage('user.setPassword', {password});
+      this._adapter.sendMessage('user.setPassword', {password});
     }
   }
 
   removeUsernameAndPasswordFromStorage(bridged) {
-    storage.removeItem('form:username', this.storageBackend());
-    storage.removeItem('form:password', this.storageBackend());
+    this._storage.removeItem('form:username', this.storageBackend());
+    this._storage.removeItem('form:password', this.storageBackend());
     if (!bridged) {
-      app.adapter.sendMessage('user.removeUsernameAndPasswordFromStorage');
+      this._adapter.sendMessage('user.removeUsernameAndPasswordFromStorage');
     }
   }
 
@@ -88,39 +91,33 @@ class User {
   auth() {
     const username = this.username(),
           password = this.password(),
-          {icon}   = app.util,
           headers  = {'Authorization': `Basic ${btoa(unescape(encodeURIComponent(`${username}:${password}`)))}`};
     debug('user.js: start auth');
     return http.head("/api/client/auth", {headers, timeout: this.authTimeout}).then((xhr) => {
       this.authing = false;
-      app.adapter.sendMessage('util.user.authing', false);
+      this._adapter.sendMessage('util.user.authing', false);
       this.authed = true;
-      app.adapter.sendMessage('util.user.authed', true);
-      icon.updateTooltip();
-      app.adapter.sendMessage('initAuthTransfer');
+      this._adapter.sendMessage('util.user.authed', true);
+      this._icon.updateTooltip();
+      this._adapter.sendMessage('initAuthTransfer');
       debug("user.js: auth ok");
       return xhr;
     }).catch((xhr) => {
       this.authing = false;
-      app.adapter.sendMessage('util.user.authing', false);
+      this._adapter.sendMessage('util.user.authing', false);
       this.authed = false;
-      app.adapter.sendMessage('util.user.authed', false);
+      this._adapter.sendMessage('util.user.authed', false);
       debug(`user.js: auth error, ${xhr.tinyhttp.cause}`);
-      throw(xhr);
+      throw xhr;
     });
   }
 
   logout(afterLogout) {
-    const {
-      proxy,
-      util: {icon}
-    } = app;
-
-    return proxy.disable().then(() => {
+    return this._proxy.disable().then(() => {
       this.authed = false;
-      app.adapter.sendMessage('util.user.authed', false);
+      this._adapter.sendMessage('util.user.authed', false);
       this.removeUsernameAndPasswordFromStorage();
-      icon.updateTooltip();
+      this._icon.updateTooltip();
       if (afterLogout) {
         afterLogout();
       }
