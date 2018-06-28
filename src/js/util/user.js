@@ -1,16 +1,5 @@
 import tinyhttp from "tinyhttp";
 
-/*
-TODO: All calls to change username/password should use user util
-TODO: setUsername and setPassword must propagate changes to backend
-TODO: All calls to change rememberme should be done via user util
-TODO: All calls to retrieve password/username should use user util
-TODO: Handle messages to adapter
-TODO: Make sure it's okay to set settings before user/proxy etc
-FIXME: Memory storage isn't working?
-FIXME: Can't reproduce session logging out
-*/
-
 class User {
   constructor (app) {
     // bindings

@@ -5,7 +5,7 @@ const LoginField = ({ name, localeKey, autocomplete, type, onChange, defaultValu
   return (
     <input
       name={name}
-      placeholder={t(localeKey) /* TODO: Is it okay to replace with t()? */}
+      placeholder={t(localeKey)}
       autoComplete={autocomplete || 'on'}
       type={type}
       onChange={onChange}
