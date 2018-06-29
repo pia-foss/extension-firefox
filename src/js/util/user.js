@@ -38,10 +38,6 @@ class User {
     return this._settings.getItem('rememberme') ? 'localStorage' : 'memoryStorage';
   }
 
-  unusedBackend () {
-    return this.settings.getItem('rememberme') ? 'memoryStorage' : 'localStorage';
-  }
-
   /**
    * Set the value of remember me, and swap credentials over to new storage medium
    *

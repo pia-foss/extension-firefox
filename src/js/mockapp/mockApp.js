@@ -81,6 +81,9 @@ export default class MockApp {
       if (!app) { return Promise.resolve(); }
 
       // set settings values
+      // it is critical the settings are intiialized before setting up the user
+      // to ensure "remember me" is set and user credentials are saved to the
+      // correct storage location via setUsername and setPassword
       for(let key in app.util.settings) {
         this.util.settings.setItem(key, app.util.settings[key], true);
       }
