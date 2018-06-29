@@ -1,12 +1,10 @@
-import initInputField      from 'component/inputfield'
-import initCheckboxField   from 'component/checkboxfield'
-import initRememberMeField from 'component/remembermefield'
-import onSubmit            from 'eventhandler/templates/login/onsubmit'
+import RememberMeCheckbox from './checkbox/remembermecheckbox';
+import initInputField     from 'component/inputfield';
+import onSubmit           from 'eventhandler/templates/login/onsubmit';
 
 export default function(renderer, app, window, document) {
   const React           = renderer.react,
-        InputField      = initInputField(renderer, app),
-        RememberMeField = initRememberMeField(renderer, app)
+        InputField      = initInputField(renderer, app);
 
   class LoginForm extends React.Component {
     handleSubmit(event) {
@@ -31,14 +29,18 @@ export default function(renderer, app, window, document) {
               <InputField autocomplete="off" remember={true} storageKey="form:password" localeKey="PasswordPlaceholder" type="password"/>
             </div>
             <div className="form-group">
-              <RememberMeField remember={true} name="rememberme" labelLocaleKey="RememberMe"/>
+              <RememberMeCheckbox
+                remember={true}
+                labelLocaleKey="RememberMe"
+                app={app}
+              />
             </div>
             <div className="form-group text-center">
               <button id="submit-form-button" type="submit" className="upcase-bold btn-success form-control">
                 {t('LoginText')}
               </button>
               <div className="resetpw text-center">
-                <a href={this.resetPasswordURL()} target="_blank">
+                <a href={this.resetPasswordURL()} target="_blank" rel="noopener noreferrer">
                   {t("ResetPasswordText")}
                 </a>
               </div>

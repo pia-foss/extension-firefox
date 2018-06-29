@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.1.6__
+
+* Fixed input & checkbox styling on linux
+
 __v1.1.5__
 
 * Fixed bug where some extension settings were not being synced with the browser.
