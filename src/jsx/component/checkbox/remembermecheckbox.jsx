@@ -22,12 +22,6 @@ class RememberMeCheckbox extends Component {
 
   onChange (checked) {
     const {user} = this.props.app.util;
-    if(checked) {
-      settings.setItem("rememberme", true);
-    }
-    else {
-      settings.setItem("rememberme", false);
-    }
     user.setRememberMe(checked);
   }
 
@@ -41,7 +35,7 @@ class RememberMeCheckbox extends Component {
         />
         <label htmlFor="remember-checkbox">{t(this.props.labelLocaleKey)}</label>
       </div>
-    )
+    );
   }
 }
 
