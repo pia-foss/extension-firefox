@@ -6,6 +6,10 @@ __v1.1.7__
 * Fixed a bug where user was unable to logout of extension in a Private Window
 * Fixed a bug where localStorage was not being cleared by unchecking "remember me" in Private Window
 
+__v1.1.6__
+
+* Fixed input & checkbox styling on linux
+
 __v1.1.5__
 
 * Fixed bug where some extension settings were not being synced with the browser.

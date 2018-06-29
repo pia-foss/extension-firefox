@@ -1,10 +1,9 @@
 import LoginField from 'component/loginfield';
-import initRememberMeField from 'component/remembermefield';
-import onSubmit            from 'eventhandler/templates/login/onsubmit';
+import RememberMeCheckbox from './checkbox/remembermecheckbox';
+import onSubmit from 'eventhandler/templates/login/onsubmit';
 
 export default function(renderer, app, window, document) {
-  const React           = renderer.react,
-        RememberMeField = initRememberMeField(renderer, app);
+  const React           = renderer.react;
 
   class LoginForm extends React.Component {
     constructor(props) {
@@ -19,7 +18,7 @@ export default function(renderer, app, window, document) {
     }
 
     resetPasswordURL() {
-      const {i18n} = app.util
+      const {i18n} = app.util;
       return `https://${i18n.domainMap.get(i18n.locale)}/pages/reset-password`
     }
 
@@ -71,14 +70,18 @@ export default function(renderer, app, window, document) {
               />
             </div>
             <div className="form-group">
-              <RememberMeField remember={true} name="rememberme" labelLocaleKey="RememberMe"/>
+              <RememberMeCheckbox
+                remember={true}
+                labelLocaleKey="RememberMe"
+                app={app}
+              />
             </div>
             <div className="form-group text-center">
               <button id="submit-form-button" type="submit" className="upcase-bold btn-success form-control">
                 {t('LoginText')}
               </button>
               <div className="resetpw text-center">
-                <a href={this.resetPasswordURL()} target="_blank">
+                <a href={this.resetPasswordURL()} target="_blank" rel="noopener noreferrer">
                   {t("ResetPasswordText")}
                 </a>
               </div>
