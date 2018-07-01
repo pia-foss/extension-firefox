@@ -1,5 +1,7 @@
 __HEAD__
 
+* Added debug messages to proxy
+
 __v1.1.6__
 
 * Fixed input & checkbox styling on linux
