@@ -1,5 +1,11 @@
 __HEAD__
 
+__v1.1.8__
+
+* Fixing bug where UI Language dropdown icon was no longer visible
+
+* Added debug messages to proxy
+
 __v1.1.7__
 
 * Fixed a bug where credntials were being cleared when the popup was closed in a Private Window

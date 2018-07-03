@@ -109,7 +109,7 @@ export default function(renderer, app, window, document) {
                       </label>
                     </a>
                   </div>
-                  <div className="col-xs-6 checkmarkcontainer">
+                  <div className="col-xs-6 checkbox-container">
                     <LanguageDropdown/>
                   </div>
                 </div>
