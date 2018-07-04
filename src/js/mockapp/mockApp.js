@@ -79,20 +79,24 @@ export default class MockApp {
   initialize () {
     return this.sendMessage('initialize').then((app) => {
       if (!app) { return Promise.resolve(); }
-      // set user, proxy, and region values
-      this.proxy.setEnabled(app.proxy.enabled);
-      this.util.user.authed = app.util.user.authed;
-      this.util.user.authing = app.util.user.authing;
-      this.util.storage.setItem('form:username', app.util.user.username);
-      this.util.storage.setItem('form:password', app.util.user.password);
-      this.util.regionlist.setSelectedRegion(app.util.regionlist.region.id, true);
-      this.util.storage.setItem('online', app.online);
-      this.util.regionlist.resetFavoriteRegions(app.util.regionlist.favorites);
 
       // set settings values
+      // it is critical the settings are intiialized before setting up the user
+      // to ensure "remember me" is set and user credentials are saved to the
+      // correct storage location via setUsername and setPassword
       for(let key in app.util.settings) {
         this.util.settings.setItem(key, app.util.settings[key], true);
       }
+
+      // set user, proxy, and region values
+      this.util.user.authed = app.util.user.authed;
+      this.util.user.authing = app.util.user.authing;
+      this.proxy.setEnabled(app.proxy.enabled);
+      this.util.user.setUsername(app.util.user.username, true);
+      this.util.user.setPassword(app.util.user.password, true);
+      this.util.regionlist.setSelectedRegion(app.util.regionlist.region.id, true);
+      this.util.storage.setItem('online', app.online);
+      this.util.regionlist.resetFavoriteRegions(app.util.regionlist.favorites);
 
       // set bypasslist rules
       const userRuleKey = this.util.bypasslist._storageKeys.userrk;
@@ -145,12 +149,6 @@ export default class MockApp {
       else if (message.type === 'util.regionlist.region') {
         this.util.regionlist.setSelectedRegion(message.data, true);
         return resolve({});
-      }
-      else if (message.type === 'requestAuthTransfer') {
-        return resolve({
-          username: this.util.user.username(),
-          password: this.util.user.password()
-        });
       }
       else { return resolve({}); }
     })

@@ -1,7 +1,6 @@
 export default class MockAppAdapter {
   constructor (app) {
     // bindings
-    this.setAuth = this.setAuth.bind(this);
     this.initialize = this.initialize.bind(this);
     this.sendMessage = this.sendMessage.bind(this);
     this.handleMessage = this.handleMessage.bind(this);
@@ -38,6 +37,25 @@ export default class MockAppAdapter {
         app.util.user.authing = message.data;
         return resolve({});
       }
+      else if (message.type === 'util.user.setUsername') {
+        const {username} = message.data;
+        app.util.user.setUsername(username, true);
+        return resolve({});
+      }
+      else if (message.type === 'util.user.setPassword') {
+        const {password} = message.data;
+        app.util.user.setPassword(password, true);
+        return resolve({});
+      }
+      else if (message.type === 'util.user.setRememberMe') {
+        const {rememberMe} = message.data;
+        app.util.user.setRememberMe(rememberMe, true);
+        return resolve({});
+      }
+      else if (message.type === 'util.user.removeUsernameAndPasswordFromStorage') {
+        app.util.user.removeUsernameAndPasswordFromStorage(true);
+        return resolve({});
+      }
       else if (message.type === 'util.regionlist.region') {
         app.util.regionlist.setSelectedRegion(message.data, true);
         return resolve({});
@@ -72,10 +90,6 @@ export default class MockAppAdapter {
         app.util.regionlist.setFavoriteRegion(message.data, true);
         return resolve({});
       }
-      else if (message.type === 'initAuthTransfer') {
-        this.setAuth();
-        return resolve({});
-      }
       else { return resolve({}); }
     })
     .then(response) // eslint-disable-line dot-location
@@ -93,8 +107,8 @@ export default class MockAppAdapter {
         user: {
           authed: app.util.user.authed,
           authing: app.util.user.authing,
-          username: app.util.user.username(),
-          password: app.util.user.password()
+          username: app.util.user.getUsername(),
+          password: app.util.user.getPassword()
         },
         regionlist: {
           region: {id: app.util.regionlist.getSelectedRegion().id},
@@ -116,18 +130,9 @@ export default class MockAppAdapter {
     payload.util.settings.blockutm = app.util.settings.getItem('blockutm');
     payload.util.settings.maceprotection = app.util.settings.getItem('maceprotection');
     payload.util.settings.debugmode = app.util.settings.getItem('debugmode');
-    payload.util.settings.rememberme = app.util.settings.getItem('rememberme');
+    payload.util.settings.rememberme = app.util.user.getRememberMe();
 
     return payload;
-  }
-
-  setAuth() {
-    this.sendMessage('requestAuthTransfer')
-    .then((user) => { // eslint-disable-line dot-location
-      if (!user.username || !user.password) { return; }
-      app.util.storage.setItem('form:username', user.username, app.util.user.storageBackend())
-      app.util.storage.setItem('form:password', user.password, app.util.user.storageBackend())
-    });
   }
 
   sendMessage (type, data) {

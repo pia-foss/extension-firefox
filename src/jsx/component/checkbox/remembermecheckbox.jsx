@@ -21,29 +21,8 @@ class RememberMeCheckbox extends Component {
   }
 
   onChange (checked) {
-    const {storage, settings} = this.props.app.util;
-    if(checked) {
-      /* Copy the username and password stored in memory to localStorage */
-      storage.setItem("form:username", storage.getItem("form:username", "memoryStorage"), "localStorage")
-      storage.setItem("form:password", storage.getItem("form:password", "memoryStorage"), "localStorage")
-      /* Forget the username and password stored in memory */
-      storage.removeItem("form:username", "memoryStorage")
-      storage.removeItem("form:password", "memoryStorage")
-      settings.setItem("rememberme", true)
-    }
-    else {
-      /* Copy the username and password stored in localStorage to memory */
-      const username = storage.getItem("form:username", "localStorage"),
-            password = storage.getItem("form:password", "localStorage")
-      if(typeof(username) === "string" && username.length > 0 && typeof(password) === "string" && password.length > 0) {
-        storage.setItem("form:username", username, "memoryStorage")
-        storage.setItem("form:password", password, "memoryStorage")
-      }
-      /* Forget the username and password stored in localStorage */
-      storage.removeItem("form:username", "localStorage")
-      storage.removeItem("form:password", "localStorage")
-      settings.setItem("rememberme", false)
-    }
+    const {user} = this.props.app.util;
+    user.setRememberMe(checked);
   }
 
   render () {
@@ -56,7 +35,7 @@ class RememberMeCheckbox extends Component {
         />
         <label htmlFor="remember-checkbox">{t(this.props.labelLocaleKey)}</label>
       </div>
-    )
+    );
   }
 }
 
