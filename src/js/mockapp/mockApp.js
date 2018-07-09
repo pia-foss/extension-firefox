@@ -58,7 +58,7 @@ export default class MockApp {
     this.util.icon = new icon(this);
     this.util.user = new user(this);
     this.util.i18n = new i18n(this);
-    this.util.errorinfo = new errorinfo(self);
+    this.util.errorinfo = new errorinfo(this);
     this.util = Object.freeze(this.util);
 
     // NOTE: Do not initialize the bypass list here,

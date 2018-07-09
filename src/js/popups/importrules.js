@@ -22,7 +22,7 @@ browser.runtime.getBackgroundPage(({app}) => {
       return;
     }
     bypasslist.importRules(rules);
-    window.close();
+    browser.windows.remove(browser.windows.WINDOW_ID_CURRENT);
   };
 
   /**
