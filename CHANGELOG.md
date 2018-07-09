@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.1.9__
+
+* Fixing bug where import rules window wouldn't close on Windows
+
 __v1.1.8__
 
 * Fixing bug where UI Language dropdown icon was no longer visible
