@@ -1,5 +1,7 @@
 __HEAD__
 
+* Updated build scripts to include cross-env and predefine all ENV VARS
+
 __v1.1.9__
 
 * Fixing bug where import rules window wouldn't close on Windows
