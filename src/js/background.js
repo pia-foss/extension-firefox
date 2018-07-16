@@ -10,7 +10,7 @@ import user               from "util/user";
 import bypasslist         from "util/bypasslist";
 import latencytest        from "util/latencytest";
 import buildinfo          from "util/buildinfo";
-import logger             from "util/logger";
+import Logger             from "util/logger";
 import counter            from "util/counter";
 import settingsmanager    from "util/settingsmanager";
 import errorinfo          from "util/errorinfo";
@@ -27,12 +27,12 @@ import BrowserProxy          from "chromesettings/proxy";
 
 import eventhandler from "eventhandler/eventhandler";
 
-(function (window) {
+(function () {
   const self = Object.create(null);
 
   self.frozen = @@freezeApp;
   self.buildinfo    = new buildinfo(self);
-  self.logger       = new logger(self);
+  self.logger       = new Logger(self);
   self.eventhandler = new eventhandler(self);
   window.debug = self.logger.debug /* eslint-ignore no-unused-vars */
 
@@ -68,7 +68,7 @@ import eventhandler from "eventhandler/eventhandler";
   self.chromesettings = Object.freeze(self.chromesettings);
 
   self.util.bypasslist.init();
-  
+
   (() => {
     const {proxy} = self;
     const {user,settings,storage,regionlist} = self.util;
@@ -95,4 +95,4 @@ import eventhandler from "eventhandler/eventhandler";
       debug(`Proxy error: ${error.message}`);
     });
   }
-}(window))
+}());

@@ -6,7 +6,7 @@ export default function(renderer, app, window, document) {
 
   class ChromeUpgradeTemplate extends React.Component {
     closeWindow() {
-      window.close()
+      browser.windows.remove(browser.windows.WINDOW_ID_CURRENT);
     }
 
     render() {
