@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.1.10__
+
+* Added try/catch along code base to catch any 'dead object' error that hang the UI
+
 * Updated build scripts to include cross-env and predefine all ENV VARS
 
 __v1.1.9__

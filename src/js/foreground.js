@@ -1,8 +1,8 @@
-import MockApp     from "mockapp/mockApp"
-import newRenderer from "renderer/renderer"
-import initOnError from "eventhandler/onerror"
+import MockApp     from "mockapp/mockApp";
+import Renderer from "renderer/renderer";
+import initOnError from "eventhandler/onerror";
 
-(new function(window, document) {
+(function() {
   let app, init;
   const background = browser.extension.getBackgroundPage();
 
@@ -16,7 +16,7 @@ import initOnError from "eventhandler/onerror"
 
   // setup global bindings
   init.then(() => {
-    const renderer = new newRenderer(app, window, document);
+    const renderer = new Renderer(app, window, document);
     window.debug = app.logger.debug; /* eslint-ignore no-unused-vars */
     window.t = app.util.i18n.t; /* eslint-ignore no-unused-vars */
     window.addEventListener('error', initOnError(app));
@@ -91,12 +91,12 @@ import initOnError from "eventhandler/onerror"
         link.setAttribute("rel", "stylesheet");
         link.setAttribute("href", `/css/locales/${i18n.locale}.css`);
         document.head.appendChild(link);
-      }
+      };
       renderTemplate();
-    }
+    };
 
     if (document.readyState === 'complete' || document.readyState === 'interactive') { pagerender(); }
     else { document.addEventListener('DOMContentLoaded', pagerender); }
   })
   .catch((err) => { console.log(err); });
-}(window, document))
+}());
