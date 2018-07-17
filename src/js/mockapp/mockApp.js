@@ -76,6 +76,12 @@ export default class MockApp {
   initialize () {
     return this.sendMessage('initialize').then((app) => {
       if (!app) { return Promise.resolve(); }
+
+      // set settings values
+      for(let key in app.util.settings) {
+        this.util.settings.setItem(key, app.util.settings[key], true);
+      }
+
       // set user, proxy, and region values
       this.proxy.setEnabled(app.proxy.enabled);
       this.util.user.authed = app.util.user.authed;
@@ -85,11 +91,6 @@ export default class MockApp {
       this.util.regionlist.setSelectedRegion(app.util.regionlist.region.id, true);
       this.util.storage.setItem('online', app.online);
       this.util.regionlist.resetFavoriteRegions(app.util.regionlist.favorites);
-
-      // set settings values
-      for(let key in app.util.settings) {
-        this.util.settings.setItem(key, app.util.settings[key], true);
-      }
 
       // set bypasslist rules
       const userRuleKey = this.util.bypasslist.userRulesStorageKey;
@@ -111,8 +112,6 @@ export default class MockApp {
           }
         }
       }).catch((err) => { this.proxy.disable(); }); // eslint-disable-line
-
-      if(!this.util.user.inStorage()) { this.proxy.disable(); }
     });
   }
 
