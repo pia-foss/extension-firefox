@@ -39,7 +39,7 @@
     "message": "Fingerprint protection"
   },
   "FingerprintProtectionTooltip": {
-    "message": "Protect against browser fingerprinting by providing generic information about your computer and preventing access to certain browser APIs."
+    "message": "Protect against browser fingerprinting by providing generic information about your computer and preventing access to certain browser APIs. Disabled by default. Recommended, but may break some websites and modify the browser's behavior. Please consult the Mozilla Wiki for a full list of changes."
   },
   "TrackingProtection": {
     "message": "Tracking protection"

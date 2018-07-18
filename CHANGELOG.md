@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.1.14__
+
+* Set Fingerprint Protection off by default
+
 __v1.1.13__
 
 * Adding "Log me out on browser close" setting
