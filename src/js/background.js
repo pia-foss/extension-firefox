@@ -83,8 +83,6 @@ import eventhandler from "eventhandler/eventhandler";
       }
     }).catch(proxy.disable);
 
-    if(!user.inStorage()) { proxy.disable(); }
-
     window.app = Object.freeze(self);
     debug("background.js: initialized");
   })();

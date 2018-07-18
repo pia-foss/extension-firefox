@@ -48,6 +48,8 @@ __v1.1.1__
 
 __v1.1.0__
 
+* Removed a line that disables the proxy if there are no credentials in storage
+
 * Add Favorite Region view
 
 __v1.0.13__

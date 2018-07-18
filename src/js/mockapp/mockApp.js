@@ -118,8 +118,6 @@ export default class MockApp {
           }
         }
       }).catch((err) => { this.proxy.disable(); }); // eslint-disable-line
-
-      if(!this.util.user.inStorage()) { this.proxy.disable(); }
     });
   }
 
