@@ -2,6 +2,8 @@ __HEAD__
 
 __v1.1.2__
 
+* Update region translations
+
 * Update project dependencies
 
 __v1.1.1__
