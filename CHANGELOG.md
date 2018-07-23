@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.1.11__
+
+* Debounce proxy button to avoid crashing browser
+
 __v1.1.10__
 
 * Added try/catch along code base to catch any 'dead object' error that hang the UI
@@ -18,7 +22,7 @@ __v1.1.8__
 
 __v1.1.7__
 
-* Fixed a bug where credntials were being cleared when the popup was closed in a Private Window
+* Fixed a bug where credentials were being cleared when the popup was closed in a Private Window
 * Fixed a bug where user was unable to logout of extension in a Private Window
 * Fixed a bug where localStorage was not being cleared by unchecking "remember me" in Private Window
 
