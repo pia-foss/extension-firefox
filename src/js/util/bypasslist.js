@@ -223,7 +223,7 @@ export default class BypassList {
 
   toArray () {
     const rules = [...Array.from(this._enabledRules.values())];
-    return [].concat(...rules.map((r) => typeof(r) === "function" ? r() : r));
+    return [].concat(...rules.map((r) => { return typeof(r) === "function" ? r() : r; }));
   }
 
   resetPopularRules (rules) {
@@ -274,12 +274,12 @@ export default class BypassList {
         });
         // Enable importedRules
         importedRules.forEach(enableRule);
-      } else if (typeof importedRules === 'undefined') {
         // Disable all rules
-        getRules().forEach(disableRule);
-      } else {
-        debug('rule set is invalid type, expected array');
       }
+      else if (typeof importedRules === 'undefined') {
+        getRules().forEach(disableRule);
+      }
+      else { debug('rule set is invalid type, expected array'); }
     };
     try {
       importRuleSet(

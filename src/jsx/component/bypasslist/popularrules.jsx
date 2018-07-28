@@ -8,7 +8,10 @@ const PopularRules = ({app}) => {
 
   return (
     <div>
-      <h3 className="bl_sectionheader">{t("PopularWebsites")}</h3>
+      <h3 className="bl_sectionheader">
+        { t("PopularWebsites") }
+      </h3>
+
       <div className="popular">
         <div>
           {popularRulesByName.map((name, i) => {
