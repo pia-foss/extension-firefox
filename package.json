@@ -2,9 +2,9 @@
   "private": true,
   "scripts": {
     "start": "web-ext run -s builds/debug",
-    "dev": "cross-env browser=firefox build=debug gitinfo=yes grunt",
-    "qa:firefox": "cross-env browser=firefox build=webstore gitinfo=yes grunt",
-    "deploy:firefox": "cross-env browser=firefox build=webstore audience=public grunt release",
+    "dev": "node script/dev.js",
+    "qa": "node script/qa.js",
+    "deploy": "node script/deploy.js",
     "translation:import": "grunt oneskyImport",
     "translation:export": "grunt oneskyExport",
     "lint": "eslint \"src/**/*.js\""
@@ -48,11 +48,11 @@
     "tinyhttp": "https://github.com/r-obert/tinyhttp.js"
   },
   "devDependencies": {
-    "cross-env": "^5.2.0",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^17.0.0",
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-jsx-a11y": "^6.1.1",
-    "eslint-plugin-react": "^7.8.2"
+    "eslint-plugin-react": "^7.8.2",
+    "web-ext": "^2.8.0"
   }
 }
