@@ -84,9 +84,9 @@ export default class MockApp {
       // it is critical the settings are intiialized before setting up the user
       // to ensure "remember me" is set and user credentials are saved to the
       // correct storage location via setUsername and setPassword
-      for(let key in app.util.settings) {
-        this.util.settings.setItem(key, app.util.settings[key], true);
-      }
+      app.util.settings.forEach(({settingID, value}) => {
+        this.util.settings.setItem(settingID, value, true);
+      });
 
       // set user, proxy, and region values
       this.util.user.authed = app.util.user.authed;
@@ -106,16 +106,21 @@ export default class MockApp {
       this.util.bypasslist.resetPopularRules();
     })
     .then(() => {
-      this.util.settings.setDefaults();
       this.util.regionlist.sync()
-      .then(() => {
-        if(this.util.user.inStorage()) {
-          if (this.util.storage.getItem('online') === 'true') {
-            this.util.user.auth().then(this.proxy.enable).catch(this.proxy.disable);
+      .then(async () => {
+        const {proxy, util: {user, storage}} = this;
+        if (user.loggedIn) {
+          const proxyOnline = storage.getItem("online") === 'true';
+          await user.auth();
+          if (proxyOnline) {
+            await proxy.enable();
           }
           else {
-            this.util.user.auth().then(this.proxy.disable).catch(this.proxy.disable);
+            await proxy.disable();
           }
+        }
+        else {
+          await proxy.disable();
         }
       }).catch((err) => { this.proxy.disable(); }); // eslint-disable-line
     });

@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.1.12__
+
+* Fixed bug where extension automatically attempted to log user in
+
 __v1.1.11__
 
 * Debounce proxy button to avoid crashing browser
