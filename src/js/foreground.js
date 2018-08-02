@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import MockApp     from "mockapp/mockApp";
 import Renderer from "renderer/renderer";
 import initOnError from "eventhandler/onerror";

@@ -1,5 +1,9 @@
 import tinyhttp from "tinyhttp";
 
+const USERNAME_KEY = 'form:username';
+const PASSWORD_KEY = 'form:password';
+const LOGGED_IN_KEY = 'loggedIn';
+
 class User {
   constructor (app) {
     // bindings
@@ -13,25 +17,57 @@ class User {
     this.setUsername = this.setUsername.bind(this);
     this.setPassword = this.setPassword.bind(this);
     this.removeUsernameAndPasswordFromStorage = this.removeUsernameAndPasswordFromStorage.bind(this);
-    this.inStorage = this.inStorage.bind(this);
     this.auth = this.auth.bind(this);
     this.logout = this.logout.bind(this);
     this.getRememberMe = this.getRememberMe.bind(this);
+    this._getLoggedInStorageItem = this.getLoggedInStorageItem.bind(this);
+    this._setLoggedInStorageItem = this.setLoggedInStorageItem.bind(this);
+    this._removeLoggedInStorageItem = this.removeLoggedInStorageItem.bind(this);
 
     // init
-    ({
-      util: {
-        storage: this._storage,
-        settings: this._settings,
-        icon: this._icon,
-      },
-      adapter: this._adapter,
-      proxy: this._proxy,
-    } = app);
+    this._app = app;
     this._http = tinyhttp('https://www.privateinternetaccess.com');
     this.authed = false;
     this.authing = false;
     this.authTimeout = 5000;
+  }
+
+  get _storage () { return this._app.util.storage; }
+  get _settings () { return this._app.util.settings; }
+  get _icon () { return this._app.util.icon; }
+  get _adapter () { return this._app.adapter; }
+  get _proxy () { return this._app.proxy; }
+
+  get loggedIn () {
+    const loggedInStorageItem = this.getLoggedInStorageItem();
+    const credentialsStored = (
+      this.getUsername().length &&
+      this.getPassword().length
+    );
+
+    if (loggedInStorageItem && !credentialsStored) {
+      console.error(debug('user is expecting to be logged in, but no credentials exist'));
+    }
+
+    return loggedInStorageItem && credentialsStored;
+  }
+
+  getLoggedInStorageItem () {
+    return this._storage.getItem(LOGGED_IN_KEY, this.storageBackend()) === 'true';
+  }
+
+  setLoggedInStorageItem (value, bridged) {
+    this._storage.setItem(LOGGED_IN_KEY, value, this.storageBackend());
+    if (!bridged) {
+      this._adapter.sendMessage('util.user.setLoggedInStorageItem', {value});
+    }
+  }
+
+  removeLoggedInStorageItem (bridged) {
+    this._storage.removeItem(LOGGED_IN_KEY, this.storageBackend());
+    if (!bridged) {
+      this._adapter.sendMessage('util.user.removeLoggedInStorageItem');
+    }
   }
 
   storageBackend() {
@@ -52,16 +88,21 @@ class User {
       // Get username and password and remove from previous storage
       const username = this.getUsername();
       const password = this.getPassword();
+      const loggedIn = this.getLoggedInStorageItem();
+
+      // Remove from current storage medium
       this.removeUsernameAndPasswordFromStorage(true);
+      this.removeLoggedInStorageItem(true);
 
       // Swap storage
       this._settings.setItem('rememberme', Boolean(rememberMe), true);
+      this.setLoggedInStorageItem(loggedIn);
 
       // Set username and password in new storage
       this.setUsername(username, true);
       this.setPassword(password, true);
       if (!bridged) {
-        this._adapter.sendMessage('util.user.setRememberMe', { rememberMe });
+        this._adapter.sendMessage('util.user.setRememberMe', {rememberMe});
       }
     }
   }
@@ -75,12 +116,12 @@ class User {
   }
 
   getUsername() {
-    const username = this._storage.getItem('form:username', this.storageBackend());
+    const username = this._storage.getItem(USERNAME_KEY, this.storageBackend());
     return typeof username === 'string' ? username.trim() : '';
   }
 
   getPassword() {
-    const password = this._storage.getItem('form:password', this.storageBackend());
+    const password = this._storage.getItem(PASSWORD_KEY, this.storageBackend());
     return password || '';
   }
 
@@ -97,29 +138,25 @@ class User {
   }
 
   setUsername(username, bridged) {
-    this._storage.setItem('form:username', username, this.storageBackend());
+    this._storage.setItem(USERNAME_KEY, username, this.storageBackend());
     if (!bridged) {
       this._adapter.sendMessage('util.user.setUsername', {username});
     }
   }
 
   setPassword(password, bridged) {
-    this._storage.setItem('form:password', password, this.storageBackend());
+    this._storage.setItem(PASSWORD_KEY, password, this.storageBackend());
     if (!bridged) {
       this._adapter.sendMessage('util.user.setPassword', {password});
     }
   }
 
   removeUsernameAndPasswordFromStorage(bridged) {
-    this._storage.removeItem('form:username', this.storageBackend());
-    this._storage.removeItem('form:password', this.storageBackend());
+    this._storage.removeItem(USERNAME_KEY, this.storageBackend());
+    this._storage.removeItem(PASSWORD_KEY, this.storageBackend());
     if (!bridged) {
       this._adapter.sendMessage('util.user.removeUsernameAndPasswordFromStorage');
     }
-  }
-
-  inStorage() {
-    return this.getUsername().length > 0 && this.getPassword().length > 0;
   }
 
   auth() {
@@ -131,11 +168,13 @@ class User {
       this.authing = false;
       this._adapter.sendMessage('util.user.authing', false);
       this.authed = true;
+      this.setLoggedInStorageItem(true);
       this._adapter.sendMessage('util.user.authed', true);
       this._icon.updateTooltip();
       debug("user.js: auth ok");
       return xhr;
     }).catch((xhr) => {
+      this.setLoggedInStorageItem(false);
       this.authing = false;
       this._adapter.sendMessage('util.user.authing', false);
       this.authed = false;
@@ -149,12 +188,12 @@ class User {
     return this._proxy.disable().then(() => {
       this.authed = false;
       this._adapter.sendMessage('util.user.authed', false);
+      this.setLoggedInStorageItem(false);
       this.removeUsernameAndPasswordFromStorage();
       this._icon.updateTooltip();
       if (afterLogout) {
         afterLogout();
       }
-      return;
     });
   }
 }

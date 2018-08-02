@@ -72,14 +72,21 @@ import eventhandler from "eventhandler/eventhandler";
   (() => {
     const {proxy} = self;
     const {user,settings,storage,regionlist} = self.util;
-    settings.setDefaults();
+    settings.init();
 
-    regionlist.sync().then(() => {
-      if(user.inStorage()) {
-        if(storage.getItem("online") === "true"){
-          user.auth().then(proxy.enable).catch(proxy.disable);
+    regionlist.sync().then(async () => {
+      if (user.loggedIn) {
+        const proxyOnline = storage.getItem("online") === 'true';
+        await user.auth();
+        if (proxyOnline) {
+          await proxy.enable();
         }
-        else { user.auth().then(proxy.disable).catch(proxy.disable); }
+        else {
+          await proxy.disable();
+        }
+      }
+      else {
+        await proxy.disable();
       }
     }).catch(proxy.disable);
 

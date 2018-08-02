@@ -56,12 +56,27 @@ export default class MockAppAdapter {
         app.util.user.removeUsernameAndPasswordFromStorage(true);
         return resolve({});
       }
+      else if (message.type === 'util.user.setLoggedInStorageItem') {
+        const {value} = message.data;
+        app.util.user.setLoggedInStorageItem(value, true);
+        return resolve({});
+      }
+      else if (message.type === 'util.user.removeLoggedInStorageItem') {
+        app.util.user.removeLoggedInStorageItem(true);
+        return resolve({});
+      }
       else if (message.type === 'util.regionlist.region') {
         app.util.regionlist.setSelectedRegion(message.data, true);
         return resolve({});
       }
       else if (message.type === 'updateSettings') {
-        app.util.settings.setItem(message.data.key, message.data.value, true);
+        const {settingID, value} = message.data;
+        app.util.settings.setItem(settingID, value, true);
+        return resolve({});
+      }
+      else if (message.type === 'util.settings.toggle') {
+        const {settingID} = message.data;
+        app.util.settings.toggle(settingID, true);
         return resolve({});
       }
       else if (message.type === 'enablePopularRule') {
@@ -108,29 +123,19 @@ export default class MockAppAdapter {
           authed: app.util.user.authed,
           authing: app.util.user.authing,
           username: app.util.user.getUsername(),
-          password: app.util.user.getPassword()
+          password: app.util.user.getPassword(),
         },
         regionlist: {
           region: {id: app.util.regionlist.getSelectedRegion().id},
-          favorites: app.util.storage.getItem('favoriteregions')
+          favorites: app.util.storage.getItem('favoriteregions'),
         },
         bypasslist: {
           user: app.util.bypasslist.getUserRules(),
-          popular: app.util.bypasslist.enabledPopularRules().join(",")
+          popular: app.util.bypasslist.enabledPopularRules().join(","),
         },
-        settings: {}
-      }
+        settings: app.util.settings.getAll(),
+      },
     };
-
-    // set settings values
-    for(let key in app.chromesettings) {
-      let id = app.chromesettings[key].settingID
-      payload.util.settings[id] = app.util.settings.getItem(id);
-    }
-    payload.util.settings.blockutm = app.util.settings.getItem('blockutm');
-    payload.util.settings.maceprotection = app.util.settings.getItem('maceprotection');
-    payload.util.settings.debugmode = app.util.settings.getItem('debugmode');
-    payload.util.settings.rememberme = app.util.user.getRememberMe();
 
     return payload;
   }
