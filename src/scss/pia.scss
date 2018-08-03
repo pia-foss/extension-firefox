@@ -56,6 +56,8 @@ body a, body a:active, body a:focus, body a:hover {
   color: #BB1227 !important;
 }
 
+.popover { max-width: 100%; }
+
 #template-content #region-list .active .list-item-latency {
   color: #FFFFFF !important;
 }
@@ -74,7 +76,7 @@ li.popular-rule {
 #pia {
     min-height: 210px;
     width: 370px;
-    padding: 10px;
+    padding: 10px 15px;
     overflow-x:hidden;
 }
 
@@ -85,6 +87,16 @@ li.popular-rule {
             padding-left: 25px;
         }
     }
+}
+
+#bypasslist-template {
+  max-height: 580px;
+  overflow: auto;
+  .add-container {
+    display: flex;
+    margin-top: 10px;
+    align-items: center;
+  }
 }
 
 #template-content {
@@ -247,10 +259,11 @@ li.popular-rule {
             background-color: $blue !important;
             border-color: $blue !important;
         }
-        max-height:350px;
-        overflow:scroll;
-        margin-bottom:-10px;
-        padding-top:10px;
+        max-height: 350px;
+        min-height: 350px;
+        overflow: scroll;
+        margin-bottom: -10px;
+        padding-top: 10px;
         margin-top: 1px;
     }
     .status {
@@ -509,16 +522,17 @@ box-shadow:none;
 }
 
 div#debuglog-template {
-    ul {
-        list-style-type: none;
-        padding: 10px;
-        li {
-            margin-bottom: 10px;
-        }
-        li:last-child {
-            margin-bottom: 0px;
-        }
+  max-height: 580px;
+  ul {
+    list-style-type: none;
+    padding: 10px;
+    li {
+      margin-bottom: 10px;
     }
+    li:last-child {
+      margin-bottom: 0px;
+    }
+  }
 }
 
 .select-style span {
@@ -746,6 +760,9 @@ div#debuglog-template ul time {
     font-weight: 500;
     display: block;
     clear: both;
+    &.instructions {
+      margin-bottom: 5px;
+    }
 }
 .bypassitem {
     display: inline-block;
@@ -776,13 +793,10 @@ div#debuglog-template ul time {
     clear: both;
     overflow: hidden;
 }
-.add-container {
-    padding-right: 50px;
-}
 .add-bar{
   margin: 0 auto;
   width: 100%;
-  height: 36px;
+  height: 35px;
   padding: 5px 10px;
   font-size: 13px;
   border: 1px solid #D2D0D2;
@@ -793,17 +807,21 @@ div#debuglog-template ul time {
   border: 1px solid #bbbbbb;
 }
 .add-btn {
-  position: relative;
-  float: right;
-  width: 35px;
-  height: 35px;
-  top: -35px;
-  right: -42px;
+  width: 36px;
+  height: 32px;
   border-radius: 100px;
   background-color: #67C069;
   border:0;
   color: #fff;
   font-size: 21px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 10px 0 15px;
+  > p {
+    pointer-events: none;
+    margin: 0;
+  }
 }
 
 .add-btn:hover, .add-btn:active, .add-btn:focus{
@@ -820,9 +838,9 @@ div#debuglog-template ul time {
   height: 150px;
   overflow-y: auto;
   width: 100%;
-  margin-top: -35px;
-  float:left;
-}.otherbypassitem {
+  margin-top: 10px;
+}
+.otherbypassitem {
     color: #888;
     border-bottom: 1px solid #eee;
     padding: 2px 0 8px 0;
@@ -1002,4 +1020,9 @@ div#debuglog-template ul time {
 }
 .private-disclaimer {
   color: #CC0000;
+}
+
+#settings-template {
+  max-height: 580px;
+  overflow: auto;
 }
