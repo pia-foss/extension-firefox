@@ -1,5 +1,5 @@
 import React from 'react';
-import PropType from 'prop-types';
+import PropTypes from 'prop-types';
 
 import ErrorBoundary from '../../hoc/errorboundary';
 
@@ -26,7 +26,7 @@ const buildClassName = (postfix, id, ...others) => {
  *
  * @param {*} props React props
  *
- * @returns {React.StatelessComponent} Component
+ * @returns {JSX.Element} Component
  */
 const Checkbox = (props) => {
 
@@ -35,6 +35,7 @@ const Checkbox = (props) => {
     className,
     onChange,
     checked,
+    disabled,
   } = props;
 
   return (
@@ -46,6 +47,7 @@ const Checkbox = (props) => {
         onChange={onChange}
         className={buildClassName('input', id)}
         type="checkbox"
+        disabled={disabled}
       />
       <label
         htmlFor={id}
@@ -56,10 +58,11 @@ const Checkbox = (props) => {
 }
 
 Checkbox.propTypes = {
-  id: PropType.string.isRequired,
-  className: PropType.string,
-  onChange: PropType.func,
-  checked: PropType.bool.isRequired,
-}
+  id: PropTypes.string.isRequired,
+  className: PropTypes.string,
+  onChange: PropTypes.func,
+  checked: PropTypes.bool.isRequired,
+  disabled: PropTypes.bool,
+};
 
 export default ErrorBoundary(Checkbox);
