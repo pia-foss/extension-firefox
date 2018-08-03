@@ -59,12 +59,15 @@ import eventhandler from "eventhandler/eventhandler";
   self.util = Object.freeze(self.util);
 
   self.chromesettings = Object.create(null);
-  self.chromesettings.webrtc             = new webrtc(self);
-  self.chromesettings.networkprediction  = new networkprediction(self);
-  self.chromesettings.httpreferer        = new httpreferer(self);
-  self.chromesettings.hyperlinkaudit     = new hyperlinkaudit(self);
-  self.chromesettings.trackingprotection = new trackingprotection(self);
+  self.chromesettings.webrtc                = new webrtc(self);
+  self.chromesettings.networkprediction     = new networkprediction(self);
+  self.chromesettings.httpreferer           = new httpreferer(self);
+  self.chromesettings.hyperlinkaudit        = new hyperlinkaudit(self);
+  self.chromesettings.trackingprotection    = new trackingprotection(self);
   self.chromesettings.fingerprintprotection = new fingerprintprotection(self);
+  Object.values(self.chromesettings)
+    .filter((setting) => setting.init)
+    .forEach((setting) => setting.init());
   self.chromesettings = Object.freeze(self.chromesettings);
 
   self.util.bypasslist.init();
@@ -75,14 +78,20 @@ import eventhandler from "eventhandler/eventhandler";
     settings.init();
 
     regionlist.sync().then(async () => {
-      if (user.loggedIn) {
-        const proxyOnline = storage.getItem("online") === 'true';
-        await user.auth();
-        if (proxyOnline) {
-          await proxy.enable();
+      const {loggedIn, logOutOnClose} = user;
+      if (loggedIn) {
+        if (logOutOnClose) {
+          await user.logout();
         }
         else {
-          await proxy.disable();
+          const proxyOnline = storage.getItem("online") === 'true';
+          await user.auth();
+          if (proxyOnline) {
+            await proxy.enable();
+          }
+          else {
+            await proxy.disable();
+          }
         }
       }
       else {

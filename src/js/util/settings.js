@@ -1,3 +1,24 @@
+/* Types
+
+  interface AppSetting {
+    settingDefault: boolean;
+    settingID: string;
+  }
+
+  interface ContentSetting extends AppSetting {
+    clearSetting(): void;
+    applySetting(): void;
+    isApplied(): boolean;
+  }
+
+  interface ChromeSetting extends ApiSetting {
+    isApplied(): boolean;
+    isControllable(): boolean;
+  }
+
+  type ApiSetting = ContentSetting | ChromeSetting;
+*/
+
 const ApplicationIDs = {
   BLOCK_UTM: 'blockutm',
   MACE_PROTECTION: 'maceprotection',
@@ -16,6 +37,7 @@ class Settings {
     this.getItem = this.getItem.bind(this);
     this.setItem = this.setItem.bind(this);
     this.getAll = this.getAll.bind(this);
+    this.getControllable = this.getControllable.bind(this);
 
     // Init
     this._app = app;
@@ -26,7 +48,7 @@ class Settings {
   /* ------------------------------------ */
 
   get _storage () { return this._app.util.storage; }
-  get _regionList () { return this._app.util.regionList; }
+  get _regionList () { return this._app.util.regionlist; }
   get _adapter () { return this._app.adapter; }
   get _proxy () { return this._app.proxy; }
   get _logger () { return this._app.logger; }
@@ -189,7 +211,7 @@ class Settings {
    */
   hasItem (settingID) {
     if (this._validID(settingID)) {
-      return this._storage.hasItem(settingID);
+      return this._storage.hasItem(`settings:${settingID}`);
     }
     else {
       throw new Error('settings.js: cannot perform hasItem with invalid settingID');
@@ -254,6 +276,65 @@ class Settings {
       throw new Error('cannot perform setItem with invalid settingID');
     }
   }
+
+
+  /**
+   * Determine whether specified setting is controllable by user
+   *
+   * @param {string} settingID ID for setting
+   *
+   * @returns {boolean} Whether the setting is controllable by user
+   *
+   * @throws {Error} if settingID is not valid
+   */
+  getControllable (settingID) {
+    if (this._validID(settingID)) {
+      // LogoutOnClose depends on rememberme
+      if (settingID === ApplicationIDs.LOGOUT_ON_CLOSE) {
+        return this.getItem(ApplicationIDs.REMEMBER_ME);
+      }
+
+      else if (this._apiIDs.includes(settingID)) {
+        const setting = this._getApiSetting(settingID);
+        // Chromesettings have function
+        if (typeof setting.isControllable === 'function') {
+          return setting.isControllable();
+        }
+        else {
+          return true;
+        }
+      }
+      // By default controllable is true
+      else {
+        return true;
+      }
+    }
+    else {
+      throw new Error('settings.js: cannot get controllable without valid settingID');
+    }
+  }
+
+  /**
+   * Get the actual setting for specified API settingID
+   *
+   * @param {string} settingID ID of setting
+   *
+   * @returns {ApiSetting} setting corresponding to settingID
+   *
+   * @throws {Error} if settingID is not valid API setting
+   */
+  getApiSetting (settingID) {
+    if (!this._validID(settingID)) {
+      throw new Error('invalid settingID');
+    }
+    else if (this._apiIDs.includes(settingID)) {
+      return this._apiSettings.find((s) => s.settingID === settingID);
+    }
+    else {
+      throw new Error('settings.js: getApiSetting requires settingID for ApiSetting, not AppSetting');
+    }
+  }
+
 
   /* ------------------------------------ */
   /*               Static                 */

@@ -32,6 +32,10 @@ class User {
     this.authTimeout = 5000;
   }
 
+  /* ------------------------------------ */
+  /*              Getters                 */
+  /* ------------------------------------ */
+
   get _storage () { return this._app.util.storage; }
   get _settings () { return this._app.util.settings; }
   get _icon () { return this._app.util.icon; }
@@ -40,7 +44,7 @@ class User {
 
   get loggedIn () {
     const loggedInStorageItem = this.getLoggedInStorageItem();
-    const credentialsStored = (
+    const credentialsStored = Boolean(
       this.getUsername().length &&
       this.getPassword().length
     );
@@ -50,6 +54,10 @@ class User {
     }
 
     return loggedInStorageItem && credentialsStored;
+  }
+
+  get logOutOnClose () {
+    return this._settings.getItem('logoutOnClose');
   }
 
   getLoggedInStorageItem () {
@@ -188,8 +196,10 @@ class User {
     return this._proxy.disable().then(() => {
       this.authed = false;
       this._adapter.sendMessage('util.user.authed', false);
+      if (!this.getRememberMe()) {
+        this.removeUsernameAndPasswordFromStorage();
+      }
       this.setLoggedInStorageItem(false);
-      this.removeUsernameAndPasswordFromStorage();
       this._icon.updateTooltip();
       if (afterLogout) {
         afterLogout();

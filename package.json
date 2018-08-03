@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "start": "web-ext run -s builds/debug",
     "dev": "cross-env browser=firefox build=debug gitinfo=yes grunt",
     "qa:firefox": "cross-env browser=firefox build=webstore gitinfo=yes grunt",
     "deploy:firefox": "cross-env browser=firefox build=webstore audience=public grunt release",
