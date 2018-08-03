@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.1.15__
+
+* Fix components breaking out of parent styling
+
 __v1.1.14__
 
 * Set Fingerprint Protection off by default
