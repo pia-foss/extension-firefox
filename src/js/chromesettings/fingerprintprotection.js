@@ -10,7 +10,7 @@ export default function(app) {
     return details.value === true;
   }));
 
-  self.settingDefault = true;
+  self.settingDefault = false;
   self.available = Boolean(setting);
   self.settingID = "fingerprintprotection";
 
@@ -24,7 +24,7 @@ export default function(app) {
       debug(`fingerprintprotection.js: block failed (${error})`);
       return self;
     });
-  }
+  };
 
   self.clearSetting = () => {
     return self._set({value: false}, {applyValue: true})
@@ -36,7 +36,7 @@ export default function(app) {
       debug(`fingerprintprotection.js: unblock failed (${error})`);
       return self;
     });
-  }
+  };
 
   return self;
 }
