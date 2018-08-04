@@ -416,6 +416,12 @@
   "us_wdc": {
     "message": "US Washington DC"
   },
+  "us_washington_dc": {
+    "message": "US Washington DC"
+  },
+  "us_denver": {
+    "message": "US Denver"
+  },
   "uk": {
     "message": "UK London"
   },
@@ -523,5 +529,8 @@
   },
   "hungary": {
     "message": "Hungary"
+  },
+  "lu": {
+    "message": "Luxembourg"
   }
 }

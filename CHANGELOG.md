@@ -60,6 +60,8 @@ __v1.1.3__
 
 __v1.1.2__
 
+* Update region translations
+
 * Update project dependencies
 
 __v1.1.1__
@@ -68,7 +70,9 @@ __v1.1.1__
 
 __v1.1.0__
 
-* Removed a line that disables the proxy if there are no credentials in storage
+* Update region translations
+
+* Remove a line that disables the proxy if there are no credentials in storage
 
 * Add Favorite Region view
 
