@@ -1,5 +1,11 @@
 __HEAD__
 
+__v1.1.18__
+
+* Fixed visual bug with popover on extension settings
+
+* Updated Changelog to have consistent phrasing
+
 __v1.1.17__
 
 * Updated NPM build script to include automated packaging
@@ -12,7 +18,7 @@ __v1.1.16__
 
 __v1.1.15__
 
-* Fix components breaking out of parent styling
+* Fixed components breaking out of parent styling
 
 __v1.1.14__
 
@@ -20,7 +26,7 @@ __v1.1.14__
 
 __v1.1.13__
 
-* Adding "Log me out on browser close" setting
+* Added "Log me out on browser close" setting
 
 __v1.1.12__
 
@@ -28,7 +34,7 @@ __v1.1.12__
 
 __v1.1.11__
 
-* Debounce proxy button to avoid crashing browser
+* Debounced proxy button to avoid crashing browser
 
 __v1.1.10__
 
@@ -38,11 +44,11 @@ __v1.1.10__
 
 __v1.1.9__
 
-* Fixing bug where import rules window wouldn't close on Windows
+* Fixed bug where import rules window wouldn't close on Windows
 
 __v1.1.8__
 
-* Fixing bug where UI Language dropdown icon was no longer visible
+* Fixed bug where UI Language dropdown icon was no longer visible
 
 * Added debug messages to proxy
 
@@ -62,35 +68,35 @@ __v1.1.5__
 
 __v1.1.4__
 
-* Route Latency checks through HTTPS
+* Routed Latency checks through HTTPS
 
 __v1.1.3__
 
-* Add import/export feature for bypass list
+* Added import/export feature for bypass list
 
 __v1.1.2__
 
-* Update region translations
+* Updated region translations
 
-* Update project dependencies
+* Updated project dependencies
 
 __v1.1.1__
 
-* Update Region selection/favorite tab design
+* Updated Region selection/favorite tab design
 
 __v1.1.0__
 
-* Update region translations
+* Updated region translations
 
-* Remove a line that disables the proxy if there are no credentials in storage
+* Removed a line that disables the proxy if there are no credentials in storage
 
-* Add Favorite Region view
+* Added Favorite Region view
 
 __v1.0.13__
 
-* Update helpdesk links
+* Updated helpdesk links
 
-* Update translations for new Berlin region.
+* Updated translations for new Berlin region.
 
 __v1.0.11__
 
@@ -98,7 +104,7 @@ __v1.0.11__
 
 __v1.0.10__
 
-* Update Translations for Washington DC region.
+* Updated Translations for Washington DC region.
 
 __v1.0.9__
 
@@ -110,11 +116,11 @@ __v1.0.8__
 
 __v1.0.7__
 
-* Add new bypass list page.
+* Added new bypass list page.
 
 __v1.0.6__
 
-* Fix warning for Firefox ESR.
+* Fixed warning for Firefox ESR.
 
 * Default Fingerprinting Protection to true
 
@@ -128,11 +134,11 @@ __v1.0.3__
 
 * Updated Translations for newest features.
 
-* Overhaul extension to work in Private Browsing Mode.
+* Overhauled extension to work in Private Browsing Mode.
 
-* Add warning disclaimer ion popup window while in private browsing mode.
+* Added warning disclaimer ion popup window while in private browsing mode.
 
-* Add 'View Debug Log' button to extension section of settings.
+* Added 'View Debug Log' button to extension section of settings.
 
 __v1.0.0__
 
