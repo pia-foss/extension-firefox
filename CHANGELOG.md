@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.1.17__
+
+* Adding linting adhering to airbnb style guide
+
 __v1.1.16__
 
 * Updated the Bypass list custom rule instructions and placeholder
