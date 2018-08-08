@@ -2,6 +2,8 @@ __HEAD__
 
 __v1.1.17__
 
+* Updated NPM build script to include automated packaging
+
 * Adding linting adhering to airbnb style guide
 
 __v1.1.16__
