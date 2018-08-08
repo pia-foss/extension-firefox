@@ -73,30 +73,22 @@ import eventhandler from "eventhandler/eventhandler";
   self.util.bypasslist.init();
 
   (() => {
-    const {proxy} = self;
-    const {user,settings,storage,regionlist} = self.util;
+    const { proxy } = self;
+    const { user, settings, storage, regionlist } = self.util;
     settings.init();
 
     regionlist.sync().then(async () => {
-      const {loggedIn, logOutOnClose} = user;
+      const { loggedIn, logOutOnClose } = user;
       if (loggedIn) {
-        if (logOutOnClose) {
-          await user.logout();
-        }
+        if (logOutOnClose) { await user.logout(); }
         else {
           const proxyOnline = storage.getItem("online") === 'true';
           await user.auth();
-          if (proxyOnline) {
-            await proxy.enable();
-          }
-          else {
-            await proxy.disable();
-          }
+          if (proxyOnline) { await proxy.enable(); }
+          else { await proxy.disable(); }
         }
       }
-      else {
-        await proxy.disable();
-      }
+      else { await proxy.disable(); }
     }).catch(proxy.disable);
 
     window.app = Object.freeze(self);

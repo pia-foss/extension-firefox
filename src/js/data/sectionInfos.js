@@ -34,24 +34,25 @@
  *
  * @returns {SectionInfo[]} sectionInfo with derived state added
  */
-const addDerivedInfo = (sectionInfos, {settings}) => {
+const addDerivedInfo = (sectionInfos, { settings }) => {
   return sectionInfos.map((section) => {
     const newSection = Object.assign({}, section);
     newSection.settingInfos = newSection.settingInfos
       .map((info) => {
         // Builders are a way to inject other components in
         // and must be ignored (have no derived state)
-        if (info.builder) {
-          return info;
-        }
+        let currentInfo;
+        if (info.builder) { currentInfo = info; }
         else {
           // Add value & controllable from settings
           const newInfo = Object.assign({}, info, {
             controllable: settings.getControllable(info.settingID),
             value: settings.getItem(info.settingID),
           });
-          return newInfo;
+          currentInfo = newInfo;
         }
+
+        return currentInfo;
       });
 
     return newSection;
@@ -66,7 +67,7 @@ const addDerivedInfo = (sectionInfos, {settings}) => {
  * @returns {number} Total number of settings for this section
  */
 const getTotalCount = (settingInfos) => {
-  return settingInfos.filter((s) => !s.builder).length;
+  return settingInfos.filter((s) => { return !s.builder; }).length;
 };
 
 /**
@@ -78,9 +79,9 @@ const getTotalCount = (settingInfos) => {
  */
 const getEnabledCount = (settingInfos) => {
   return settingInfos
-    .filter((s) => !s.builder)
-    .map((s) => s.controllable ? s.value : Boolean(s.disabledValue))
-    .reduce((accum, value) => (accum + Number(value)), 0);
+    .filter((s) => { return !s.builder; })
+    .map((s) => { return s.controllable ? s.value : Boolean(s.disabledValue); })
+    .reduce((accum, value) => { return (accum + Number(value)); }, 0);
 };
 
 /*
@@ -98,17 +99,19 @@ const getEnabledCount = (settingInfos) => {
  * @param {string} settingID id of setting
  * @param {function} settingInfoUpdater Transformation for settingInfo
  *
- * @returns {({sectionInfos}: {sectionInfos: SectionInfo[]}) => SectionInfo[]} Updater for sectionInfos state
+ * @returns { ({ sectionInfos }: { sectionInfos: SectionInfo[] }) => SectionInfo[] } Updater for sectionInfos state
  */
-const createAdjustSectionSettingInfo = (sectionName, settingID, settingInfoUpdater) => ({sectionInfos}) => {
-  const section = sectionInfos.find((sec) => sec.name === sectionName);
+const createAdjustSectionSettingInfo = (sectionName, settingID, settingInfoUpdater) => ({ sectionInfos }) => {
+  const section = sectionInfos.find((sec) => { return sec.name === sectionName; });
+
   if (!section) {
     throw new Error(debug(`sectionInfo.js: failed to find section with name ${sectionName}`));
   }
 
   const settingInfo = section.settingInfos
-    .filter((info) => !info.builder)
-    .find((info) => info.settingID === settingID);
+    .filter((info) => { return !info.builder; })
+    .find((info) => { return info.settingID === settingID; });
+
   if (!settingInfo) {
     throw new Error(debug(`sectionInfo.js: failed to find settingInfo with id ${settingID} in section ${sectionName}`));
   }
@@ -116,11 +119,15 @@ const createAdjustSectionSettingInfo = (sectionName, settingID, settingInfoUpdat
   try {
     const updatedSettingInfo = settingInfoUpdater(settingInfo);
 
-    const newSettingInfos = section.settingInfos.map((info) => info.settingID === settingID ? updatedSettingInfo : info);
-    const newSection = Object.assign({}, section, {settingInfos: newSettingInfos});
-    const newSectionInfos = sectionInfos.map((secInfo) => secInfo.name === sectionName ? newSection : secInfo);
+    const newSettingInfos = section.settingInfos.map((info) => {
+      return info.settingID === settingID ? updatedSettingInfo : info;
+    });
+    const newSection = Object.assign({}, section, { settingInfos: newSettingInfos });
+    const newSectionInfos = sectionInfos.map((secInfo) => {
+      return secInfo.name === sectionName ? newSection : secInfo;
+    });
 
-    return {sectionInfos: newSectionInfos};
+    return { sectionInfos: newSectionInfos };
   }
   catch (err) {
     debug(`sectionInfo.js: Failed to update setting ${settingID} in section ${sectionName} with error:`);
@@ -148,7 +155,7 @@ const createValueUpdater = (value) => (settingInfo) => {
   return Object.assign(
     {},
     settingInfo,
-    {value}
+    { value },
   );
 };
 
@@ -163,8 +170,8 @@ const createValueUpdater = (value) => (settingInfo) => {
  * @returns {*} sections informations
  */
 const createInitialSectionInfos = (
-  {settings, browser, user},
-  {debugSettingItemBuilder, languageDropdownBuilder}
+  { settings, browser, user },
+  { debugSettingItemBuilder, languageDropdownBuilder },
 ) => {
   const baseInfo = [
     {
@@ -173,8 +180,8 @@ const createInitialSectionInfos = (
       settingInfos: [
         {
           settingID: 'preventwebrtcleak',
-          label: t("WebRTCLeakProtection"),
-          tooltip: t("WebRTCTooltip", {browser}),
+          label: t('WebRTCLeakProtection'),
+          tooltip: t('WebRTCTooltip', { browser }),
         },
       ],
     },
@@ -185,7 +192,7 @@ const createInitialSectionInfos = (
         {
           settingID: 'blocknetworkprediction',
           label: t('BlockNetworkPrediction'),
-          tooltip: t('BlockNetworkPredictionTooltip', {browser}),
+          tooltip: t('BlockNetworkPredictionTooltip', { browser }),
         },
       ],
     },
@@ -201,12 +208,14 @@ const createInitialSectionInfos = (
         {
           settingID: 'fingerprintprotection',
           label: t('FingerprintProtection'),
-          tooltip: t('FingerprintProtectionTooltip', {browser}),
+          tooltip: t('FingerprintProtectionTooltip', { browser }),
+          learnMore: 'Mozilla Wiki - Security/Fingerprinting',
+          learnMoreHref: 'https://wiki.mozilla.org/Security/Fingerprinting',
         },
         {
           settingID: 'blockreferer',
           label: t('BlockHTTPReferer'),
-          tooltip: t('BlockHTTPRefererTooltip', {browser}),
+          tooltip: t('BlockHTTPRefererTooltip', { browser }),
         },
         {
           settingID: 'blockhyperlinkaudit',
@@ -246,17 +255,17 @@ const createInitialSectionInfos = (
         },
         {
           builder: debugSettingItemBuilder,
-          key: 'debug-setting'
+          key: 'debug-setting',
         },
         {
           builder: languageDropdownBuilder,
-          key: 'language-dropdown'
+          key: 'language-dropdown',
         },
       ],
     },
   ];
 
-  return addDerivedInfo(baseInfo, {settings});
+  return addDerivedInfo(baseInfo, { settings });
 };
 
 export {

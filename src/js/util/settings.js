@@ -25,11 +25,12 @@ const ApplicationIDs = {
   DEBUG_MODE: 'debugmode',
   REMEMBER_ME: 'rememberme',
   LOGOUT_ON_CLOSE: 'logoutOnClose',
+  FIRST_RUN: 'firstRun',
 };
 
 
 class Settings {
-  constructor (app) {
+  constructor(app) {
     // Bindings
     this.init = this.init.bind(this);
     this.toggle = this.toggle.bind(this);
@@ -47,36 +48,47 @@ class Settings {
   /*              Getters                 */
   /* ------------------------------------ */
 
-  get _storage () { return this._app.util.storage; }
-  get _regionList () { return this._app.util.regionlist; }
-  get _adapter () { return this._app.adapter; }
-  get _proxy () { return this._app.proxy; }
-  get _logger () { return this._app.logger; }
-  get _chromeSettings () { return this._app.chromesettings; }
+  get _storage() { return this._app.util.storage; }
+
+  get _regionList() { return this._app.util.regionlist; }
+
+  get _adapter() { return this._app.adapter; }
+
+  get _proxy() { return this._app.proxy; }
+
+  get _logger() { return this._app.logger; }
+
+  get _chromeSettings() { return this._app.chromesettings; }
 
   /* ------------------------------------ */
   /*          Transformations             */
   /* ------------------------------------ */
 
-  get _apiSettings () { return [...Object.values(this._chromeSettings)]; }
-  get _allSettings () { return [...Settings._appDefaults, ...this._apiSettings]; }
-  get _appIDs () { return Settings._appDefaults.map((setting) => setting.settingID); }
-  get _apiIDs () { return this._apiSettings.map((setting) => setting.settingID); }
-  get _allIDs () { return [...this._appIDs, ...this._apiIDs]; }
+  get _apiSettings() { return [...Object.values(this._chromeSettings)]; }
+
+  get _allSettings() { return [...Settings._appDefaults, ...this._apiSettings]; }
+
+  get _appIDs() { return Settings._appDefaults.map((setting) => { return setting.settingID; }); }
+
+  get _apiIDs() { return this._apiSettings.map((setting) => setting.settingID); }
+
+  get _allIDs() { return [...this._appIDs, ...this._apiIDs]; }
 
   /* ------------------------------------ */
   /*              Private                 */
   /* ------------------------------------ */
 
-  _getApiSetting (settingID) {
-    return this._apiSettings.find((setting) => setting.settingID === settingID);
+  _getApiSetting(settingID) {
+    return this._apiSettings.find((setting) => { return setting.settingID === settingID; });
   }
 
-  _existsApplicationSetting (settingID) {
-    return Boolean(Settings._appDefaults.find((setting) => setting.settingID === settingID));
+  _existsApplicationSetting(settingID) {
+    return Boolean(Settings._appDefaults.find((setting) => {
+      return setting.settingID === settingID;
+    }));
   }
 
-  _validID (settingID) {
+  _validID(settingID) {
     if (!this._allIDs.includes(settingID)) {
       console.error(debug(`invalid settingID: ${settingID}`));
       return false;
@@ -85,10 +97,9 @@ class Settings {
     return true;
   }
 
-  _toggleSetting (settingID) {
+  _toggleSetting(settingID) {
     const newValue = !this.getItem(settingID);
     this.setItem(settingID, newValue, true);
-
     return newValue;
   }
 
@@ -99,7 +110,7 @@ class Settings {
    *
    * @returns {boolean} new value of setting
    */
-  _toggleApplicationSetting (settingID) {
+  _toggleApplicationSetting(settingID) {
     const newValue = this._toggleSetting(settingID);
 
     switch (settingID) {
@@ -128,7 +139,7 @@ class Settings {
    *
    * @returns {Promise<boolean>} new value of setting;
    */
-  async _toggleApiSetting (setting) {
+  async _toggleApiSetting(setting) {
     const toggle = setting.isApplied() ? setting.clearSetting : setting.applySetting;
     try {
       await toggle.call(setting);
@@ -156,7 +167,7 @@ class Settings {
    *
    * @returns {void}
    */
-  init () {
+  init() {
     this._allSettings.forEach((setting) => {
       if (!this.hasItem(setting.settingID)) {
         // We call this in bridged mode because we do not want it setting items on the background
@@ -177,9 +188,9 @@ class Settings {
    *
    * @throws {Error} if settingID is not valid
    */
-  async toggle (settingID, bridged) {
+  async toggle(settingID, bridged) {
     if (!bridged) {
-      this._adapter.sendMessage('util.settings.toggle', {settingID});
+      this._adapter.sendMessage('util.settings.toggle', { settingID });
     }
 
     // Look for setting in application settings
@@ -209,7 +220,7 @@ class Settings {
    *
    * @throws {Error} if settingID is not valid
    */
-  hasItem (settingID) {
+  hasItem(settingID) {
     if (this._validID(settingID)) {
       return this._storage.hasItem(`settings:${settingID}`);
     }
@@ -227,7 +238,7 @@ class Settings {
    *
    * @throws {Error} if settingID is not valid
    */
-  getItem (settingID) {
+  getItem(settingID) {
     if (this._validID(settingID)) {
       return this._storage.getItem(`settings:${settingID}`) === 'true';
     }
@@ -241,7 +252,7 @@ class Settings {
    *
    * @returns {Setting[]} list of settings
    */
-  getAll () {
+  getAll() {
     return this._allIDs.map((settingID) => {
       return {
         settingID,
@@ -261,14 +272,14 @@ class Settings {
    *
    * @returns {void}
    */
-  setItem (settingID, value, bridged) {
+  setItem(settingID, value, bridged) {
     if (this._validID(settingID)) {
       value = String(value) === 'true';
       if (value !== this.getItem(settingID)) {
         const key = `settings:${settingID}`;
         this._storage.setItem(key, value);
         if (!bridged) {
-          this._adapter.sendMessage('updateSettings', {settingID, value});
+          this._adapter.sendMessage('updateSettings', { settingID, value });
         }
       }
     }
@@ -287,7 +298,7 @@ class Settings {
    *
    * @throws {Error} if settingID is not valid
    */
-  getControllable (settingID) {
+  getControllable(settingID) {
     if (this._validID(settingID)) {
       // LogoutOnClose depends on rememberme
       if (settingID === ApplicationIDs.LOGOUT_ON_CLOSE) {
@@ -323,7 +334,7 @@ class Settings {
    *
    * @throws {Error} if settingID is not valid API setting
    */
-  getApiSetting (settingID) {
+  getApiSetting(settingID) {
     if (!this._validID(settingID)) {
       throw new Error('invalid settingID');
     }
@@ -345,7 +356,7 @@ class Settings {
    *
    * Also used as list of acceptable application settingID's
    */
-  static get _appDefaults () {
+  static get _appDefaults() {
     return [
       {
         settingID: ApplicationIDs.BLOCK_UTM,
@@ -366,6 +377,10 @@ class Settings {
       {
         settingID: ApplicationIDs.LOGOUT_ON_CLOSE,
         settingDefault: false,
+      },
+      {
+        settingID: ApplicationIDs.FIRST_RUN,
+        settingDefault: true,
       },
     ];
   }
