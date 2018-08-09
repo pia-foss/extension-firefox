@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.1.19__
+
+* Added tooltip to remember me checkbox
+
 __v1.1.18__
 
 * Fixed visual bug with popover on extension settings
