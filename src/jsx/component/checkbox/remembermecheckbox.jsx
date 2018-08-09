@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import PropType from 'prop-types';
 
+import Tooltip from 'component/tooltip';
 import UncontrolledCheckbox from './uncontrolledcheckbox';
 
 /**
@@ -27,13 +28,14 @@ class RememberMeCheckbox extends Component {
 
   render () {
     return (
-      <div className={`remember-me-container`}>
+      <div className="remember-me-container popover-owner">
         <UncontrolledCheckbox
           defaultChecked={this.defaultChecked}
           onChange={this.onChange}
           id="remember-checkbox"
         />
         <label htmlFor="remember-checkbox">{t(this.props.labelLocaleKey)}</label>
+        <Tooltip message={t('RememberMeTooltip')} />
       </div>
     );
   }

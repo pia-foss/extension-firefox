@@ -155,6 +155,27 @@
     }
   }
 }
+
+.popover-owner:hover {
+  &:hover {
+    > .popover {
+      display: block;
+    }
+  }
+}
+
+.remember-me-container {
+  .popover {
+    margin-left: auto;
+    margin-right: auto;
+    top: 128px;
+
+    &::after,&::before {
+      left: 10%;
+    }
+  }
+}
+
 .settings-icon .popover.darkpopover {
   bottom: 48px;
 }
