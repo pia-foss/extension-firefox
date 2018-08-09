@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.1.20__
+
+* Added error messages to import popup if file is invalid
+
 __v1.1.19__
 
 * Added tooltip to remember me checkbox
@@ -14,7 +18,7 @@ __v1.1.17__
 
 * Updated NPM build script to include automated packaging
 
-* Adding linting adhering to airbnb style guide
+* Added linting adhering to airbnb style guide
 
 __v1.1.16__
 
