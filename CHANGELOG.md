@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.1.22__
+
+* Fixed a bug where the proxy disconnects when opening extension in PB Mode
+
 __v1.1.21__
 
 * Added a disclaimer on initial installation warning about the Fingerprint Protection setting

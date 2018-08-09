@@ -26,11 +26,16 @@
       ["any"]
     ]
   },
+  "settings" : {
+    "import/resolver": {
+      "node": {
+          "paths": ["./src/js"]
+        }
+    }
+  },
   "globals": {
     "t": true,
-    "debug": true,
-    "browser": true,
-    "chrome": true
+    "debug": true
   },
   "env": {
     "browser": true,

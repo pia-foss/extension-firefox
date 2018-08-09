@@ -1,16 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import LoginTemplate from '../templates/logintemplate';
-import AuthenticatedTemplate from '../templates/authenticatedtemplate';
-import ChangeRegionTemplate from '../templates/changeregiontemplate';
-import SettingsTemplate from '../templates/settingstemplate';
-import ChromeUpgradeTemplate from '../templates/chromeupgradetemplate';
-import PleaseWaitTemplate from '../templates/pleasewaittemplate';
-import UncontrollableTemplate from '../templates/uncontrollabletemplate';
-import ChangelogTemplate from '../templates/changelogtemplate';
-import DebugLogTemplate from '../templates/debuglogtemplate';
-import BypassListTemplate from '../templates/bypasslisttemplate';
-import FingerprintOptIn from '../templates/fingerprint-opt-in';
+import LoginTemplate from 'templates/logintemplate';
+import AuthenticatedTemplate from 'templates/authenticatedtemplate';
+import ChangeRegionTemplate from 'templates/changeregiontemplate';
+import SettingsTemplate from 'templates/settingstemplate';
+import ChromeUpgradeTemplate from 'templates/chromeupgradetemplate';
+import PleaseWaitTemplate from 'templates/pleasewaittemplate';
+import UncontrollableTemplate from 'templates/uncontrollabletemplate';
+import ChangelogTemplate from 'templates/changelogtemplate';
+import DebugLogTemplate from 'templates/debuglogtemplate';
+import BypassListTemplate from 'templates/bypasslisttemplate';
+import FingerprintOptIn from 'templates/fingerprint-opt-in';
 
 export default class Renderer {
   constructor(app, window, document) {
