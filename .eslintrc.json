@@ -23,6 +23,7 @@
     }]
   },
   "env": {
-    "browser": true
+    "browser": true,
+    "webextensions": true
   }
 }
