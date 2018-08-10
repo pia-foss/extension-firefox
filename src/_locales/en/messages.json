@@ -39,7 +39,25 @@
     "message": "Fingerprint protection"
   },
   "FingerprintProtectionTooltip": {
-    "message": "Protect against browser fingerprinting by providing generic information about your computer and preventing access to certain browser APIs. Disabled by default. Recommended, but may break some websites and modify the browser's behavior. Please consult the Mozilla Wiki for a full list of changes."
+    "message": "Protect against browser fingerprinting by providing generic information about your computer and preventing access to certain browser APIs."
+  },
+  "FingerprintProtectionHeader": {
+    "message": "Fingerprint Protection Setting"
+  },
+  "FingerprintProtectionDisclaimer": {
+    "message": "This setting can provide extra privacy and security but may break certain websites and cause the browser to behave differently than expected. A full list of modifications can be found here:"
+  },
+  "FingerprintProtectionInstructions": {
+    "message": "This feature is recommended but some users may find it inconvenient. Please choose to either enable or disable Fingerprint Protection:"
+  },
+  "FingerprintProtectionEnable": {
+    "message": "Enable"
+  },
+  "FingerprintProtectionDisable": {
+    "message": "Disable"
+  },
+  "FingerprintProtectionAfterword": {
+    "message": "This settings can also be changed from the \"Extension Settings\" panel after logging into the extension."
   },
   "TrackingProtection": {
     "message": "Tracking protection"

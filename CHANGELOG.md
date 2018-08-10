@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.1.21__
+
+* Added a disclaimer on initial installation warning about the Fingerprint Protection setting
+
 __v1.1.20__
 
 * Added error messages to import popup if file is invalid
