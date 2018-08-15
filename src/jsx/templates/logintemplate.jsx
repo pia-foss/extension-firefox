@@ -39,7 +39,7 @@ export default function (renderer, app, window, document) {
                 className="col-xs-10 btn-info btn-signup"
                 target="_blank"
                 rel="noopener noreferrer"
-                href={this.joinURL}
+                href={this.joinURL()}
               >
                 { t('JoinText') }
               </a>

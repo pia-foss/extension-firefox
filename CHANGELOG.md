@@ -1,6 +1,14 @@
 __HEAD__
 
+__v1.1.23__
+
+* Fixed sign up link on login view
+
+* Fixed Account Settings link on logged in view
+
 __v1.1.22__
+
+* Fixed regression on build info while viewing settings in PB Mode
 
 * Fixed a bug where the proxy disconnects when opening extension in PB Mode
 

@@ -20,8 +20,10 @@ export default function (renderer, app, window, document) {
   return class extends Component {
     constructor(props) {
       super(props);
-      this.i18n = app.util;
+      this.i18n = app.util.i18n;
       this.state = { region: regionlist.getSelectedRegion() };
+
+      this.autologinURL = this.autologinURL.bind(this);
     }
 
     autologinURL() {
@@ -49,7 +51,7 @@ export default function (renderer, app, window, document) {
               <a
                 title={t('AccountSettingsText')}
                 className="col-xs-4 btn-icon btn-account invokepop"
-                href={this.autologinURL}
+                href={this.autologinURL()}
                 target="_blank"
                 rel="noopener noreferrer"
               >
