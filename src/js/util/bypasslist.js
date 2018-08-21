@@ -313,13 +313,6 @@ export default class BypassList {
       type: 'popup',
       width,
       height,
-    })
-      // TODO: Remove when https://bugzilla.mozilla.org/show_bug.cgi?id=1425829 has been resolved
-      .then(({id}) => {
-        browser.windows.update(id, {
-          width,
-          height: height + 1,
-        });
-      });
+    });
   }
 }

@@ -1,4 +1,6 @@
-browser.runtime.getBackgroundPage().then(({ app }) => {
+import 'babel-polyfill';
+
+browser.runtime.getBackgroundPage().then(async ({ app }) => {
   const {
     util: {
       bypasslist,
@@ -6,6 +8,26 @@ browser.runtime.getBackgroundPage().then(({ app }) => {
     },
     logger: { debug },
   } = app;
+
+  async function getCurrentWindowID() {
+    const { id: windowID } = await browser.windows.getCurrent();
+
+    return windowID;
+  }
+
+  async function closeWindow() {
+    const windowID = await getCurrentWindowID();
+
+    return browser.windows.remove(windowID);
+  }
+
+  async function updateSize() {
+    const { width, height, id } = await browser.windows.getCurrent();
+    return browser.windows.update(id, {
+      width: width + 2,
+      height: height + 2,
+    });
+  }
 
   /**
    * Set error message
@@ -61,7 +83,7 @@ browser.runtime.getBackgroundPage().then(({ app }) => {
   /**
    * Called when the imported file has been read successfully
    *
-   * @returns {void}
+   * @returns {Promise<void>}
    */
   function loadEndListener() {
     const { result } = this;
@@ -71,10 +93,11 @@ browser.runtime.getBackgroundPage().then(({ app }) => {
     }
     catch (err) {
       debug('importrules.js: failed to parse rules file, ensure valid JSON');
-      return;
+      return Promise.resolve();
     }
     bypasslist.importRules(rules);
-    browser.windows.remove(browser.windows.WINDOW_ID_CURRENT);
+
+    return closeWindow();
   }
 
   /**
@@ -93,4 +116,6 @@ browser.runtime.getBackgroundPage().then(({ app }) => {
 
   document.getElementById('import-file-label').innerHTML = t('ImportLabel');
   document.getElementById('import-file-input').addEventListener('change', onFileChange);
+  // TODO: Remove when https://bugzilla.mozilla.org/show_bug.cgi?id=1425829 has been resolved
+  await updateSize();
 });

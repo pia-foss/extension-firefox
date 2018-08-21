@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.1.25__
+
+* Fixed import window intermittedly invisible
+
 __v1.1.24__
 
 * Fixed settings not being initialised properly
