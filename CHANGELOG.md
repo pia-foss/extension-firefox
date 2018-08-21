@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.1.24__
+
+* Fixed settings not being initialised properly
+
 __v1.1.23__
 
 * Fixed sign up link on login view
