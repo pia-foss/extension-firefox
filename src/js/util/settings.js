@@ -274,13 +274,11 @@ class Settings {
    */
   setItem(settingID, value, bridged) {
     if (this._validID(settingID)) {
-      value = String(value) === 'true';
-      if (value !== this.getItem(settingID)) {
-        const key = `settings:${settingID}`;
-        this._storage.setItem(key, value);
-        if (!bridged) {
-          this._adapter.sendMessage('updateSettings', { settingID, value });
-        }
+      const newValue = String(value) === 'true';
+      const key = `settings:${settingID}`;
+      this._storage.setItem(key, newValue);
+      if (!bridged) {
+        this._adapter.sendMessage('updateSettings', { settingID, value: newValue });
       }
     }
     else {
