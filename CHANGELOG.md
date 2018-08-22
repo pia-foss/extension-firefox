@@ -1,5 +1,11 @@
 __HEAD__
 
+__v1.1.26__
+
+* Fixed a styling issue with Changelog producing a horizontal scroll.
+
+* Fixed a styling issue with "Remember me" tooltip misplaced during login error.
+
 __v1.1.25__
 
 * Fixed import window intermittedly invisible
