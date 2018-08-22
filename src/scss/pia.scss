@@ -72,6 +72,7 @@ body a, body a:active, body a:focus, body a:hover {
 }
 
 #changelog-template {
+  max-height: 580px;
     #changelog {
         margin: 15px 15px 0px 15px;
         ul {
@@ -392,17 +393,18 @@ body a, body a:active, body a:focus, body a:hover {
 }
 
 .remember-me-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  position: relative;
 
-    .remember-checkbox-container {
-        margin-right: 10px;
-    }
+  .remember-checkbox-container {
+    margin-right: 10px;
+  }
 
-    > label {
-        font-weight: normal;
-    }
+  > label {
+    font-weight: normal;
+  }
 }
 
 .errorcontainer {
