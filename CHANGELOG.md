@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.2__
+
+* Better offline startup support
+
 __v1.2.1__
 
 * Created UI tests

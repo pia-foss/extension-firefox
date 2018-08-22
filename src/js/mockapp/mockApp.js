@@ -27,6 +27,7 @@ import BrowserProxy from 'chromesettings/proxy';
 export default class MockApp {
   constructor() {
     // create app object
+    this.target = 'background';
     this.logger = new Logger(this);
     this.buildinfo = new BuildInfo(this);
     window.debug = this.logger.debug;
@@ -76,59 +77,47 @@ export default class MockApp {
   }
 
   initialize() {
-    return this.sendMessage('initialize').then((app) => {
-      if (!app) { return Promise.resolve(); }
+    return this.sendMessage('initialize')
+      .then((app) => {
+        if (!app) { return Promise.resolve(); }
 
-      // set settings values
-      // it is critical the settings are intiialized before setting up the user
-      // to ensure 'remember me' is set and user credentials are saved to the
-      // correct storage location via setUsername and setPassword
-      app.util.settings.forEach(({ settingID, value }) => {
-        this.util.settings.setItem(settingID, value, true);
-      });
+        // set settings values
+        // it is critical the settings are intiialized before setting up the user
+        // to ensure 'remember me' is set and user credentials are saved to the
+        // correct storage location via setUsername and setPassword
+        app.util.settings.forEach(({ settingID, value }) => {
+          this.util.settings.setItem(settingID, value, true);
+        });
 
-      // set user, proxy, and region values
-      this.util.user.authed = app.util.user.authed;
-      this.util.user.authing = app.util.user.authing;
-      this.util.user.setLoggedInStorageItem(app.util.user.loggedIn);
-      this.proxy.setEnabled(app.proxy.enabled);
-      this.util.user.setUsername(app.util.user.username, true);
-      this.util.user.setPassword(app.util.user.password, true);
-      this.util.regionlist.setSelectedRegion(app.util.regionlist.region.id, true);
-      this.util.storage.setItem('online', app.online);
-      this.util.regionlist.resetFavoriteRegions(app.util.regionlist.favorites);
+        // set user, proxy, and region values
+        this.util.user.authed = app.util.user.authed;
+        this.util.user.authing = app.util.user.authing;
+        this.util.user.setLoggedInStorageItem(app.util.user.loggedIn);
+        this.proxy.setEnabled(app.proxy.enabled);
+        this.util.user.setUsername(app.util.user.username, true);
+        this.util.user.setPassword(app.util.user.password, true);
+        this.util.storage.setItem('online', app.online);
+        this.util.regionlist.import(app.util.regionlist.regions);
+        this.util.regionlist.setSelectedRegion(app.util.regionlist.region.id, true);
+        this.util.regionlist.resetFavoriteRegions(app.util.regionlist.favorites);
 
-      // set bypasslist rules
-      const userRuleKey = this.util.bypasslist._storageKeys.userrk;
-      const popRuleKey = this.util.bypasslist._storageKeys.poprk;
-      this.util.storage.setItem(userRuleKey, app.util.bypasslist.user);
-      this.util.storage.setItem(popRuleKey, app.util.bypasslist.popular);
-      this.util.bypasslist.resetPopularRules();
-      return undefined;
-    })
-      .then(() => {
-        this.util.regionlist.sync()
-          .then(async () => {
-            const { proxy, util: { user, storage } } = this;
-            if (user.loggedIn) {
-              const proxyOnline = storage.getItem('online') === 'true';
-              await user.auth();
-              if (proxyOnline) { await proxy.enable(); }
-              else { await proxy.disable(); }
-            }
-            else { await proxy.disable(); }
-          })
-          .catch((err) => { this.proxy.disable(); }); // eslint-disable-line
+        // set bypasslist rules
+        const userRuleKey = this.util.bypasslist._storageKeys.userrk;
+        const popRuleKey = this.util.bypasslist._storageKeys.poprk;
+        this.util.storage.setItem(userRuleKey, app.util.bypasslist.user);
+        this.util.storage.setItem(popRuleKey, app.util.bypasslist.popular);
+        this.util.bypasslist.resetPopularRules();
+        return undefined;
       });
   }
 
   sendMessage(type, data) {
-    return browser.runtime.sendMessage({ target: 'background', type, data });
+    return browser.runtime.sendMessage({ target: this.target, type, data });
   }
 
   handleMessage(message, sender, response) {
-    if (!message) { return; }
-    if (message.target !== 'foreground') { return; }
+    if (!message) { return false; }
+    if (message.target !== 'foreground') { return false; }
 
     // can't return a promise because it's the polyfill version
     // and firefox won't recognize it as a 'real' promise

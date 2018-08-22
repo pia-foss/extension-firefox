@@ -9,48 +9,45 @@
   extension.
 
 */
-export default function(app) {
-  const hostR = /^https-[a-zA-Z0-9\-]+\.privateinternetaccess\.com$/;
+export default function (app) {
+  const hostR = /^https-[a-zA-Z0-9-]+\.privateinternetaccess\.com$/;
 
   const active = (details) => {
-    const {proxy} = app;
-    const {regionlist, settings} = app.util;
+    const { proxy } = app;
+    const { regionlist, settings } = app.util;
     const region = regionlist.getSelectedRegion();
-    const port = settings.getItem("maceprotection") ? region.macePort : region.port;
+    const port = settings.getItem('maceprotection') ? region.macePort : region.port;
 
-    return proxy.enabled() &&
-           details.isProxy &&
-           hostR.test(details.challenger.host) &&
-           region.host === details.challenger.host &&
-           port === details.challenger.port;
+    return proxy.enabled()
+      && details.isProxy
+      && hostR.test(details.challenger.host)
+      && region.host === details.challenger.host
+      && port === details.challenger.port;
   };
 
-  return function(details) {
-    if(!active(details)) { return debug("onAuthRequired/1: refused."); }
+  return function handle(details) {
+    if (!active(details)) { return debug('onAuthRequired/1: refused.'); }
 
-    const {proxy} = app;
-    const {counter, user} = app.util;
+    const { counter, user } = app.util;
 
     counter.inc(details.requestId);
 
-    if(counter.get(details.requestId) > 1) {
-      debug("onAuthRequired/1: failed.")
+    if (counter.get(details.requestId) > 1) {
+      debug('onAuthRequired/1: failed.');
       counter.del(details.requestId);
-      chrome.tabs.update({url: chrome.extension.getURL("html/errorpages/authfail.html")});
-      proxy.disable()
-      .then(() => { user.authed = false; });
-      return {cancel: true};
+      chrome.tabs.update({ url: chrome.extension.getURL('html/errorpages/authfail.html') });
+      user.logout();
+      return { cancel: true };
     }
-    else if(user.loggedIn) {
-      debug("onAuthRequired/1: allowed.");
-      return {authCredentials: {username: user.getUsername(), password: user.getPassword()}};
+
+    if (user.loggedIn) {
+      debug('onAuthRequired/1: allowed.');
+      return { authCredentials: { username: user.getUsername(), password: user.getPassword() } };
     }
-    else {
-      debug("onAuthRequired/1: user not logged in");
-      proxy.disable()
-      .then(() => { user.authed = false; })
-      .then(() => { chrome.tabs.reload(details.tabId); });
-      return {cancel: true};
-    }
+
+    debug('onAuthRequired/1: user not logged in');
+    user.logout();
+    chrome.tabs.reload(details.tabId);
+    return { cancel: true };
   };
 }
