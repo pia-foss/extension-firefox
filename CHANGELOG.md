@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.1.27__
+
+* Fixed issue where user couldn't import bypass file after changing contents
+
 __v1.1.26__
 
 * Fixed a styling issue with Changelog producing a horizontal scroll.

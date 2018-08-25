@@ -9,6 +9,24 @@ browser.runtime.getBackgroundPage().then(async ({ app }) => {
     logger: { debug },
   } = app;
 
+  /**
+   * Get the file input
+   *
+   * @returns {HTMLInputElement}
+   */
+  function getInput() {
+    return document.getElementById('import-file-input');
+  }
+
+  /**
+   * Get the input label
+   *
+   * @returns {HTMLLabelElement}
+   */
+  function getLabel() {
+    return document.getElementById('import-file-label');
+  }
+
   async function getCurrentWindowID() {
     const { id: windowID } = await browser.windows.getCurrent();
 
@@ -46,14 +64,25 @@ browser.runtime.getBackgroundPage().then(async ({ app }) => {
     return new Error(`importrules.js: ${msg}`);
   }
 
+  /**
+   * Set error for invalid file
+   */
   function setInvalidFileError() {
     setError(t('InvalidImportFileStructure'));
   }
 
+  /**
+   * Clear the error message
+   */
   function clearError() {
     setError('');
   }
 
+  /**
+   * Attempt to parse the JSON file
+   *
+   * Sets error message if parsing fails
+   */
   function parse(result) {
     let rules = null;
     try {
@@ -114,8 +143,33 @@ browser.runtime.getBackgroundPage().then(async ({ app }) => {
     }
   }
 
-  document.getElementById('import-file-label').innerHTML = t('ImportLabel');
-  document.getElementById('import-file-input').addEventListener('change', onFileChange);
+  /**
+   * Handle clicking of file input
+   *
+   * Clear current files and re-register the onfilechange listener
+   *
+   * @this {HTMLInputElement}
+   */
+  function onImportClick() {
+    this.removeEventListener('change', onFileChange);
+    this.value = null;
+    this.addEventListener('change', onFileChange);
+  }
+
+  /**
+   * Update the label text
+   *
+   * @param label {HTMLLabelElement}
+   */
+  function updateLabel(label) {
+    // eslint-disable-next-line no-param-reassign
+    label.innerHTML = t('ImportLabel');
+  }
+
+  const label = getLabel();
+  const input = getInput();
+  updateLabel(label);
+  input.addEventListener('click', onImportClick);
   // TODO: Remove when https://bugzilla.mozilla.org/show_bug.cgi?id=1425829 has been resolved
   await updateSize();
 });
