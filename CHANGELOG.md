@@ -1,12 +1,16 @@
 __HEAD__
 
+__v1.1.28__
+
+* Updated Error handling to open close popup windows
+
 __v1.1.27__
 
 * Fixed issue where user couldn't import bypass file after changing contents
 
 __v1.1.26__
 
-* Fixed a styling issue with Changelog producing a horizontal scroll.
+* Fixed a styling issue with Changelog producing a horizontal scroll
 
 * Fixed a styling issue with "Remember me" tooltip misplaced during login error.
 
@@ -142,7 +146,7 @@ __v1.0.13__
 
 __v1.0.11__
 
-* Fixed a bug where choosing a popular rule in the bypass list kills the proxy.
+* Fixed a bug where choosing a popular rule in the bypass list kills the proxy
 
 __v1.0.10__
 
