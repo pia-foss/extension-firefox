@@ -562,5 +562,11 @@
   },
   "lu": {
     "message": "Luxembourg"
+  },
+  "ae": {
+    "message": "United Arab Emirates"
+  },
+  "za": {
+    "message": "South Africa"
   }
 }

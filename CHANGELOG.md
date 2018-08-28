@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.0__
+
+* Updated Translations
+
 __v1.1.28__
 
 * Updated Error handling to open close popup windows
@@ -12,15 +16,15 @@ __v1.1.26__
 
 * Fixed a styling issue with Changelog producing a horizontal scroll
 
-* Fixed a styling issue with "Remember me" tooltip misplaced during login error.
+* Fixed a styling issue with "Remember me" tooltip misplaced during login error
 
 __v1.1.25__
 
-* Fixed import window intermittedly invisible
+* Fixed import window intermittently invisible
 
 __v1.1.24__
 
-* Fixed settings not being initialised properly
+* Fixed settings not being initialized properly
 
 __v1.1.23__
 
