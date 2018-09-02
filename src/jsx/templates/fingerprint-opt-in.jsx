@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import CompanyLogo from '../component/companylogo';
+import CompanyLogo from '../component/CompanyLogo';
 
 export default function (renderer, app) {
   return class FingerprintOptIn extends Component {

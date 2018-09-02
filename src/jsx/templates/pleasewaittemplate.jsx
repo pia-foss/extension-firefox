@@ -1,10 +1,13 @@
 import React from 'react';
-import CompanyLogo from '../component/companylogo';
+import CompanyLogo from '../component/CompanyLogo';
+import OfflineWarning from '../component/OfflineWarning';
 
 export default function () {
   const PleaseWaitTemplate = () => {
     return (
-      <div id="please-wait-template">
+      <div id="please-wait-template" className="row">
+        <OfflineWarning />
+
         <CompanyLogo />
 
         <div className="top-border">

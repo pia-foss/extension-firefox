@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import CompanyLogo from '../component/companylogo';
+import OfflineWarning from '../component/OfflineWarning';
+import CompanyLogo from '../component/CompanyLogo';
 
 export default function () {
   class UncontrollableTemplate extends Component {
@@ -19,7 +20,9 @@ export default function () {
 
     render() {
       return (
-        <div>
+        <div className="uncontrollable-template row">
+          <OfflineWarning />
+
           <CompanyLogo />
 
           <div className="top-border">
@@ -30,13 +33,13 @@ export default function () {
             </p>
 
             <p className="btn-center">
-              <a
+              <button
+                type="button"
                 className="btn btn-success"
-                href="#"
                 onClick={this.openExtensionsPage}
               >
                 { t('ManageExtensions') }
-              </a>
+              </button>
             </p>
           </div>
         </div>

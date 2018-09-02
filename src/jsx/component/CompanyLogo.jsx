@@ -2,7 +2,7 @@ import React from 'react';
 
 const CompanyLogo = () => {
   return (
-    <div id="company-logo" className="row">
+    <div className="row company-logo">
       <div className="col-xs-12 text-center">
         <img
           width="210"

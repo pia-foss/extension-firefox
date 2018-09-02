@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import CompanyLogo from '../component/companylogo';
+import CompanyLogo from '../component/CompanyLogo';
+import OfflineWarning from '../component/OfflineWarning';
 import initLoginForm from '../component/loginform';
 
 export default function (renderer, app, window, document) {
@@ -24,7 +25,8 @@ export default function (renderer, app, window, document) {
 
     render() {
       return (
-        <div id="login-template">
+        <div id="login-template" className="row">
+          <OfflineWarning />
           <CompanyLogo />
           <div className="top-border">
             <LoginForm />
