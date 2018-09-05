@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.1__
+
+* Created UI tests
+
 __v1.2.0__
 
 * Updated Translations

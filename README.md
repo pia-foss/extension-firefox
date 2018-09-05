@@ -107,8 +107,19 @@ The git information is shown on the extension settings page if the build was con
   * Tick "Enable add-on debugging" if it isn't already.
   * Click "Load Temporary Add-on", and choose the path to the manifest file in the build directory.
 
-  Optionally, `web-ext run` from the `./build/debug` directory can be used in development.  
+  Optionally, `web-ext run` from the `./build/debug` directory can be used in development.
 
+#### Testing
+
+**Requirements**
+
+- npm
+
+**Running Tests**
+
+Simply run the npm command
+
+    `npm test`
 
 ## Translations
 
