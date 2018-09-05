@@ -17,3 +17,6 @@ todo.txt
 package-lock.json
 .env
 config/oneskyauthfile.json
+.nyc_output/*
+coverage/*
+*.xpi

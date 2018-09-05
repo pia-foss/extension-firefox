@@ -93,7 +93,7 @@ export default function (renderer, app) {
             <div className="fingerprint-options-buttons">
               <button
                 type="button"
-                className="btn btn-success"
+                className="btn btn-success enable"
                 onClick={this.enable}
               >
                 { t('FingerprintProtectionEnable') }
@@ -101,7 +101,7 @@ export default function (renderer, app) {
 
               <button
                 type="button"
-                className="btn btn-success"
+                className="btn btn-success disable"
                 onClick={this.disable}
               >
                 { t('FingerprintProtectionDisable') }

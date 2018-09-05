@@ -1,4 +1,4 @@
-const {generateExtension, firefox} = require('./util');
+const { generateExtension, firefox } = require('./util');
 
 // set up env vars
 process.env.build = 'webstore'; // eslint-disable-line no-process-env

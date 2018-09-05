@@ -1,5 +1,9 @@
 {
   "extends": "eslint-config-airbnb",
+  "parser": "typescript-eslint-parser",
+  "plugins": [
+    "typescript"
+  ],
   "parserOptions": {
     "ecmaVersion": 2017,
     "ecmaFeatures": {
