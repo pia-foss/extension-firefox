@@ -113,7 +113,7 @@ function packExtension(browser) {
   });
 };
 
-function renameExtension(browser, directory = builds) {
+function renameExtension(browser, directory) {
    return fs.moveSync(generateWebstoreFilePath(browser), generateFilePath(browser, directory));
 };
 
@@ -124,7 +124,14 @@ function logInfo() {
   console.log(`Detected Platform: ${platform}`);
 }
 
-function generateExtension(browser, destDir = artifactsDir) {
+/**
+ * Pack extension and move to appropriate directory
+ *
+ * @param {string} browser The browser name to build for
+ * @param {string} [destDir] the destination directory for packed extension.
+ * defaults to `builds` directory
+ */
+function generateExtension(browser, destDir = buildsDir) {
   logInfo();
 
   // generate a build and pack the extension
