@@ -2,6 +2,7 @@ export default class MockAppAdapter {
   constructor(app) {
     // properties
     this.app = app;
+    this.target = 'foreground';
 
     // bindings
     this.initialize = this.initialize.bind(this);
@@ -13,8 +14,8 @@ export default class MockAppAdapter {
   }
 
   handleMessage(message, sender, response) {
-    if (!message) { return; }
-    if (message.target !== 'background') { return; }
+    if (!message) { return false; }
+    if (message.target !== 'background') { return false; }
 
     // can't return a promise because it's the polyfill version
     // and firefox won't recognize it as a "real" promise
@@ -64,6 +65,9 @@ export default class MockAppAdapter {
       else if (message.type === 'util.regionlist.region') {
         this.app.util.regionlist.setSelectedRegion(message.data, true);
       }
+      else if (message.type === 'util.regionlist.regions') {
+        this.app.util.regionlist.import(message.data);
+      }
       else if (message.type === 'updateSettings') {
         const { settingID, value } = message.data;
         this.app.util.settings.setItem(settingID, value, true);
@@ -97,8 +101,8 @@ export default class MockAppAdapter {
 
       return resolve(res);
     })
-      .then(response) // eslint-disable-line dot-location
-      .catch((err) => { return response(false); }); // eslint-disable-line
+      .then(response)
+      .catch(() => { return response(false); });
 
     // must return true here to keep the response callback alive
     return true;
@@ -118,6 +122,7 @@ export default class MockAppAdapter {
         },
         regionlist: {
           region: { id: this.app.util.regionlist.getSelectedRegion().id },
+          regions: this.app.util.regionlist.export(),
           favorites: this.app.util.storage.getItem('favoriteregions'),
         },
         bypasslist: {
@@ -132,11 +137,11 @@ export default class MockAppAdapter {
   }
 
   sendMessage(type, data) {
-    return browser.runtime.sendMessage({ target: 'foreground', type, data })
-    .catch((err) => { // eslint-disable-line dot-location
-      const errMessage = 'Could not establish connection';
-      if (err.message.startsWith(errMessage)) { return; } // eslint-disable-line no-useless-return
-      else { throw err; }
-    });
+    return browser.runtime.sendMessage({ target: this.target, type, data })
+      .catch((err) => {
+        const errMessage = 'Could not establish connection';
+        if (err.message.startsWith(errMessage)) { return; }
+        throw err;
+      });
   }
 }

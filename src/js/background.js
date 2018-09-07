@@ -1,104 +1,116 @@
-import "babel-polyfill";
-import MockAppAdapter from "mockapp/mockAppAdapter";
+import 'babel-polyfill';
+import MockAppAdapter from 'mockapp/mockAppAdapter';
 
-import storage            from "util/storage";
-import settings           from "util/settings";
-import icon               from "util/icon";
-import regionlist         from "util/regionlist";
-import regionsorter       from "util/regionsorter";
-import user               from "util/user";
-import bypasslist         from "util/bypasslist";
-import latencytest        from "util/latencytest";
-import buildinfo          from "util/buildinfo";
-import Logger             from "util/logger";
-import counter            from "util/counter";
-import settingsmanager    from "util/settingsmanager";
-import errorinfo          from "util/errorinfo";
-import i18n               from "util/i18n";
-import platforminfo       from "util/platforminfo";
+import Storage from 'util/storage';
+import Settings from 'util/settings';
+import Icon from 'util/icon';
+import RegionList from 'util/regionlist';
+import RegionSorter from 'util/regionsorter';
+import User from 'util/user';
+import BypassList from 'util/bypasslist';
+import LatencyTest from 'util/latencytest';
+import BuildInfo from 'util/buildinfo';
+import Logger from 'util/logger';
+import Counter from 'util/counter';
+import SettingsManager from 'util/settingsmanager';
+import ErrorInfo from 'util/errorinfo';
+import I18n from 'util/i18n';
+import PlatformInfo from 'util/platforminfo';
 
-import hyperlinkaudit        from "chromesettings/hyperlinkaudit";
-import webrtc                from "chromesettings/webrtc";
-import httpreferer           from "chromesettings/httpreferer";
-import networkprediction     from "chromesettings/networkprediction";
-import fingerprintprotection from "chromesettings/fingerprintprotection";
-import trackingprotection    from "chromesettings/trackingprotection";
-import BrowserProxy          from "chromesettings/proxy";
+import HyperlinkAudit from 'chromesettings/hyperlinkaudit';
+import WebRTC from 'chromesettings/webrtc';
+import HttpReferer from 'chromesettings/httpreferer';
+import NetworkPrediction from 'chromesettings/networkprediction';
+import FingerprintProtection from 'chromesettings/fingerprintprotection';
+import TrackingProtection from 'chromesettings/trackingprotection';
+import BrowserProxy from 'chromesettings/proxy';
 
-import eventhandler from "eventhandler/eventhandler";
+import EventHandler from 'eventhandler/eventhandler';
 
-(function () {
-  const self = Object.create(null);
+// build background application (self)
+const self = Object.create(null);
 
-  self.frozen = @@freezeApp;
-  self.buildinfo    = new buildinfo(self);
-  self.logger       = new Logger(self);
-  self.eventhandler = new eventhandler(self);
-  window.debug = self.logger.debug /* eslint-ignore no-unused-vars */
+// event handling and basic browser info gathering
+self.frozen = @@freezeApp;
+self.buildinfo = new BuildInfo(self);
+self.logger = new Logger(self);
+self.eventhandler = new EventHandler(self);
 
-  /* self.proxy is a ChromeSetting like self.chromesettings.* objects are. */
-  self.proxy = BrowserProxy(self);
+// attach debugging to global scope
+window.debug = self.logger.debug;
 
-  // message connection with foreground page
-  self.adapter = new MockAppAdapter(self);
+/* self.proxy is a ChromeSetting like self.chromesettings.* objects are. */
+self.proxy = BrowserProxy(self);
 
-  self.util = Object.create(null);
-  self.util.platforminfo       = new platforminfo(self);
-  self.util.icon               = new icon(self);
-  self.util.storage            = new storage(self);
-  self.util.settings           = new settings(self);
-  self.util.i18n               = new i18n(self);
-  self.util.regionlist         = new regionlist(self);
-  self.util.bypasslist         = new bypasslist(self);
-  self.util.counter            = new counter(self);
-  self.util.user               = new user(self);
-  self.util.latencytest        = new latencytest(self);
-  self.util.regionsorter       = new regionsorter(self);
-  self.util.settingsmanager    = new settingsmanager(self);
-  self.util.errorinfo          = new errorinfo(self);
-  self.util = Object.freeze(self.util);
+// message connection with foreground page
+self.adapter = new MockAppAdapter(self);
 
-  self.chromesettings = Object.create(null);
-  self.chromesettings.webrtc                = new webrtc(self);
-  self.chromesettings.networkprediction     = new networkprediction(self);
-  self.chromesettings.httpreferer           = new httpreferer(self);
-  self.chromesettings.hyperlinkaudit        = new hyperlinkaudit(self);
-  self.chromesettings.trackingprotection    = new trackingprotection(self);
-  self.chromesettings.fingerprintprotection = new fingerprintprotection(self);
-  Object.values(self.chromesettings)
-    .filter((setting) => setting.init)
-    .forEach((setting) => setting.init());
-  self.chromesettings = Object.freeze(self.chromesettings);
+// attach utility functions
+self.util = Object.create(null);
+self.util.platforminfo = new PlatformInfo(self);
+self.util.icon = new Icon(self);
+self.util.storage = new Storage(self);
+self.util.settings = new Settings(self);
+self.util.i18n = new I18n(self);
+self.util.regionlist = new RegionList(self);
+self.util.bypasslist = new BypassList(self);
+self.util.counter = new Counter(self);
+self.util.user = new User(self);
+self.util.latencytest = new LatencyTest(self);
+self.util.regionsorter = new RegionSorter(self);
+self.util.settingsmanager = new SettingsManager(self);
+self.util.errorinfo = new ErrorInfo(self);
+self.util = Object.freeze(self.util);
 
-  self.util.bypasslist.init();
+// attach browser specific functions
+self.chromesettings = Object.create(null);
+self.chromesettings.webrtc = new WebRTC(self);
+self.chromesettings.networkprediction = new NetworkPrediction(self);
+self.chromesettings.httpreferer = new HttpReferer(self);
+self.chromesettings.hyperlinkaudit = new HyperlinkAudit(self);
+self.chromesettings.trackingprotection = new TrackingProtection(self);
+self.chromesettings.fingerprintprotection = new FingerprintProtection(self);
 
-  (() => {
-    const { proxy } = self;
-    const { user, settings, storage, regionlist } = self.util;
-    settings.init();
+// initialize all functions
+Object.values(self.chromesettings)
+  .filter((setting) => { return setting.init; })
+  .forEach((setting) => { return setting.init(); });
+self.chromesettings = Object.freeze(self.chromesettings);
+self.util.bypasslist.init();
+self.util.settings.init();
 
-    regionlist.sync().then(async () => {
-      const { loggedIn, logOutOnClose } = user;
-      if (loggedIn) {
-        if (logOutOnClose) { await user.logout(); }
-        else {
-          const proxyOnline = storage.getItem("online") === 'true';
-          await user.auth();
-          if (proxyOnline) { await proxy.enable(); }
-          else { await proxy.disable(); }
-        }
-      }
-      else { await proxy.disable(); }
-    }).catch(proxy.disable);
+// check if regions are set
+const { regionlist } = self.util;
+const regionsSet = regionlist.hasRegions();
+if (!regionsSet) { regionlist.sync(); }
 
-    window.app = Object.freeze(self);
-    debug("background.js: initialized");
-  })();
+// check if application should logout on close, will disable proxy as well
+let userPromise;
+const { proxy } = self;
+const { user } = self.util;
+if (user.loggedIn && user.logOutOnClose) { userPromise = user.logout(); }
+else { userPromise = Promise.resolve(); }
 
-  // PAC error messages
-  if (browser.proxy) {
-    browser.proxy.onProxyError.addListener((error) => {
-      debug(`Proxy error: ${error.message}`);
-    });
-  }
-}());
+userPromise
+  // enable proxy if online and previously enabled
+  .then(() => {
+    const { storage } = self.util;
+    const proxyOnline = storage.getItem('online') === 'true';
+    if (user.loggedIn && proxyOnline) { return proxy.enable(); }
+    return proxy.disable();
+  })
+  .catch((err) => {
+    debug(err);
+    return proxy.disable();
+  });
+
+// attach app to background page
+window.app = Object.freeze(self);
+debug('background.js: initialized');
+
+// PAC error messages
+if (browser.proxy) {
+  browser.proxy.onProxyError.addListener((error) => {
+    debug(`Proxy error: ${error.message}`);
+  });
+}
