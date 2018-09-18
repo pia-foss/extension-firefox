@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Switch from '../component/switch';
-import CompanyLogo from '../component/companylogo';
+import OfflineWarning from '../component/OfflineWarning';
+import CompanyLogo from '../component/CompanyLogo';
 import initCurrentRegion from '../component/currentregion';
 import initActionButton from '../component/actionbutton';
 import initSettingsIcon from '../component/settingsicon';
@@ -9,21 +10,26 @@ export default function (renderer, app, window, document) {
   const CurrentRegion = initCurrentRegion(renderer, app, window, document);
   const ActionButton = initActionButton(renderer, app, window, document);
   const SettingsIcon = initSettingsIcon(renderer, app, window, document);
-  const { regionlist, user } = app.util;
-
-  const logout = () => {
-    return user.logout(() => {
-      return renderer.renderTemplate('login');
-    });
-  };
 
   return class extends Component {
     constructor(props) {
       super(props);
-      this.i18n = app.util.i18n;
-      this.state = { region: regionlist.getSelectedRegion() };
 
+      // properties
+      this.user = app.util.user;
+      this.i18n = app.util.i18n;
+      this.regionlist = app.util.regionlist;
+      this.state = { region: this.regionlist.getSelectedRegion() };
+
+      // bindings
+      this.logout = this.logout.bind(this);
       this.autologinURL = this.autologinURL.bind(this);
+    }
+
+    logout() {
+      return this.user.logout(() => {
+        return renderer.renderTemplate('login');
+      });
     }
 
     autologinURL() {
@@ -34,6 +40,8 @@ export default function (renderer, app, window, document) {
       const { region } = this.state;
       return (
         <div id="authenticated-template" className="row">
+          <OfflineWarning />
+
           <CompanyLogo />
 
           <div className="connection">
@@ -76,7 +84,7 @@ export default function (renderer, app, window, document) {
                 extraClassList="col-xs-3 btn-icon btn-logout"
                 title={t('LogoutText')}
                 tooltip={t('LogoutText')}
-                callback={logout}
+                callback={this.logout}
               />
             </div>
           </div>

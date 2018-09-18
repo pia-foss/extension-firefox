@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.3__
+
+* Added Offline Warning Banner
+
 __v1.2.2__
 
 * Better offline startup support
