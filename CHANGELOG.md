@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.4__
+
+* Fixed issue where connfail page wouldn't redirect on refresh
+
 __v1.2.3__
 
 * Added Offline Warning Banner
