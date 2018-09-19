@@ -7,39 +7,42 @@
   Being unaware of this could introduce serious bugs that compromise the security of the
   extension.
 */
-export default function(app) {
+export default function onErrorOccurred(app) {
   const networkErrors = [
-    "NS_ERROR_UNKNOWN_PROXY_HOST",
-    "NS_ERROR_PROXY_CONNECTION_REFUSED",
-    "NS_ERROR_CONNECTION_REFUSED",
-    "NS_ERROR_NET_TIMEOUT",
-    "NS_ERROR_OFFLINE",
-    "NS_ERROR_ABORT"
+    'NS_ERROR_UNKNOWN_PROXY_HOST',
+    'NS_ERROR_PROXY_CONNECTION_REFUSED',
+    'NS_ERROR_CONNECTION_REFUSED',
+    'NS_ERROR_NET_TIMEOUT',
+    'NS_ERROR_OFFLINE',
+    'NS_ERROR_ABORT',
   ];
 
   return (details) => {
-    const connectedToPIA    = app.proxy.enabled();
-    const errorOnMainFrame  = details.type === "main_frame";
-    const catchableError    = networkErrors.indexOf(details.error) > -1;
+    const connectedToPIA = app.proxy.enabled();
+    const errorOnMainFrame = details.type === 'main_frame';
+    const catchableError = networkErrors.indexOf(details.error) > -1;
 
-    if(!connectedToPIA || !errorOnMainFrame || !catchableError) { return; }
+    if (!connectedToPIA || !errorOnMainFrame || !catchableError) {
+      return { cancel: false };
+    }
 
-    // get the tab from the details object
-    browser.tabs.get(details.tabId)
-    // update tab with error page
-    .then(() => {
-      let url;
-      if (details.url && !details.url.startsWith('moz-extension')) {
-        url = encodeURIComponent(details.url);
+    const { error, tabId } = details;
+    const { url } = details;
+
+    (async () => {
+      try {
+        await browser.tabs.get(tabId);
+        const errorID = app.util.errorinfo.set(error, url);
+        const connfailUrl = chrome.extension.getURL(`html/errorpages/connfail.html?id=${errorID}`);
+        chrome.tabs.update(details.tabId, { url: connfailUrl });
+        debug(`connection error: successfully navigated to ${connfailUrl}`);
       }
-
-      const msg = details.error;
-      const errorPageURL = chrome.extension.getURL(`html/errorpages/connfail.html?msg=${msg}&url=${url}`);
-      chrome.tabs.update(details.tabId, {url: errorPageURL});
-    })
-    .catch(() => {});
+      catch (err) {
+        debug(`connection error: failed to create error for ${url}`);
+      }
+    })();
 
     debug(`connection error: ${details.error}`);
-    return {cancel: true};
-  }
+    return { cancel: true };
+  };
 }
