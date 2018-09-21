@@ -1,35 +1,34 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import LoginTemplate from 'templates/logintemplate';
-import AuthenticatedTemplate from 'templates/authenticatedtemplate';
-import ChangeRegionTemplate from 'templates/changeregiontemplate';
-import SettingsTemplate from 'templates/settingstemplate';
-import ChromeUpgradeTemplate from 'templates/chromeupgradetemplate';
-import PleaseWaitTemplate from 'templates/pleasewaittemplate';
-import UncontrollableTemplate from 'templates/uncontrollabletemplate';
-import ChangelogTemplate from 'templates/changelogtemplate';
-import DebugLogTemplate from 'templates/debuglogtemplate';
-import BypassListTemplate from 'templates/bypasslisttemplate';
-import FingerprintOptIn from 'templates/fingerprint-opt-in';
+import LoginTemplate from 'templates/LoginTemplate';
+import AuthenticatedTemplate from 'templates/AuthenticatedTemplate';
+import ChangeRegionTemplate from 'templates/ChangeRegionTemplate';
+import SettingsTemplate from 'templates/SettingsTemplate';
+import ChromeUpgradeTemplate from 'templates/ChromeUpgradeTemplate';
+import PleaseWaitTemplate from 'templates/PleaseWaitTemplate';
+import UncontrollableTemplate from 'templates/UncontrollableTemplate';
+import ChangelogTemplate from 'templates/ChangeLogTemplate';
+import DebugLogTemplate from 'templates/DebugLogTemplate';
+import BypassListTemplate from 'templates/BypassListTemplate';
+import FingerprintOptInTemplate from 'templates/FingerprintOptInTemplate';
 
 export default class Renderer {
-  constructor(app, window, document) {
-    // TODO: remove ref to React when components are more stable
+  constructor() {
     this.react = React;
     this.currentTemplate = undefined;
     this.previousTemplate = undefined;
     this.templates = {
-      login: () => { return LoginTemplate(this, app, window, document); },
-      authenticated: () => { return AuthenticatedTemplate(this, app, window, document); },
-      change_region: () => { return ChangeRegionTemplate(this, app, window, document); },
-      settings: () => { return SettingsTemplate(this, app, window, document); },
-      upgrade_chrome: () => { return ChromeUpgradeTemplate(this, app); },
+      login: () => { return LoginTemplate(); },
+      authenticated: () => { return AuthenticatedTemplate(); },
+      change_region: () => { return ChangeRegionTemplate(); },
+      settings: () => { return SettingsTemplate(); },
+      upgrade_chrome: () => { return ChromeUpgradeTemplate(); },
       please_wait: () => { return PleaseWaitTemplate(); },
       uncontrollable: () => { return UncontrollableTemplate(); },
-      changelog: () => { return ChangelogTemplate(this, app, window, document); },
-      debuglog: () => { return DebugLogTemplate(this, app, window, document); },
-      bypasslist: () => { return BypassListTemplate(this, app, window, document); },
-      fingerprint: () => { return FingerprintOptIn(this, app); },
+      changelog: () => { return ChangelogTemplate(); },
+      debuglog: () => { return DebugLogTemplate(); },
+      bypasslist: () => { return BypassListTemplate(); },
+      fingerprint: () => { return FingerprintOptInTemplate(); },
     };
 
     // bindings
