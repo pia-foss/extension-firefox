@@ -115,6 +115,20 @@ export abstract class WebElementBase {
     await this.seleniumElement.waitAndFindVisibleElement();
   }
 
+  public async waitForNotPresent() {
+    // Give time for the element to appear
+    // Can be significantly less than the base wait time
+    try {
+      await this.seleniumElement.waitAndFindElement(1 / 4);
+    }
+    catch {
+      // Element might already have disappeared, ignore errors
+    }
+
+    // Wait for the element to disappear
+    await this.seleniumElement.waitForNotPresent();
+  }
+
   public async waitExtraForVisible() {
     await this.seleniumElement.waitAndFindVisibleElement(2);
   }

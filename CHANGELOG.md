@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.5__
+
+* Improved general test reliability
+
 __v1.2.4__
 
 * Fixed issue where connfail page wouldn't redirect on refresh
