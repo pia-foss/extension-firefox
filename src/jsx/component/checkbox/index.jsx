@@ -11,7 +11,7 @@ const buildClassName = (postfix, id, ...others) => {
   classNames = [...classNames, ...others];
 
   return classNames.join(' ');
-}
+};
 
 /**
  * Presentational checkbox
@@ -29,7 +29,6 @@ const buildClassName = (postfix, id, ...others) => {
  * @returns {JSX.Element} Component
  */
 const Checkbox = (props) => {
-
   const {
     id,
     className,
@@ -55,14 +54,20 @@ const Checkbox = (props) => {
       />
     </div>
   );
-}
+};
 
 Checkbox.propTypes = {
   id: PropTypes.string.isRequired,
   className: PropTypes.string,
-  onChange: PropTypes.func,
+  onChange: PropTypes.func.isRequired,
   checked: PropTypes.bool.isRequired,
   disabled: PropTypes.bool,
 };
+
+Checkbox.defaultProps = {
+  className: '',
+  disabled: false,
+};
+
 
 export default ErrorBoundary(Checkbox);

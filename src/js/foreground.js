@@ -8,9 +8,12 @@ let app;
 const background = browser.extension.getBackgroundPage();
 if (background) { ({ app } = background); }
 else { app = new MockApp(); }
+if (!background) { window.app = app; } // in PB Mode, put app on window
 
 // create react template renderer
-const renderer = new Renderer(app, window, document);
+const renderer = new Renderer();
+if (background) { background.renderer = renderer; }
+else { window.renderer = renderer; } // in PB Mode, put renderer on window
 
 // check to see if we need to initialize
 let init;
@@ -69,11 +72,8 @@ init
   .then(() => { renderer.renderTemplate('please_wait'); })
   // check if regions need to be synched
   .then(() => {
-    let regionPromise;
     const { regionlist } = app.util;
-    if (regionlist.hasRegions()) { regionPromise = Promise.resolve(); }
-    else { regionPromise = regionlist.sync(); }
-    return regionPromise;
+    if (!regionlist.hasRegions()) { regionlist.sync(); }
   })
   // capability checks
   .then(() => {
@@ -97,12 +97,10 @@ init
   })
   // render view
   .then((needsUpgrade) => {
-    const { regionlist } = app.util;
-    const hasRegions = regionlist.hasRegions();
     const firstRun = app.util.settings.getItem('firstRun');
     if (needsUpgrade) { renderer.renderTemplate('upgrade_chrome'); }
     else if (firstRun) { renderer.renderTemplate('fingerprint'); }
-    else if (app.util.user.loggedIn && hasRegions) { renderer.renderTemplate('authenticated'); }
+    else if (app.util.user.loggedIn) { renderer.renderTemplate('authenticated'); }
     else { app.proxy.disable().then(() => { return renderer.renderTemplate('login'); }); }
   })
   .catch((err) => { debug(err); });

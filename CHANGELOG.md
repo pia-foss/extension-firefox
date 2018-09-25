@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.6__
+
+* Full Offline support for regions
+
 __v1.2.5__
 
 * Improved general test reliability
