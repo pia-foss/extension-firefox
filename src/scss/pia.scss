@@ -317,3 +317,8 @@ a, a:active, a:focus, a:hover { color: #39b54a; }
 
   input { cursor: pointer; }
 }
+
+#settings-template {
+  max-height: 580px;
+  overflow: auto;
+}

@@ -28,6 +28,11 @@ __v1.2.0__
 
 * Updated Translations
 
+__v1.1.29__
+
+* Fixed translation for hyperlink auditing setting
+* Fixed style break out in the region selection area
+
 __v1.1.28__
 
 * Updated Error handling to open close popup windows
