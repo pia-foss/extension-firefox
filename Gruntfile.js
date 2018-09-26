@@ -13,16 +13,16 @@ const {build, freezeApp, audience, browser} = process.env; // eslint-disable-lin
 // helper functions
 const stringify = (s) => {
   return typeof(s) === "string" ? s : JSON.stringify(s);
-}
+};
 
 const info = (s) => {
   return echomd(`${color.yellow("INFO")}: ${stringify(s)}`);
-}
+};
 
 const panic = (s) => {
   echomd(`${color.red("PANIC")}: ${stringify(s)}`);
   process.exit(1); // eslint-disable-line no-process-exit
-}
+};
 
 
 module.exports = function(grunt) {
@@ -72,21 +72,21 @@ module.exports = function(grunt) {
 
   grunt.registerTask("release", ["setreleaseenv", "build", "createzip", "compress"]);
 
-  grunt.freezeApp = () => { return freezeApp !== "0" };
+  grunt.freezeApp = () => { return freezeApp !== "0"; };
 
   grunt.getCommit = () => {
     if(["yes", "1", "true"].includes(gitinfo)) {
       return grunt.config.get('gitinfo').local.branch.current.SHA;
     }
-  }
+  };
 
   grunt.getBranch = () => {
     if(["yes", "1", "true"].includes(gitinfo)) {
       return grunt.config.get('gitinfo').local.branch.current.name;
     }
-  }
+  };
 
-  grunt.zipName = () => { return getZipPath(build); }
+  grunt.zipName = () => { return getZipPath(build); };
 
   grunt.registerTask("setreleaseenv", "set release env vars", () => {
     const empty = (s) => !s || (s.trim && s.trim().length === 0);
@@ -145,6 +145,7 @@ module.exports = function(grunt) {
   grunt.registerTask("removeartifacts", "Remove artifacts created during the build process.", () => {
     fs.removeSync('src/js/templates');
     fs.removeSync('src/js/component');
+    fs.removeSync('src/js/hoc');
     fs.removeSync('tmp/');
   });
-}
+};

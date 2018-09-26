@@ -22,27 +22,37 @@ export default function(app, foreground) {
     const {adapter} = app;
     const {icon, regionlist, bypasslist, storage, settingsmanager} = app.util;
 
-    let promise;
-    if (foreground) { promise = adapter.sendMessage('proxy.enable'); }
-    else { promise = browser.proxy.register('js/pac.js'); }
+    let registering;
+    if (foreground) { registering = adapter.sendMessage('proxy.enable'); }
+    else { registering = browser.proxy.register('js/pac.js'); }
 
-    return promise.then(() => {
-      enabled = true;
-      if (!foreground) { adapter.sendMessage('proxy.enabled', true); }
-      debug("proxy.js: registered PAC script");
-      debug(`bypasslist: ${JSON.stringify(bypasslist.toArray())}`);
-      if (!foreground) {
-        browser.runtime.sendMessage({
-          payload: PACify(regionlist.getSelectedRegion()),
-          bypasslist: app.util.bypasslist.toArray()
-        }, {toProxyScript: true});
-      }
-      icon.online();
-      settingsmanager.handleConnect();
-      storage.setItem("online", "true");
-      return self;
-    });
-  }
+    return registering
+      .then(() => {
+        enabled = true;
+        if (!foreground) { adapter.sendMessage('proxy.enabled', true); }
+        debug("proxy.js: registered PAC script");
+        debug(`bypasslist: ${JSON.stringify(bypasslist.toArray())}`);
+        if (!foreground) {
+          return browser.runtime.sendMessage({
+            payload: PACify(regionlist.getSelectedRegion()),
+            bypasslist: app.util.bypasslist.toArray()
+          }, {toProxyScript: true});
+        }
+        else {
+          return Promise.resolve();
+        }
+      })
+      .then(() => {
+        icon.online();
+        settingsmanager.handleConnect();
+        storage.setItem("online", "true");
+        return self;
+      })
+      .catch((err) => {
+        self._debug('error enabling proxy', err);
+        throw err;
+      });
+  };
 
   self.disable = () => {
     // short circuit if no browser.proxy
@@ -51,20 +61,43 @@ export default function(app, foreground) {
     const {adapter} = app;
     const {icon, settingsmanager, storage} = app.util;
 
-    let promise;
-    if (foreground) { promise = adapter.sendMessage('proxy.disable'); }
-    else { promise = browser.proxy.unregister(); }
+    let unregistering;
+    if (foreground) { unregistering = adapter.sendMessage('proxy.disable'); }
+    else { unregistering = browser.proxy.unregister(); }
 
-    return promise.then(() => {
-      enabled = false;
-      if (!foreground) { app.adapter.sendMessage('proxy.enabled', false); }
-      debug("proxy.js: unregistered PAC script");
-      icon.offline();
-      settingsmanager.handleDisconnect();
-      storage.setItem("online", "false");
-      return self;
-    });
-  }
+    return unregistering
+      .then(() => {
+        enabled = false;
+        if (!foreground) {
+          return app.adapter.sendMessage('proxy.enabled', false);
+        }
+        else {
+          return Promise.resolve();
+        }
+      })
+      .then(() => {
+        debug("proxy.js: unregistered PAC script");
+        icon.offline();
+        settingsmanager.handleDisconnect();
+        storage.setItem("online", "false");
+        return self;
+      })
+      .catch((err) => {
+        self._debug('error disabling proxy', err);
+        throw err;
+      });
+  };
+
+  self._debug = (msg, err) => {
+    const debugMsg = `proxy.js: ${msg}`;
+    debug(debugMsg);
+    console.error(debugMsg);
+    if (err) {
+      const errMsg = `error: ${JSON.stringify(err, Object.getOwnPropertyNames(err))}`;
+      debug(errMsg);
+      console.error(err);
+    }
+  };
 
   return self;
 }

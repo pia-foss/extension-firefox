@@ -1,25 +1,30 @@
-export default function(app) {
+export default function (app) {
   const apply = (csettings, settings) => {
-    for(let name in csettings)
-      if(settings.getItem(csettings[name].settingID))
-        csettings[name].applySetting()
-  }
+    Object.keys(csettings).forEach((name) => {
+      if (settings.getItem(csettings[name].settingID)) {
+        csettings[name].applySetting();
+      }
+    });
+  };
+
   const clear = (csettings) => {
-    for(let name in csettings)
-      if(!csettings[name].alwaysActive)
-        csettings[name].clearSetting()
-  }
+    Object.keys(csettings).forEach((name) => {
+      if (!csettings[name].alwaysActive) {
+        csettings[name].clearSetting();
+      }
+    });
+  };
 
   this.handleConnect = () => {
-    const {settings} = app.util,
-          {chromesettings} = app
-    apply(chromesettings, settings)
-  }
+    const { settings } = app.util;
+    const { chromesettings } = app;
+    apply(chromesettings, settings);
+  };
 
   this.handleDisconnect = () => {
-    const {chromesettings} = app
-    clear(chromesettings)
-  }
+    const { chromesettings } = app;
+    clear(chromesettings);
+  };
 
-  return this
+  return this;
 }
