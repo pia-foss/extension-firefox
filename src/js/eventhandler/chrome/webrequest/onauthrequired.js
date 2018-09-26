@@ -41,12 +41,12 @@ export default function(app) {
       .then(() => { user.authed = false; });
       return {cancel: true};
     }
-    else if(user.inStorage()) {
+    else if(user.loggedIn) {
       debug("onAuthRequired/1: allowed.");
-      return {authCredentials: {username: user.username(), password: user.password()}};
+      return {authCredentials: {username: user.getUsername(), password: user.getPassword()}};
     }
     else {
-      debug("onAuthRequired/1: user not in storage");
+      debug("onAuthRequired/1: user not logged in");
       proxy.disable()
       .then(() => { user.authed = false; })
       .then(() => { chrome.tabs.reload(details.tabId); });

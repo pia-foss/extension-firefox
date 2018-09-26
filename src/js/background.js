@@ -10,7 +10,7 @@ import user               from "util/user";
 import bypasslist         from "util/bypasslist";
 import latencytest        from "util/latencytest";
 import buildinfo          from "util/buildinfo";
-import logger             from "util/logger";
+import Logger             from "util/logger";
 import counter            from "util/counter";
 import settingsmanager    from "util/settingsmanager";
 import errorinfo          from "util/errorinfo";
@@ -27,12 +27,12 @@ import BrowserProxy          from "chromesettings/proxy";
 
 import eventhandler from "eventhandler/eventhandler";
 
-(new function(window) {
+(function () {
   const self = Object.create(null);
 
   self.frozen = @@freezeApp;
   self.buildinfo    = new buildinfo(self);
-  self.logger       = new logger(self);
+  self.logger       = new Logger(self);
   self.eventhandler = new eventhandler(self);
   window.debug = self.logger.debug /* eslint-ignore no-unused-vars */
 
@@ -59,26 +59,36 @@ import eventhandler from "eventhandler/eventhandler";
   self.util = Object.freeze(self.util);
 
   self.chromesettings = Object.create(null);
-  self.chromesettings.webrtc             = new webrtc(self);
-  self.chromesettings.networkprediction  = new networkprediction(self);
-  self.chromesettings.httpreferer        = new httpreferer(self);
-  self.chromesettings.hyperlinkaudit     = new hyperlinkaudit(self);
-  self.chromesettings.trackingprotection = new trackingprotection(self);
+  self.chromesettings.webrtc                = new webrtc(self);
+  self.chromesettings.networkprediction     = new networkprediction(self);
+  self.chromesettings.httpreferer           = new httpreferer(self);
+  self.chromesettings.hyperlinkaudit        = new hyperlinkaudit(self);
+  self.chromesettings.trackingprotection    = new trackingprotection(self);
   self.chromesettings.fingerprintprotection = new fingerprintprotection(self);
+  Object.values(self.chromesettings)
+    .filter((setting) => setting.init)
+    .forEach((setting) => setting.init());
   self.chromesettings = Object.freeze(self.chromesettings);
 
-  (() => {
-    const {proxy} = self;
-    const {user,settings,storage,regionlist} = self.util;
-    settings.setDefaults();
+  self.util.bypasslist.init();
 
-    regionlist.sync().then(() => {
-      if(user.inStorage()) {
-        if(storage.getItem("online") === "true"){
-          user.auth().then(proxy.enable).catch(proxy.disable);
+  (() => {
+    const { proxy } = self;
+    const { user, settings, storage, regionlist } = self.util;
+    settings.init();
+
+    regionlist.sync().then(async () => {
+      const { loggedIn, logOutOnClose } = user;
+      if (loggedIn) {
+        if (logOutOnClose) { await user.logout(); }
+        else {
+          const proxyOnline = storage.getItem("online") === 'true';
+          await user.auth();
+          if (proxyOnline) { await proxy.enable(); }
+          else { await proxy.disable(); }
         }
-        else { user.auth().then(proxy.disable).catch(proxy.disable); }
       }
+      else { await proxy.disable(); }
     }).catch(proxy.disable);
 
     window.app = Object.freeze(self);
@@ -91,4 +101,4 @@ import eventhandler from "eventhandler/eventhandler";
       debug(`Proxy error: ${error.message}`);
     });
   }
-}(window, document))
+}());
