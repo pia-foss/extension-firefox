@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
 import ErrorBoundary from '../../hoc/errorboundary';
 
 const buildClassName = (postfix, id, ...others) => {
@@ -68,6 +67,5 @@ Checkbox.defaultProps = {
   className: '',
   disabled: false,
 };
-
 
 export default ErrorBoundary(Checkbox);

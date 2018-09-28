@@ -72,7 +72,13 @@ class RegionListItem extends Component {
       : 'region-list-item list-group-item';
     const favorite = this.region.isFavorite
       ? (
-        <div role="button" className="heart-container" tabIndex="-1" onClick={this.favorite} onKeyPress={this.favorite}>
+        <div
+          role="button"
+          tabIndex="-1"
+          className="heart-container"
+          onClick={this.favorite}
+          onKeyPress={this.favorite}
+        >
           <img
             alt="Favorite"
             className="heart"
@@ -81,7 +87,13 @@ class RegionListItem extends Component {
         </div>
       )
       : (
-        <div role="button" className="heart-container" tabIndex="-1" onClick={this.favorite} onKeyPress={this.favorite}>
+        <div
+          role="button"
+          tabIndex="-1"
+          className="heart-container"
+          onClick={this.favorite}
+          onKeyPress={this.favorite}
+        >
           <img
             alt="Favorite"
             className="heart"

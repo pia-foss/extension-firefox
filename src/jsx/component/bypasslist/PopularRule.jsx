@@ -12,7 +12,7 @@ class PopularRule extends Component {
     else { this.app = window.app; }
 
     // properties
-    const { defaultName } = this.props;
+    const { defaultName } = props;
     this.defaultName = defaultName;
     this.bypasslist = this.app.util.bypasslist;
     this.region = this.app.util.regionlist.getSelectedRegion();

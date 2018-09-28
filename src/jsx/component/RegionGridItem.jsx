@@ -13,9 +13,9 @@ class RegionGridItem extends Component {
     else { this.app = window.app; }
 
     // properties
+    this.region = props.region;
     this.storage = this.app.util.storage;
     this.regionlist = this.app.util.regionlist;
-    this.region = props.region;
 
     // bindings
     this.onClick = this.onClick.bind(this);

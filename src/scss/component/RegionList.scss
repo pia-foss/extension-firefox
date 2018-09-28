@@ -2,15 +2,9 @@
   max-height: 350px;
   min-height: 350px;
   overflow: auto;
-  margin: 0;
   display: flex;
 
-  .loader {
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-    margin: auto;
-  }
+  .loader { align-self: center; }
 
   .no-regions {
     width: 100%;

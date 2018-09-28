@@ -17,9 +17,9 @@ export default function () {
       else { this.app = window.app; }
 
       // properties
+      this.buildinfo = this.app.buildinfo;
       this.languageDropdown = LanguageDropdown;
       this.regionlist = this.app.util.regionlist;
-      this.buildinfo = this.app.buildinfo;
 
       // bindings
       this.gitInfo = this.gitInfo.bind(this);

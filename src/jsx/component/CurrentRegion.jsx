@@ -30,9 +30,9 @@ class CurrentRegion extends Component {
   render() {
     return (
       <div
-        className="current-region"
         role="button"
         tabIndex="-1"
+        className="current-region"
         onClick={this.changeRegion}
         onKeyPress={this.changeRegion}
       >

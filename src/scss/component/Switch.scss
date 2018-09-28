@@ -12,7 +12,6 @@ $switch-disabled-color: #29ABE2;
     box-sizing: border-box;
     width: $switch-width;
     height: $switch-height;
-    -webkit-appearance: none;
     -moz-appearance: none;
     position: relative;
     border-radius: $switch-height / 2;
@@ -29,8 +28,6 @@ $switch-disabled-color: #29ABE2;
     -webkit-text-size-adjust: none;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     -webkit-user-select: none;
-
-    &:checked::after { content: 'ON' }
 
     // Thumb
     &::after {
@@ -51,9 +48,7 @@ $switch-disabled-color: #29ABE2;
     }
 
     // Background tint for ON state
-    &:checked {
-      background-color: $switch-on-color;
-    }
+    &:checked { background-color: $switch-on-color; }
 
     // Thumb for ON state
     &:checked::after {
@@ -65,14 +60,9 @@ $switch-disabled-color: #29ABE2;
     }
 
     // Thumb for active state
-    &:active::after {
-      width: $switch-height;
-    }
-
+    &:active::after { width: $switch-height; }
     &:checked::before,
-    &:active::before {
-      -webkit-transform: scale(0);
-    }
+    &:active::before { -webkit-transform: scale(0); }
 
     // Disabled
     &:disabled {
@@ -94,9 +84,7 @@ $switch-disabled-color: #29ABE2;
       }
 
       // Thumb for active state
-      &:active::after {
-        width: $switch-thumb-diameter;
-      }
+      &:active::after { width: $switch-thumb-diameter; }
     }
   }
 }

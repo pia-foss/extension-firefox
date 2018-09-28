@@ -36,7 +36,7 @@ export default function () {
 
           <div className="connection">
             <div>
-              <Switch app={this.app} />
+              <Switch />
             </div>
 
             <div>

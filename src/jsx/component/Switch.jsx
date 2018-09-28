@@ -1,14 +1,18 @@
 import React, { Component } from 'react';
 import StatusText from 'component/StatusText';
-import PropTypes from 'prop-types';
 
 class Switch extends Component {
   constructor(props) {
     super(props);
 
+    const background = browser.extension.getBackgroundPage();
+    if (background) { this.app = background.app; }
+    else { this.app = window.app; }
+
+    // properties
     this.debounce = null;
-    this.proxy = props.app.proxy;
-    this.regionlist = props.app.util.regionlist;
+    this.proxy = this.app.proxy;
+    this.regionlist = this.app.util.regionlist;
     this.state = {
       enabled: this.proxy.enabled(),
       region: this.regionlist.getSelectedRegion(),
@@ -55,9 +59,5 @@ class Switch extends Component {
     );
   }
 }
-
-Switch.propTypes = {
-  app: PropTypes.object.isRequired,
-};
 
 export default Switch;

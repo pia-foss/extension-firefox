@@ -41,9 +41,9 @@
 
     .settingheader {
       margin-top: 0px;
-      float:left;
-      width:100%;
-      padding:0px 15px;
+      float: left;
+      width: 100%;
+      padding: 0px 15px;
       font-weight: 500;
       font-size: 13px;
 
@@ -64,7 +64,7 @@
         .expandicon {
           width: 15px;
           height: 10px;
-          background-image: url(../images/expand_2x.png);
+          background-image: url('../images/expand_2x.png');
           background-size: 35px;
           background-position: -20px -15px;
           display: inline-block;
@@ -79,9 +79,9 @@
   }
 
   .SettingItemContainer {
-    display:block;
+    display: block;
     clear: both;
-    overflow:hidden;
-    height:0px;
+    overflow: hidden;
+    height: 0px;
   }
 }
