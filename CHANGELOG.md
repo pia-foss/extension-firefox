@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.7__
+
+* Refactored to use native fetch API
+
 __v1.2.6__
 
 * Full Offline support for regions
