@@ -25,6 +25,7 @@ class LogoutButton extends Component {
   render() {
     return (
       <div
+        title={t('LogoutText')}
         role="button"
         tabIndex="-1"
         onClick={this.logout}

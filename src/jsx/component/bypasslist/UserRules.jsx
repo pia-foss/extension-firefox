@@ -57,7 +57,6 @@ class UserRules extends Component {
     return <BypassItem rule={rule} key={rule} onRemoveRule={this.createRemoveRule(rule)} />;
   }
 
-
   render() {
     const { userInput, userRules } = this.state;
 
@@ -88,6 +87,7 @@ class UserRules extends Component {
             onKeyPress={this.onKeyPress}
             onChange={this.onUserInputChange}
           />
+
           <button
             type="button"
             className="add-rule-btn"

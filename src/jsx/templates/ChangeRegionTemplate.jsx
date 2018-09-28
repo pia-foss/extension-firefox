@@ -67,6 +67,7 @@ export default function () {
                 { t('FavoriteRegions') }
               </button>
             </div>
+
             <div id="regions">
               { this.regions() }
             </div>

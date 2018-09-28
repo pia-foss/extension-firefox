@@ -50,6 +50,7 @@ class RegionViewToggle extends Component {
         <div className="col-xs-9">
           <RegionSorter />
         </div>
+
         <div className="col-xs-3">
           <div id="toggle-icon">
             <div
@@ -59,6 +60,7 @@ class RegionViewToggle extends Component {
               onClick={this.switchToListView}
               onKeyPress={this.switchToListView}
             />
+
             <div
               id="grid-icon"
               role="button"

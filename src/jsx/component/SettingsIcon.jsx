@@ -19,6 +19,7 @@ class SettingsIcon extends Component {
   render() {
     return (
       <div
+        title={t('ChangeExtensionSettings')}
         role="button"
         tabIndex="-1"
         className="settings-icon"

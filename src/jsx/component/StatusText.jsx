@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 
 class StatusText extends Component {
   constructor(props) {
@@ -18,7 +18,6 @@ class StatusText extends Component {
   }
 
   render() {
-    // TODO: will need translation for UNAVAILABLE
     const { enabled, hasRegion } = this.state;
 
     // determine component display state
