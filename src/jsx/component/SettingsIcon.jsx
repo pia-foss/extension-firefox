@@ -22,7 +22,7 @@ class SettingsIcon extends Component {
         title={t('ChangeExtensionSettings')}
         role="button"
         tabIndex="-1"
-        className="settings-icon"
+        className="settings-icon btn-icon"
         onClick={this.openSettings}
         onKeyPress={this.openSettings}
       >
