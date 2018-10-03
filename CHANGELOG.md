@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.9__
+
+* Autofocus username input on login screen
+
 __v1.2.8__
 
 * Android support

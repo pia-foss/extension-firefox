@@ -67,6 +67,7 @@ class LoginForm extends Component {
               localeKey="UsernamePlaceholder"
               defaultValue={user.getUsername()}
               onChange={this.onInputChange}
+              autoFocus={true}
             />
           </div>
 
