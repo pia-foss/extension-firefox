@@ -73,13 +73,17 @@ html {
 body {
   margin: 0;
   font-family: "Roboto", Helvetica, Arial, sans-serif;
+  display: flex;
+  justify-content: center;
 }
 
 *, *:before, *:after { box-sizing: inherit; }
 
+$appWidth: 370px;
+
 #pia {
   min-height: 210px;
-  width: 370px;
+  width: $appWidth;
   padding: 0 15px;
   overflow-x: hidden;
 }

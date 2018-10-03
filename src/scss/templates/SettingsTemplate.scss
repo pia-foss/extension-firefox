@@ -1,5 +1,7 @@
+$maxSettingsHeight: 580px;
+
 #settings-template {
-  max-height: 580px;
+  max-height: $maxSettingsHeight;
   overflow: auto;
 
   #settings {
