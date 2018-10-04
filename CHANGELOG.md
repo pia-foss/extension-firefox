@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.11__
+
+* Adopted more reasonable defaults for requests
+
 __v1.2.10__
 
 * Hid debug button when debug mode is off
