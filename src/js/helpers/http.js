@@ -107,8 +107,8 @@ function getOpts(methodOpts, clientOpts) {
   if (!method) {
     throw new Error('methodOpts must contain method');
   }
-  const mode = clientOpts.mode || methodOpts.mode || 'same-origin';
-  const credentials = clientOpts.credentials || methodOpts.credentials || 'include';
+  const mode = clientOpts.mode || methodOpts.mode;
+  const credentials = clientOpts.credentials || methodOpts.credentials;
   const cache = clientOpts.cache || methodOpts.cache || 'default';
   const redirect = clientOpts.redirect || methodOpts.redirect || 'follow';
   const referrer = clientOpts.referrer || methodOpts.referrer || 'client';
