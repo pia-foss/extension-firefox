@@ -33,16 +33,22 @@ class RememberMeCheckbox extends Component {
     const { labelLocaleKey } = this.props;
 
     return (
-      <div className="remember-me-container popover-owner">
+      <div className="remember-me-container">
         <UncontrolledCheckbox
           id="remember-checkbox"
           defaultChecked={this.rememberMe}
           onChange={this.onChange}
+          className="popover-trigger"
         />
-        <label htmlFor="remember-checkbox">
-          { t(labelLocaleKey) }
+        <label
+          htmlFor="remember-checkbox"
+          className="checkbox-label popover-trigger"
+        >{ t(labelLocaleKey) }
         </label>
-        <Tooltip message={t('RememberMeTooltip')} />
+        <Tooltip
+          message={t('RememberMeTooltip')}
+          orientation="right"
+        />
       </div>
     );
   }

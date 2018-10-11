@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.12__
+
+* Moved remember me tooltip to avoid hiding submit button
+
 __v1.2.11__
 
 * Adopted more reasonable defaults for requests

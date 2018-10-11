@@ -49,7 +49,7 @@ const Checkbox = (props) => {
       />
       <label
         htmlFor={id}
-        className={buildClassName('label', id)}
+        className={buildClassName('facade', id)}
       />
     </div>
   );
