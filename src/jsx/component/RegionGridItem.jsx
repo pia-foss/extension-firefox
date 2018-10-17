@@ -13,6 +13,7 @@ class RegionGridItem extends Component {
     else { this.app = window.app; }
 
     // properties
+    this.proxy = this.app.proxy;
     this.region = props.region;
     this.storage = this.app.util.storage;
     this.regionlist = this.app.util.regionlist;
@@ -24,11 +25,10 @@ class RegionGridItem extends Component {
     this.onFlagLoadError = this.onFlagLoadError.bind(this);
   }
 
-  onClick() {
-    this.regionlist.setSelectedRegion(this.region.id);
-    return this.app.proxy.enable(this.region).then(() => {
-      return this.renderer.renderTemplate('authenticated');
-    });
+  async onClick() {
+    await this.regionlist.setSelectedRegion(this.region.id);
+    await this.proxy.enable();
+    this.renderer.renderTemplate('authenticated');
   }
 
   onFlagLoadError(event) {

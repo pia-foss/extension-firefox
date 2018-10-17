@@ -1,21 +1,29 @@
+import {
+  Type,
+  Target,
+  isTarget,
+  sendMessage,
+  Namespace,
+} from 'helpers/messaging';
+
 export default class MockAppAdapter {
   constructor(app) {
     // properties
     this.app = app;
-    this.target = 'foreground';
+    this.target = Target.FOREGROUND;
 
     // bindings
     this.initialize = this.initialize.bind(this);
     this.sendMessage = this.sendMessage.bind(this);
     this.handleMessage = this.handleMessage.bind(this);
+    this.handleRegionList = this.handleRegionList.bind(this);
 
     // handle listener
     browser.runtime.onMessage.addListener(this.handleMessage);
   }
 
   handleMessage(message, sender, response) {
-    if (!message) { return false; }
-    if (message.target !== 'background') { return false; }
+    if (!isTarget(message, Target.BACKGROUND)) { return false; }
 
     // can't return a promise because it's the polyfill version
     // and firefox won't recognize it as a "real" promise
@@ -24,15 +32,6 @@ export default class MockAppAdapter {
 
       if (message.type === 'initialize') {
         res = this.initialize();
-      }
-      else if (message.type === 'proxy.enabled') {
-        this.app.proxy.setEnabled(message.data);
-      }
-      else if (message.type === 'proxy.enable') {
-        res = this.app.proxy.enable().then(() => { return {}; });
-      }
-      else if (message.type === 'proxy.disable') {
-        res = this.app.proxy.disable().then(() => { return {}; });
       }
       else if (message.type === 'util.user.authed') {
         this.app.util.user.authed = message.data;
@@ -62,12 +61,6 @@ export default class MockAppAdapter {
       else if (message.type === 'util.user.removeLoggedInStorageItem') {
         this.app.util.user.removeLoggedInStorageItem(true);
       }
-      else if (message.type === 'util.regionlist.region') {
-        this.app.util.regionlist.setSelectedRegion(message.data, true);
-      }
-      else if (message.type === 'util.regionlist.regions') {
-        this.app.util.regionlist.import(message.data);
-      }
       else if (message.type === 'updateSettings') {
         const { settingID, value } = message.data;
         this.app.util.settings.setItem(settingID, value, true);
@@ -95,8 +88,11 @@ export default class MockAppAdapter {
       else if (message.type === 'setUserRules') {
         this.app.util.bypasslist.setUserRules(message.data, true);
       }
-      else if (message.type === 'setFavoriteRegion') {
-        this.app.util.regionlist.setFavoriteRegion(message.data, true);
+      else if (message.type.startsWith(Namespace.REGIONLIST)) {
+        res = this.handleRegionList(message);
+      }
+      else if (message.type.startsWith(Namespace.PROXY)) {
+        res = this.handleProxy(message);
       }
 
       return resolve(res);
@@ -106,6 +102,57 @@ export default class MockAppAdapter {
 
     // must return true here to keep the response callback alive
     return true;
+  }
+
+  /**
+   * Handle messages directed to regionlist
+   */
+  handleRegionList(message) {
+    return Promise.resolve(message)
+      .then(({ data, type }) => {
+        const { regionlist } = this.app.util;
+
+        switch (type) {
+          case Type.SET_SELECTED_REGION: {
+            const { id } = data;
+            return regionlist.setSelectedRegion(id, true);
+          }
+          case Type.IMPORT_REGIONS: {
+            return regionlist.import(data);
+          }
+          case Type.SET_FAVORITE_REGION: {
+            return regionlist.setFavoriteRegion(data, true);
+          }
+
+          default: throw new Error(`no handler for ${type}`);
+        }
+      });
+  }
+
+  handleProxy(message) {
+    return Promise.resolve(message)
+      .then(async ({ data, type }) => {
+        const { proxy } = this.app;
+
+        switch (type) {
+          case Type.PROXY_GET_ENABLED: {
+            return proxy.getEnabled();
+          }
+          case Type.PROXY_SET_ENABLED: {
+            const { value } = data;
+            return proxy.setEnabled(value);
+          }
+          case Type.PROXY_ENABLE: {
+            await proxy.enable();
+            return undefined;
+          }
+          case Type.PROXY_DISABLE: {
+            await proxy.disable();
+            return undefined;
+          }
+          default: throw new Error(`no handler for ${type}`);
+        }
+      });
   }
 
   initialize() {
@@ -137,10 +184,10 @@ export default class MockAppAdapter {
   }
 
   sendMessage(type, data) {
-    return browser.runtime.sendMessage({ target: this.target, type, data })
+    return sendMessage(this.target, type, data)
       .catch((err) => {
-        const errMessage = 'Could not establish connection';
-        if (err.message.startsWith(errMessage)) { return; }
+        if (!err.message) { throw err; }
+        if (err.message.startsWith('Could not establish connection')) { return; }
         throw err;
       });
   }

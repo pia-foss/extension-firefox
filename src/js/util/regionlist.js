@@ -1,131 +1,185 @@
 import http from 'helpers/http';
+import { Type, Target } from 'helpers/messaging';
 
-export default function (app) {
-  const self = Object.create(null);
-  const { storage } = app.util;
-  const defaultRegionID = 'us_new_york_city';
-  const regionMap = new Map();
+class RegionList {
+  constructor(app, foreground) {
+    this.app = app;
+    this.foreground = foreground;
+    this.synced = false;
+    this.syncing = false;
+    this.regionMap = new Map();
+    chrome.alarms.create('PollRegionList', { delayInMinutes: 30, periodInMinutes: 30 });
 
-  const createLocalizedName = (regionID, region) => {
-    const name = t(regionID);
-    return name.length > 0 ? name : region.name;
-  };
+    // bindings
+    this.testHost = this.testHost.bind(this);
+    this.testPort = this.testPort.bind(this);
+    this.getPotentialHosts = this.getPotentialHosts.bind(this);
+    this.getPotentialPorts = this.getPotentialPorts.bind(this);
+    this.hasRegions = this.hasRegions.bind(this);
+    this.toArray = this.toArray.bind(this);
+    this.isSelectedRegion = this.isSelectedRegion.bind(this);
+    this.getSelectedRegion = this.getSelectedRegion.bind(this);
+    this.setSelectedRegion = this.setSelectedRegion.bind(this);
+    this.sync = this.sync.bind(this);
+    this.import = this.import.bind(this);
+    this.export = this.export.bind(this);
+    this.setFavoriteRegion = this.setFavoriteRegion.bind(this);
+    this.resetFavoriteRegions = this.resetFavoriteRegions.bind(this);
+  }
 
-  const createRegion = (regionID, region) => {
-    return {
-      scheme: 'https',
-      id: regionID,
-      name: region.name,
-      localizedName: () => { return createLocalizedName(regionID, region); },
-      iso: region.iso,
-      host: region.dns,
-      port: region.port,
-      macePort: region.mace,
-      flag: `/images/flags/${region.iso}_64.png`,
-      active: false,
-      latency: 0,
-      offline: false,
-      isFavorite: false,
-    };
-  };
+  /**
+   * Test to see if the provided host is potentially used w/ active proxy
+   *
+   * @param {string} host The host to test
+   */
+  testHost(host) {
+    return this.getPotentialHosts().includes(host);
+  }
 
-  self.synced = false;
-  self.syncing = false;
+  /**
+   * Test to see if the provided port is potentially used w/ active proxy
+   *
+   * @param {number} port The port to test
+   */
+  testPort(port) {
+    return this.getPotentialPorts().includes(port);
+  }
 
-  self.hasRegions = () => {
-    return !!regionMap.size;
-  };
+  /**
+   * Get a list of hosts that are potentially being used for the active proxy connection
+   */
+  getPotentialHosts() {
+    return this.toArray()
+      .map((r) => { return r.host; });
+  }
 
-  self.toArray = () => {
-    return Array.from(regionMap.values());
-  };
+  /**
+   * Get a list of ports that are potentially being used for the active proxy connection
+   */
+  getPotentialPorts() {
+    const { util: { settings } } = this.app;
+    const key = settings.getItem('maceprotection') ? 'macePort' : 'port';
 
-  self.isSelectedRegion = (region) => {
-    return self.getSelectedRegion().id === region.id;
-  };
+    return this.toArray()
+      .map((r) => { return r[key]; });
+  }
+
+  hasRegions() {
+    return !!this.regionMap.size;
+  }
+
+  toArray() {
+    return Array.from(this.regionMap.values());
+  }
+
+  isSelectedRegion(region) {
+    return this.getSelectedRegion().id === region.id;
+  }
 
   /*
-    we keep an on-disk copy of the last selected region,
+    NOTE: we keep an on-disk copy of the last selected region,
     incase this method is called when the region list has
     not synced.
   */
-  self.getSelectedRegion = () => {
-    const fromMemory = self.toArray().find((region) => { return region.active; });
-    const fromStorage = storage.getItem('region');
-    if (fromMemory) { return fromMemory; }
-    if (fromStorage) {
-      const region = JSON.parse(fromStorage);
-      region.localizedName = () => { return createLocalizedName(region.id, region); };
-      return region;
-    }
-    return undefined;
-  };
+  getSelectedRegion() {
+    const { storage } = this.app.util;
+    let selectedRegion;
 
-  self.setSelectedRegion = (id, bridged) => {
-    const region = regionMap.get(id);
+    // check in memory
+    selectedRegion = this.toArray().find((region) => { return region.active; });
+    // check in storage
+    if (!selectedRegion) {
+      selectedRegion = Object.assign(
+        {},
+        JSON.parse(storage.getItem('region')),
+        {
+          localizedName() {
+            return RegionList.createLocalizedName(selectedRegion.id, selectedRegion);
+          },
+        },
+      );
+    }
+
+    return selectedRegion;
+  }
+
+  async setSelectedRegion(id, bridged) {
+    const {
+      util: { storage },
+      adapter,
+    } = this.app;
+    const region = this.regionMap.get(id);
     if (bridged) { storage.setItem('activeproxy', id); }
     if (region) {
-      self.toArray().forEach((currentRegion) => {
+      this.toArray().forEach((currentRegion) => {
         const thisRegion = currentRegion;
         thisRegion.active = false;
       });
       region.active = true;
       storage.setItem('activeproxy', region.id);
       storage.setItem('region', JSON.stringify(region));
-      if (!bridged) { app.adapter.sendMessage('util.regionlist.region', region.id); }
+      if (!bridged) { await adapter.sendMessage(Type.SET_SELECTED_REGION, { id: region.id }); }
     }
-  };
+  }
 
-  self.sync = () => {
-    self.syncing = true;
+  async sync() {
+    const {
+      util: { storage, bypasslist },
+      adapter,
+      target,
+    } = this.app;
+    this.syncing = true;
     let favoriteRegions = storage.getItem('favoriteregions');
     if (favoriteRegions) { favoriteRegions = favoriteRegions.split(','); }
     else { favoriteRegions = []; }
-
-    debug('regionlist.js: start sync');
-    return http.get('https://www.privateinternetaccess.com/api/client/services/https', { timeout: 5000 })
-      .then(async (res) => {
-        regionMap.clear();
-        const json = await res.json();
-        Object.keys(json).forEach((regionID) => {
-          const region = createRegion(regionID, json[regionID]);
-          if (favoriteRegions.includes(regionID)) { region.isFavorite = true; }
-          regionMap.set(regionID, region);
-        });
-        self.setSelectedRegion(storage.getItem('activeproxy') || defaultRegionID);
-        self.syncing = false;
-        self.synced = true;
-        app.util.bypasslist.updatePingGateways();
-        // NOTE: Rather than using the "briged" pattern, we should move to this.
-        if (app.target === 'background') {
-          app.adapter.sendMessage('util.regionlist.regions', self.export());
-        }
-        debug('regionlist.js: sync ok');
-        return res;
-      })
-      .catch((res) => {
-        self.syncing = false;
-        self.synced = false;
-        debug(`regionlist.js: sync error (${res.cause})`);
-        return res;
+    RegionList.debug('start sync');
+    try {
+      const response = await http.get(
+        'https://www.privateinternetaccess.com/api/client/services/https',
+        { timeout: 5000 },
+      );
+      this.regionMap.clear();
+      const json = await response.json();
+      Object.keys(json).forEach((regionID) => {
+        const region = RegionList.createRegion(regionID, json[regionID]);
+        if (favoriteRegions.includes(regionID)) { region.isFavorite = true; }
+        this.regionMap.set(regionID, region);
       });
-  };
+      this.setSelectedRegion(storage.getItem('activeproxy') || RegionList.defaultRegionID);
+      this.syncing = false;
+      this.synced = true;
+      bypasslist.updatePingGateways();
+      // NOTE: Rather than using the "briged" pattern, we should move to this.
+      if (target === Target.BACKGROUND) {
+        adapter.sendMessage(Type.IMPORT_REGIONS, this.export());
+      }
+      debug('regionlist.js: sync ok');
 
-  self.import = (regions) => {
+      return response;
+    }
+    catch (err) {
+      this.syncing = false;
+      this.synced = false;
+      RegionList.debug(err);
+      return err;
+    }
+  }
+
+  import(regions) {
     if (!regions || !Array.isArray(regions)) { return; }
-    regionMap.clear();
+    this.regionMap.clear();
     regions.forEach((region) => {
-      const newRegion = createRegion(region.id, region);
-      regionMap.set(region.id, newRegion);
+      const newRegion = RegionList.createRegion(region.id, region);
+      this.regionMap.set(region.id, newRegion);
     });
 
-    self.syncing = false;
-    self.synced = true;
-    app.util.bypasslist.updatePingGateways();
-  };
+    this.syncing = false;
+    this.synced = true;
+    this.app.util.bypasslist.updatePingGateways();
+  }
 
-  self.export = () => {
-    return Array.from(regionMap.values())
+  export() {
+    return Array.from(this.regionMap.values())
       .map((region) => {
         return {
           id: region.id,
@@ -136,20 +190,25 @@ export default function (app) {
           mace: region.macePort,
         };
       });
-  };
+  }
 
-  self.setFavoriteRegion = (region, bridged) => {
+  setFavoriteRegion(region, bridged) {
+    const {
+      util: { storage },
+      adapter,
+    } = this.app;
+
     // get this region from regionMap
     let regionId = '';
     if (typeof region === 'string') { regionId = region; }
     else { regionId = region.id; }
 
     // alert background page if not bridged
-    if (!bridged) { app.adapter.sendMessage('setFavoriteRegion', regionId); }
+    if (!bridged) { adapter.sendMessage(Type.SET_FAVORITE_REGION, regionId); }
 
     // get this region isFavorite
     let isFavorite = false;
-    const memRegion = self.toArray().find((r) => { return r.id === regionId; });
+    const memRegion = this.toArray().find((r) => { return r.id === regionId; });
     ({ isFavorite } = memRegion);
 
     // get current favorite regions from storage
@@ -170,21 +229,65 @@ export default function (app) {
 
     // update in memory region
     memRegion.isFavorite = !memRegion.isFavorite;
-    return region;
-  };
 
-  self.resetFavoriteRegions = (regions) => {
+    return region;
+  }
+
+  resetFavoriteRegions(regions) {
+    const {
+      util: { storage },
+    } = this.app;
+
     storage.setItem('favoriteregions', regions);
 
     if (regions) {
       regions.split(',').forEach((region) => {
-        const memRegion = self.toArray().find((r) => { return r.id === region.id; });
+        const memRegion = this.toArray().find((r) => { return r.id === region.id; });
         if (memRegion) { memRegion.isFavorite = !memRegion.isFavorite; }
       });
     }
-  };
+  }
 
-  chrome.alarms.create('PollRegionList', { delayInMinutes: 30, periodInMinutes: 30 });
+  static get defaultRegionID() {
+    return 'us_new_york_city';
+  }
 
-  return self;
+  static createLocalizedName(regionID, region) {
+    const name = t(regionID);
+    return name.length > 0 ? name : region.name;
+  }
+
+  static createRegion(regionID, region) {
+    return {
+      scheme: 'https',
+      id: regionID,
+      name: region.name,
+      iso: region.iso,
+      host: region.dns,
+      port: region.port,
+      macePort: region.mace,
+      flag: `/images/flags/${region.iso}_64.png`,
+      active: false,
+      latency: 0,
+      offline: false,
+      isFavorite: false,
+      localizedName() {
+        return RegionList.createLocalizedName(regionID, region);
+      },
+    };
+  }
+
+  static debug(msg, err) {
+    const debugMsg = `regionlist.js: ${msg}`;
+    debug(debugMsg);
+    console.log(debugMsg);
+    if (err) {
+      const errMsg = `regionlist.js error: ${JSON.stringify(err, Object.getOwnPropertyNames(err))}`;
+      debug(errMsg);
+      console.error(errMsg);
+    }
+    return new Error(debugMsg);
+  }
 }
+
+export default RegionList;

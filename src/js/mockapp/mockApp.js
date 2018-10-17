@@ -22,12 +22,19 @@ import TrackingProtection from 'chromesettings/trackingprotection';
 import FingerprintProtection from 'chromesettings/fingerprintprotection';
 import BrowserProxy from 'chromesettings/proxy';
 
+import {
+  Target,
+  isTarget,
+  sendMessage,
+  Type,
+} from 'helpers/messaging';
+
 // import eventhandler from 'eventhandler/eventhandler'
 
 export default class MockApp {
   constructor() {
     // create app object
-    this.target = 'background';
+    this.target = Target.BACKGROUND;
     this.logger = new Logger(this);
     this.buildinfo = new BuildInfo(this);
     window.debug = this.logger.debug;
@@ -49,7 +56,7 @@ export default class MockApp {
     this.util.storage = new Storage(this);
     this.util.platforminfo = new PlatformInfo(this);
     this.util.settings = new Settings(this);
-    this.util.regionlist = new RegionList(this);
+    this.util.regionlist = new RegionList(this, true);
     this.util.bypasslist = new BypassList(this, true);
     this.util.counter = new Counter(this);
     this.util.latencytest = new LatencyTest(this);
@@ -112,12 +119,11 @@ export default class MockApp {
   }
 
   sendMessage(type, data) {
-    return browser.runtime.sendMessage({ target: this.target, type, data });
+    return sendMessage(this.target, type, data);
   }
 
   handleMessage(message, sender, response) {
-    if (!message) { return false; }
-    if (message.target !== 'foreground') { return false; }
+    if (!isTarget(message, Target.FOREGROUND)) { return false; }
 
     // can't return a promise because it's the polyfill version
     // and firefox won't recognize it as a 'real' promise
@@ -131,7 +137,7 @@ export default class MockApp {
       else if (message.type === 'util.user.authing') {
         this.util.user.authing = message.data.util.user.authing;
       }
-      else if (message.type === 'util.regionlist.region') {
+      else if (message.type === Type.SET_SELECTED_REGION) {
         this.util.regionlist.setSelectedRegion(message.data, true);
       }
 

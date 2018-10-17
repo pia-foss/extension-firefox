@@ -1,89 +1,71 @@
 /*
-  interface Meta {
-    target: string;
-    type: string;
-  }
+  Utilities for sending/receiving messages within the PIA application
 
-  type Listener <T> = (payload: T) => void;
+  @type Listener <T> = (payload: T) => void;
 */
-
-const Type = {
-  FOREGROUND_OPEN: '@all/foreground_open',
-};
 
 const Target = {
   ALL: '@all',
   POPUPS: '@popups',
   FOREGROUND: '@foreground',
   BACKGROUND: '@background',
+  PAC: '@pac',
 };
 
-const validateMeta = function (meta, props) {
-  if (typeof meta !== 'object') {
-    throw new Error(`expected meta to be object, not ${typeof meta}`);
-  }
-  if (meta === null) {
-    throw new Error('expected meta to be object, not null');
-  }
-  if (typeof meta.target !== 'string') {
-    throw new Error('expected meta to contain string property "target"');
-  }
-  if (typeof meta.type !== 'string') {
-    throw new Error('expected meta to contain string property "type');
-  }
+const Namespace = {
+  REGIONLIST: 'util.regionlist',
+  PROXY: 'proxy',
 };
 
-const isValidTarget = function (listenerTarget, senderTarget) {
-  if (senderTarget === Target.ALL) {
-    return true;
-  }
-  if (senderTarget === listenerTarget) {
-    return true;
-  }
-
-  return false;
+const Type = {
+  FOREGROUND_OPEN: 'foreground_open',
+  UPDATE_PAC_INFO: 'update_pac_info',
+  SET_SELECTED_REGION: `${Namespace.REGIONLIST}.setSelectedRegion`,
+  IMPORT_REGIONS: `${Namespace.REGIONLIST}.import`,
+  SET_FAVORITE_REGION: `${Namespace.REGIONLIST}.setFavoriteRegion`,
+  PROXY_GET_ENABLED: `${Namespace.PROXY}.getEnabled`,
+  PROXY_SET_ENABLED: `${Namespace.PROXY}.setEnabled`,
+  PROXY_ENABLE: `${Namespace.PROXY}.enable`,
+  PROXY_DISABLE: `${Namespace.PROXY}.disable`,
 };
 
-/**
- * Listen for messages
- *
- * @template T
- * @param {Meta} meta Metadata about message
- * @param {Listener<T>} listener Listener triggered when message is received
- *
- * @returns {void}
- */
-const onMessage = function (meta, listener) {
-  validateMeta(meta);
-  chrome.runtime.onMessage.addListener((message) => {
-    if (message.type === meta.type && isValidTarget(meta.target, message.target)) {
-      listener(message.data);
-    }
-  });
-};
-
-/**
- * Send a message
- *
- * @template T
- * @param {Meta} meta Metadata about message
- * @param {T} [data] Payload to send
- *
- * @returns {void}
- */
-const sendMessage = function (meta, data) {
-  validateMeta(meta);
-  const { target, type } = meta;
-  chrome.runtime.sendMessage({
-    target,
+function sendMessage(target, type, data) {
+  if (!Object.values(Target).includes(target)) {
+    throw new Error(`invalid target: ${target}`);
+  }
+  const msg = {
     type,
-    data,
-  });
-};
+    target,
+    data: data || {},
+  };
+  const opts = {
+    toProxyScript: target === Target.PAC || target === Target.ALL,
+  };
+
+  return browser.runtime.sendMessage(msg, opts);
+}
+
+function isTarget(message, target) {
+  if (!message) { return false; }
+  if (!message.target) { return false; }
+  if (message.target !== target && message.target !== Target.ALL) { return false; }
+
+  return true;
+}
+
+function isType(message, type) {
+  if (!message) { return false; }
+  if (!message.type) { return false; }
+  if (!message.type === type) { return false; }
+
+  return true;
+}
 
 export {
-  onMessage,
-  sendMessage,
-  Type,
   Target,
+  Type,
+  Namespace,
+  sendMessage,
+  isTarget,
+  isType,
 };

@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.13__
+
+* Fixed authentication dialog presented after changing regions
+
 __v1.2.12__
 
 * Moved remember me tooltip to avoid hiding submit button

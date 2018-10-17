@@ -29,5 +29,4 @@
     "src": "<%= grunt.config.get('buildpath') %>/js/popups/importrules.js",
     "dest": "<%= grunt.config.get('buildpath') %>/js/popups/importrules.js"
   }
-
 }
