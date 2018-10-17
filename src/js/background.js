@@ -40,7 +40,7 @@ self.eventhandler = new EventHandler(self);
 window.debug = self.logger.debug;
 
 /* self.proxy is a ChromeSetting like self.chromesettings.* objects are. */
-self.proxy = BrowserProxy(self);
+self.proxy = new BrowserProxy(self);
 
 // message connection with foreground page
 self.adapter = new MockAppAdapter(self);

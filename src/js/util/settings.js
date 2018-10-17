@@ -117,7 +117,7 @@ class Settings {
       case ApplicationIDs.MACE_PROTECTION:
         if (this._proxy.enabled()) {
           // No bridged mode for enable
-          this._proxy.enable(this._regionList.getSelectedRegion()).catch(console.error);
+          this._proxy.enable().catch(console.error);
         }
         break;
 

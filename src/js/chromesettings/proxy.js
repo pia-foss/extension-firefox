@@ -1,103 +1,150 @@
+import { sendMessage, Type, Target } from 'helpers/messaging';
+
 let enabled = false;
 
-export default function(app, foreground) {
-  const self = {};
-  const PACify = (region) => {
-    const {settings} = app.util
-    return {
-      type: "https",
-      host: region.host,
-      port: settings.getItem("maceprotection") ? region.macePort : region.port
+class Proxy {
+  constructor(app, foreground) {
+    this.app = app;
+    this.foreground = foreground;
+
+    // bindings
+    this.enabled = this.enabled.bind(this);
+    this.getEnabled = this.getEnabled.bind(this);
+    this.setEnabled = this.setEnabled.bind(this);
+    this.enable = this.enable.bind(this);
+    this.disable = this.disable.bind(this);
+  }
+
+  enabled() {
+    return this.getEnabled();
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  getEnabled() {
+    return enabled;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  setEnabled(value) {
+    enabled = value;
+  }
+
+  /**
+   * Enable the proxy
+   */
+  async enable() {
+    // short circuit if no browser.proxy
+    if (!browser.proxy) {
+      Proxy.debug('unable to enable proxy, browser.proxy not available');
+      return this;
+    }
+    try {
+      const {
+        adapter,
+        util: {
+          icon,
+          regionlist,
+          bypasslist,
+          storage,
+          settingsmanager,
+        },
+      } = this.app;
+      const region = regionlist.getSelectedRegion();
+
+      if (this.foreground) {
+        await adapter.sendMessage(Type.PROXY_ENABLE);
+      }
+      else {
+        Proxy.debug(`connecting to ${region.host}`);
+        await browser.proxy.register('js/pac.js');
+      }
+
+      this.setEnabled(true);
+      if (!this.foreground) {
+        await adapter.sendMessage(Type.PROXY_SET_ENABLED, { value: true });
+      }
+      Proxy.debug('registered PAC script');
+      Proxy.debug(`bypass list is ${JSON.stringify(bypasslist.toArray())}`);
+      if (!this.foreground) {
+        // Send message to PAC script updating proxy information
+        await sendMessage(Target.PAC, Type.UPDATE_PAC_INFO, {
+          payload: this.PACify(region),
+          bypasslist: bypasslist.toArray(),
+        });
+      }
+      icon.online();
+      settingsmanager.handleConnect();
+      storage.setItem('online', 'true');
+
+      return this;
+    }
+    catch (err) {
+      Proxy.debug('error disabling proxy', err);
+      throw err;
     }
   }
 
-  self.enabled = () => enabled;
+  async disable() {
+    try {
+      // short circuit if no browser.proxy
+      if (!browser.proxy) {
+        Proxy.debug('unable to disable proxy, browser.proxy not available');
+        return this;
+      }
 
-  self.setEnabled = (value) => { enabled = value };
+      const {
+        adapter,
+        util: {
+          icon,
+          settingsmanager,
+          storage,
+        },
+      } = this.app;
 
-  self.enable = (region) => {
-    // short circuit of no browser.proxy
-    if (!browser.proxy) { return Promise.resolve(self); }
+      if (this.foreground) {
+        await adapter.sendMessage(Type.PROXY_DISABLE);
+      }
+      else {
+        await browser.proxy.unregister();
+      }
+      this.setEnabled(false);
+      if (!this.foreground) {
+        await adapter.sendMessage(Type.PROXY_SET_ENABLED, { value: false });
+      }
+      Proxy.debug('unregistered PAC script');
+      icon.offline();
+      settingsmanager.handleDisconnect();
+      storage.setItem('online', String(false));
 
-    const {adapter} = app;
-    const {icon, regionlist, bypasslist, storage, settingsmanager} = app.util;
+      return this;
+    }
+    catch (err) {
+      Proxy.debug('error disabling proxy', err);
+      throw err;
+    }
+  }
 
-    let registering;
-    if (foreground) { registering = adapter.sendMessage('proxy.enable'); }
-    else { registering = browser.proxy.register('js/pac.js'); }
+  PACify(region) {
+    const { settings } = this.app.util;
 
-    return registering
-      .then(() => {
-        enabled = true;
-        if (!foreground) { adapter.sendMessage('proxy.enabled', true); }
-        debug("proxy.js: registered PAC script");
-        debug(`bypasslist: ${JSON.stringify(bypasslist.toArray())}`);
-        if (!foreground) {
-          return browser.runtime.sendMessage({
-            payload: PACify(regionlist.getSelectedRegion()),
-            bypasslist: app.util.bypasslist.toArray()
-          }, {toProxyScript: true});
-        }
-        else {
-          return Promise.resolve();
-        }
-      })
-      .then(() => {
-        icon.online();
-        settingsmanager.handleConnect();
-        storage.setItem("online", "true");
-        return self;
-      })
-      .catch((err) => {
-        self._debug('error enabling proxy', err);
-        throw err;
-      });
-  };
+    return {
+      type: 'https',
+      host: region.host,
+      port: settings.getItem('maceprotection') ? region.macePort : region.port,
+    };
+  }
 
-  self.disable = () => {
-    // short circuit if no browser.proxy
-    if (!browser.proxy) { return Promise.resolve(self); }
-
-    const {adapter} = app;
-    const {icon, settingsmanager, storage} = app.util;
-
-    let unregistering;
-    if (foreground) { unregistering = adapter.sendMessage('proxy.disable'); }
-    else { unregistering = browser.proxy.unregister(); }
-
-    return unregistering
-      .then(() => {
-        enabled = false;
-        if (!foreground) {
-          return app.adapter.sendMessage('proxy.enabled', false);
-        }
-        else {
-          return Promise.resolve();
-        }
-      })
-      .then(() => {
-        debug("proxy.js: unregistered PAC script");
-        icon.offline();
-        settingsmanager.handleDisconnect();
-        storage.setItem("online", "false");
-        return self;
-      })
-      .catch((err) => {
-        self._debug('error disabling proxy', err);
-        throw err;
-      });
-  };
-
-  self._debug = (msg, err) => {
+  static debug(msg, err) {
     const debugMsg = `proxy.js: ${msg}`;
     debug(debugMsg);
-    console.error(debugMsg);
+    console.log(debugMsg);
     if (err) {
       const errMsg = `error: ${JSON.stringify(err, Object.getOwnPropertyNames(err))}`;
       debug(errMsg);
-      console.error(err);
+      console.error(errMsg);
     }
-  };
-
-  return self;
+    return new Error(debugMsg);
+  }
 }
+
+export default Proxy;
