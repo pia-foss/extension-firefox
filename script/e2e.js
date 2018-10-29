@@ -16,13 +16,13 @@ const { runMochaTests, print, root, firefox, remove, generateExtension } = requi
     print(`GITINFO=${process.env.gitinfo}`);
     print(`FREEZE_APP=${process.env.freezeApp}`);
 
-    const directory = root('test', 'e2e')
+    const directory = root('test', 'e2e');
     const extensionGlob = path.join(directory, '*.xpi');
 
     await remove(extensionGlob);
     print('\n\n-- building extension --\n\n');
     await generateExtension(firefox, directory);
-    print('\n\n-- running tests --\n\n');
+    print('\n\n-- running basic tests --\n\n');
     await runMochaTests();
     if (!process.env.PIA_SKIP_CLEANUP) {
       print('\n\n-- cleaning up --\n\n');

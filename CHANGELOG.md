@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.14__
+
+* Converted proxy to chrome setting
+
 __v1.2.13__
 
 * Fixed authentication dialog presented after changing regions

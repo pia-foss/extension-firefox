@@ -1,17 +1,17 @@
 let payload;
-let bypasslist = [];
+let bypassList = [];
 
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // Cannot import messaging utils as this file cannot be 'browserified'
   if (!message) { return; }
   if (message.target !== '@pac') { return; }
-  if (message.type !== 'update_pac_info') { return; }
+  if (message.type !== '@pac/update') { return; }
   if (typeof message.data !== 'object') { return; }
   if (message.data === null) { return; }
 
   const { data } = message;
   if (data.payload) { ({ payload } = data); }
-  if (data.bypasslist) { ({ bypasslist } = data); }
+  if (data.bypassList) { ({ bypassList } = data); }
   sendResponse({});
 });
 
@@ -53,8 +53,8 @@ function bypassFilter(url, host) {
     }
   }
 
-  // handle bypasslist
-  return bypasslist.some((rule) => {
+  // handle bypassList
+  return bypassList.some((rule) => {
     let matchee = host;
     if (rule.startsWith('http')) { matchee = url; }
     return matchRule(matchee, rule);

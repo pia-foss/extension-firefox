@@ -27,90 +27,98 @@ import BrowserProxy from 'chromesettings/proxy';
 
 import EventHandler from 'eventhandler/eventhandler';
 
-// build background application (self)
-const self = Object.create(null);
+(async function buildBackground() {
+  // build background application (self)
+  const self = Object.create(null);
 
-// event handling and basic browser info gathering
-self.frozen = @@freezeApp;
-self.buildinfo = new BuildInfo(self);
-self.logger = new Logger(self);
-self.eventhandler = new EventHandler(self);
+  // event handling and basic browser info gathering
+  self.frozen = @@freezeApp;
+  self.buildinfo = new BuildInfo(self);
+  self.logger = new Logger(self);
+  self.eventhandler = new EventHandler(self);
 
-// attach debugging to global scope
-window.debug = self.logger.debug;
+  // attach debugging to global scope
+  window.debug = self.logger.debug;
 
-/* self.proxy is a ChromeSetting like self.chromesettings.* objects are. */
-self.proxy = new BrowserProxy(self);
+  /* self.proxy is a ChromeSetting like self.chromesettings.* objects are. */
+  self.proxy = new BrowserProxy(self);
 
-// message connection with foreground page
-self.adapter = new MockAppAdapter(self);
+  // message connection with foreground page
+  self.adapter = new MockAppAdapter(self);
 
-// attach utility functions
-self.util = Object.create(null);
-self.util.platforminfo = new PlatformInfo(self);
-self.util.icon = new Icon(self);
-self.util.storage = new Storage(self);
-self.util.settings = new Settings(self);
-self.util.i18n = new I18n(self);
-self.util.regionlist = new RegionList(self);
-self.util.bypasslist = new BypassList(self);
-self.util.counter = new Counter(self);
-self.util.user = new User(self);
-self.util.latencytest = new LatencyTest(self);
-self.util.regionsorter = new RegionSorter(self);
-self.util.settingsmanager = new SettingsManager(self);
-self.util.errorinfo = new ErrorInfo(self);
-self.util = Object.freeze(self.util);
+  // attach utility functions
+  self.util = Object.create(null);
+  self.util.platforminfo = new PlatformInfo(self);
+  self.util.icon = new Icon(self);
+  self.util.storage = new Storage(self);
+  self.util.settings = new Settings(self);
+  self.util.i18n = new I18n(self);
+  self.util.regionlist = new RegionList(self);
+  self.util.bypasslist = new BypassList(self);
+  self.util.counter = new Counter(self);
+  self.util.user = new User(self);
+  self.util.latencytest = new LatencyTest(self);
+  self.util.regionsorter = new RegionSorter(self);
+  self.util.settingsmanager = new SettingsManager(self);
+  self.util.errorinfo = new ErrorInfo(self);
+  self.util = Object.freeze(self.util);
 
-// attach browser specific functions
-self.chromesettings = Object.create(null);
-self.chromesettings.webrtc = new WebRTC(self);
-self.chromesettings.networkprediction = new NetworkPrediction(self);
-self.chromesettings.httpreferer = new HttpReferer(self);
-self.chromesettings.hyperlinkaudit = new HyperlinkAudit(self);
-self.chromesettings.trackingprotection = new TrackingProtection(self);
-self.chromesettings.fingerprintprotection = new FingerprintProtection(self);
+  // attach browser specific functions
+  self.chromesettings = Object.create(null);
+  self.chromesettings.webrtc = new WebRTC(self);
+  self.chromesettings.networkprediction = new NetworkPrediction(self);
+  self.chromesettings.httpreferer = new HttpReferer(self);
+  self.chromesettings.hyperlinkaudit = new HyperlinkAudit(self);
+  self.chromesettings.trackingprotection = new TrackingProtection(self);
+  self.chromesettings.fingerprintprotection = new FingerprintProtection(self);
 
-// initialize all functions
-Object.values(self.chromesettings)
-  .filter((setting) => { return setting.init; })
-  .forEach((setting) => { return setting.init(); });
-self.chromesettings = Object.freeze(self.chromesettings);
-self.util.bypasslist.init();
-self.util.settings.init();
+  // Initialization
+  const reflect = (pr) => {
+    return pr
+      .then(() => {})
+      .catch((err) => { debug(`background.js: ${err.message || err}`); });
+  };
+  const pendingInit = Object.values(self.chromesettings)
+    .map((setting) => { return setting.init(); })
+    .map(reflect);
+  await Promise.all(pendingInit);
+  self.chromesettings = Object.freeze(self.chromesettings);
+  self.util.bypasslist.init();
+  self.util.settings.init();
+  await self.proxy.init();
 
-// check if regions are set
-const { regionlist } = self.util;
-const regionsSet = regionlist.hasRegions();
-if (!regionsSet) { regionlist.sync(); }
+  // check if regions are set
+  const { regionlist } = self.util;
+  const regionsSet = regionlist.hasRegions();
+  if (!regionsSet) { regionlist.sync(); }
 
-// check if application should logout on close, will disable proxy as well
-let userPromise;
-const { proxy } = self;
-const { user } = self.util;
-if (user.loggedIn && user.logOutOnClose) { userPromise = user.logout(); }
-else { userPromise = Promise.resolve(); }
+  // check if application should logout on close, will disable proxy as well
+  let userPromise;
+  const { proxy } = self;
+  const { user } = self.util;
+  if (user.loggedIn && user.logOutOnClose) { userPromise = user.logout(); }
+  else { userPromise = Promise.resolve(); }
 
-userPromise
-  // enable proxy if online and previously enabled
-  .then(() => {
-    const { storage } = self.util;
-    const proxyOnline = storage.getItem('online') === 'true';
-    if (user.loggedIn && proxyOnline) { return proxy.enable(); }
-    return proxy.disable();
-  })
-  .catch((err) => {
-    debug(err);
-    return proxy.disable();
-  });
+  userPromise
+    // enable proxy if online and previously enabled
+    .then(() => {
+      const { storage } = self.util;
+      const proxyOnline = storage.getItem('online') === 'true';
+      if (user.loggedIn && proxyOnline) { return proxy.enable(); }
+      return proxy.disable();
+    })
+    .catch((err) => {
+      debug(err);
+      return proxy.disable();
+    });
 
-// attach app to background page
-window.app = Object.freeze(self);
-debug('background.js: initialized');
+  // attach app to background page
+  window.app = Object.freeze(self);
+  debug('background.js: initialized');
 
-// PAC error messages
-if (browser.proxy) {
-  browser.proxy.onProxyError.addListener((error) => {
-    debug(`Proxy error: ${error.message}`);
-  });
-}
+  if (browser.proxy) {
+    browser.proxy.onProxyError.addListener((error) => {
+      debug(`Proxy error: ${error.message}`);
+    });
+  }
+})();

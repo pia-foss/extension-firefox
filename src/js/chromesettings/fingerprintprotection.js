@@ -1,42 +1,48 @@
 import ChromeSetting from './chromesetting';
 
-export default function () {
-  let setting;
-  if (chrome.privacy && chrome.privacy.websites && chrome.privacy.websites.resistFingerprinting) {
-    setting = chrome.privacy.websites.resistFingerprinting;
+class FingerprintProtection extends ChromeSetting {
+  constructor() {
+    super(FingerprintProtection.getSetting());
+
+    // functions
+    this.applySetting = this.createApplySetting(
+      true,
+      'fingerprintprotection',
+      'block',
+    );
+
+    // bindings
+    this.clearSetting = this.clearSetting.bind(this);
+    this.onChange = this.onChange.bind(this);
+
+    // init
+    this.settingDefault = false;
+    this.available = Boolean(this.setting);
+    this.settingID = 'fingerprintprotection';
   }
 
-  const self = Object.create(ChromeSetting(setting, (details) => {
-    return details.value === false;
-  }));
+  async clearSetting() {
+    try {
+      await this.set({ value: false }, { applyValue: true });
+      ChromeSetting.debug('fingerprintprotection', 'unblock ok');
+    }
+    catch (err) {
+      ChromeSetting.debug('fingerprintprotection', 'unblock failed', err);
+    }
+    return this;
+  }
 
-  self.settingDefault = false;
-  self.available = Boolean(setting);
-  self.settingID = 'fingerprintprotection';
+  onChange(details) {
+    this.setLevelOfControl(details.levelOfControl);
+    this.setBlocked(details.value === false);
+  }
 
-  self.applySetting = () => {
-    return self._set({ value: true })
-      .then(() => {
-        debug('fingerprintprotection.js: block ok');
-        return self;
-      })
-      .catch((error) => {
-        debug(`fingerprintprotection.js: block failed (${error})`);
-        return self;
-      });
-  };
-
-  self.clearSetting = () => {
-    return self._set({ value: false }, { applyValue: true })
-      .then(() => {
-        debug('fingerprintprotection.js: unblock ok');
-        return self;
-      })
-      .catch((error) => {
-        debug(`fingerprintprotection.js: unblock failed (${error})`);
-        return self;
-      });
-  };
-
-  return self;
+  static getSetting() {
+    if (chrome.privacy && chrome.privacy.websites) {
+      return chrome.privacy.websites.resistFingerprinting;
+    }
+    return undefined;
+  }
 }
+
+export default FingerprintProtection;

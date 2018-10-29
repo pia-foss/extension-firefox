@@ -29,8 +29,6 @@ import {
   Type,
 } from 'helpers/messaging';
 
-// import eventhandler from 'eventhandler/eventhandler'
-
 export default class MockApp {
   constructor() {
     // create app object
@@ -83,29 +81,41 @@ export default class MockApp {
     browser.runtime.onMessage.addListener(this.handleMessage);
   }
 
-  initialize() {
-    return this.sendMessage('initialize')
-      .then((app) => {
-        if (!app) { return Promise.resolve(); }
+  async initialize() {
+    try {
+      const app = await this.sendMessage('initialize');
 
-        // set settings values
+      // Initialize settings
+      if (app) {
+        // initialize settings localStorage
         // it is critical the settings are intiialized before setting up the user
         // to ensure 'remember me' is set and user credentials are saved to the
         // correct storage location via setUsername and setPassword
         app.util.settings.forEach(({ settingID, value }) => {
           this.util.settings.setItem(settingID, value, true);
         });
+      }
+      const reflect = (pr) => {
+        return pr
+          .then(() => {})
+          .catch((err) => { debug(`background.js: ${err.message || err}`); });
+      };
+      const pendingInit = Object.values(this.chromesettings)
+        .map((setting) => { return setting.init(); })
+        .map(reflect);
+      await Promise.all(pendingInit);
 
+      if (app) {
         // set user, proxy, and region values
+        this.proxy.setLevelOfControl(app.proxy.levelOfControl);
         this.util.user.authed = app.util.user.authed;
         this.util.user.authing = app.util.user.authing;
         this.util.user.setLoggedInStorageItem(app.util.user.loggedIn);
-        this.proxy.setEnabled(app.proxy.enabled);
         this.util.user.setUsername(app.util.user.username, true);
         this.util.user.setPassword(app.util.user.password, true);
         this.util.storage.setItem('online', app.online);
         this.util.regionlist.import(app.util.regionlist.regions);
-        this.util.regionlist.setSelectedRegion(app.util.regionlist.region.id, true);
+        await this.util.regionlist.setSelectedRegion(app.util.regionlist.region.id, true);
         this.util.regionlist.resetFavoriteRegions(app.util.regionlist.favorites);
 
         // set bypasslist rules
@@ -114,12 +124,28 @@ export default class MockApp {
         this.util.storage.setItem(userRuleKey, app.util.bypasslist.user);
         this.util.storage.setItem(popRuleKey, app.util.bypasslist.popular);
         this.util.bypasslist.resetPopularRules();
-        return undefined;
-      });
+      }
+
+      await this.proxy.init();
+    }
+    catch (err) {
+      console.error(debug('mockApp.js: error occurred'));
+      console.error(debug(`error: ${JSON.stringify(err, Object.getOwnPropertyNames(err))}`));
+    }
   }
 
-  sendMessage(type, data) {
-    return sendMessage(this.target, type, data);
+  async sendMessage(type, data) {
+    let message;
+    try {
+      message = await sendMessage(this.target, type, data);
+    }
+    catch (err) {
+      debug('mockApp.js: error');
+      debug(`error: ${JSON.stringify(err, Object.getOwnPropertyNames(err))}`);
+      throw err;
+    }
+
+    return message;
   }
 
   handleMessage(message, sender, response) {
@@ -127,18 +153,15 @@ export default class MockApp {
 
     // can't return a promise because it's the polyfill version
     // and firefox won't recognize it as a 'real' promise
-    new Promise((resolve) => {
-      if (message.type === 'proxy.enabled') {
-        this.proxy.setEnabled(message.data);
-      }
-      else if (message.type === 'util.user.authed') {
-        this.util.user.authed = message.data.util.user.authed;
+    new Promise(async (resolve) => {
+      if (message.type === 'util.user.authed') {
+        this.util.user.authed = message.data;
       }
       else if (message.type === 'util.user.authing') {
-        this.util.user.authing = message.data.util.user.authing;
+        this.util.user.authing = message.data;
       }
       else if (message.type === Type.SET_SELECTED_REGION) {
-        this.util.regionlist.setSelectedRegion(message.data, true);
+        await this.util.regionlist.setSelectedRegion(message.data, true);
       }
 
       return resolve({});

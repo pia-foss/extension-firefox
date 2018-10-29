@@ -1,42 +1,40 @@
-import ChromeSetting from "chromesettings/chromesetting";
+import ChromeSetting from 'chromesettings/chromesetting';
 
-export default function(app) {
-  let setting;
-  if (chrome.privacy && chrome.privacy.websites && chrome.privacy.websites.hyperlinkAuditingEnabled) {
-    setting = chrome.privacy.websites.hyperlinkAuditingEnabled;
+class HyperLinkAudit extends ChromeSetting {
+  constructor() {
+    super(HyperLinkAudit.getSetting());
+
+    // function
+    this.applySetting = this.createApplySetting(
+      false,
+      'hyperlinkaudit',
+      'block',
+    );
+    this.clearSetting = this.createClearSetting(
+      'hyperlinkaudit',
+      'unblock',
+    );
+
+    // bindings
+    this.onChange = this.onChange.bind(this);
+
+    // init
+    this.settingDefault = true;
+    this.available = Boolean(this.setting);
+    this.settingID = 'blockhyperlinkaudit';
   }
 
-  const self = Object.create(ChromeSetting(setting, (details) => {
-    return details.value === false;
-  }));
-
-  self.settingDefault = true;
-  self.available = Boolean(setting);
-  self.settingID = "blockhyperlinkaudit";
-
-  self.applySetting = () => {
-    return self._set({value: false})
-    .then(() => {
-      debug("hyperlinkaudit.js: block ok");
-      return self;
-    })
-    .catch((error) => {
-      debug(`hyperlinkaudit.js: block failed (${error})`);
-      return self;
-    });
+  onChange(details) {
+    this.setLevelOfControl(details.levelOfControl);
+    this.setBlocked(details.value === false);
   }
 
-  self.clearSetting = () => {
-    return self._clear({})
-    .then(() => {
-      debug("hyperlinkaudit.js: unblock ok");
-      return self;
-    })
-    .catch((error) => {
-      debug(`hyperlinkaudit.js: unblock failed (${error})`);
-      return self;
-    });
+  static getSetting() {
+    if (chrome.privacy && chrome.privacy.websites) {
+      return chrome.privacy.websites.hyperlinkAuditingEnabled;
+    }
+    return undefined;
   }
-
-  return self;
 }
+
+export default HyperLinkAudit;
