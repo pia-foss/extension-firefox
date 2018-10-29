@@ -1,42 +1,43 @@
-import ChromeSetting from "chromesettings/chromesetting";
+import ChromeSetting from 'chromesettings/chromesetting';
 
-export default function(app) {
-  let setting;
-  if (chrome.privacy && chrome.privacy.network && chrome.privacy.network.webRTCIPHandlingPolicy) {
-    setting = chrome.privacy.network.webRTCIPHandlingPolicy;
+class WebRTC extends ChromeSetting {
+  constructor() {
+    super(WebRTC.getSetting());
+
+    // functions
+    this.applySetting = this.createApplySetting(
+      'disable_non_proxied_udp',
+      'webrtc',
+      'block',
+    );
+    this.clearSetting = this.createClearSetting(
+      'webrtc',
+      'unblock',
+    );
+
+    // bindings
+    this.onChange = this.onChange.bind(this);
+
+    // init
+    this.settingDefault = true;
+    this.blockable = Boolean(this.setting);
+    this.settingID = 'preventwebrtcleak';
   }
 
-  const self = Object.create(ChromeSetting(setting, (details) => {
-    return details.value === "disable_non_proxied_udp";
-  }));
-
-  self.settingDefault = true;
-  self.blockable = Boolean(setting);
-  self.settingID = "preventwebrtcleak";
-
-  self.applySetting = () => {
-    return self._set({value: "disable_non_proxied_udp"})
-    .then(() => {
-      debug("webrtc.js: block ok");
-      return self;
-    })
-    .catch((error) => {
-      debug(`webrtc.js: block failed (${error})`);
-      return self;
-    });
+  onChange(details) {
+    this.setLevelOfControl(details.levelOfControl);
+    this.setBlocked(details.value === 'disable_non_proxied_udp');
   }
 
-  self.clearSetting = () => {
-    return self._clear()
-    .then(() => {
-      debug(`webrtc.js: unblock ok`);
-      return self;
-    })
-    .catch((error) => {
-      debug(`webrtc.js: unblock failed (${error})`);
-      return self;
-    });
+  static getSetting() {
+    if (
+      chrome.privacy
+      && chrome.privacy.network
+    ) {
+      return chrome.privacy.network.webRTCIPHandlingPolicy;
+    }
+    return undefined;
   }
-
-  return self;
 }
+
+export default WebRTC;

@@ -1,149 +1,150 @@
-import { sendMessage, Type, Target } from 'helpers/messaging';
+import ChromeSetting from './chromesetting';
+import { sendMessage, Type, Target } from '../helpers/messaging';
 
-let enabled = false;
+const ONLINE_KEY = 'online';
+const MACE_KEY = 'maceprotection';
 
-class Proxy {
+class Proxy extends ChromeSetting {
   constructor(app, foreground) {
-    this.app = app;
-    this.foreground = foreground;
+    super();
 
     // bindings
-    this.enabled = this.enabled.bind(this);
+    this.onChange = this.onChange.bind(this);
+    this.settingsInMemory = this.settingsInMemory.bind(this);
     this.getEnabled = this.getEnabled.bind(this);
-    this.setEnabled = this.setEnabled.bind(this);
+    this.enabled = this.enabled.bind(this);
     this.enable = this.enable.bind(this);
     this.disable = this.disable.bind(this);
+    this.set = this.set.bind(this);
+    this.get = this.get.bind(this);
+    this.clear = this.clear.bind(this);
+    this.init = this.init.bind(this);
+
+    // init
+    this.app = app;
+    this.foreground = foreground;
+    // Assign a settingID for debugging purposes
+    this.settingID = 'proxy';
+    this.areSettingsInMemory = false;
+    // This is not blocked despite not having a setting
+    this.setBlocked(false);
+  }
+
+  async init() {
+    await this.get({ levelOfControl: this.levelOfControl || ChromeSetting.controllable });
+  }
+
+  onChange(details) {
+    const {
+      util: {
+        storage,
+        icon,
+        settingsmanager,
+      },
+    } = this.app;
+
+    this.setLevelOfControl(details.levelOfControl);
+    this.setBlocked(false);
+
+    if (this.enabled()) {
+      settingsmanager.handleConnect();
+      icon.online();
+      storage.setItem(ONLINE_KEY, String(true));
+    }
+    else {
+      settingsmanager.handleDisconnect();
+      icon.offline();
+      storage.setItem(ONLINE_KEY, String(false));
+    }
+
+    this.areSettingsInMemory = true;
+  }
+
+  settingsInMemory() {
+    return this.areSettingsInMemory;
+  }
+
+  getEnabled() {
+    return this.getLevelOfControl() === ChromeSetting.controlled;
   }
 
   enabled() {
     return this.getEnabled();
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  getEnabled() {
-    return enabled;
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  setEnabled(value) {
-    enabled = value;
-  }
-
-  /**
-   * Enable the proxy
-   */
   async enable() {
-    // short circuit if no browser.proxy
-    if (!browser.proxy) {
-      Proxy.debug('unable to enable proxy, browser.proxy not available');
-      return this;
+    const {
+      util: {
+        regionlist,
+        settings,
+        bypasslist,
+      },
+      adapter,
+    } = this.app;
+    if (this.foreground) {
+      await adapter.sendMessage(Type.PROXY_ENABLE);
     }
-    try {
-      const {
-        adapter,
-        util: {
-          icon,
-          regionlist,
-          bypasslist,
-          storage,
-          settingsmanager,
-        },
-      } = this.app;
+    else {
       const region = regionlist.getSelectedRegion();
-
-      if (this.foreground) {
-        await adapter.sendMessage(Type.PROXY_ENABLE);
-      }
-      else {
-        Proxy.debug(`connecting to ${region.host}`);
-        await browser.proxy.register('js/pac.js');
-      }
-
-      this.setEnabled(true);
-      if (!this.foreground) {
-        await adapter.sendMessage(Type.PROXY_SET_ENABLED, { value: true });
-      }
-      Proxy.debug('registered PAC script');
-      Proxy.debug(`bypass list is ${JSON.stringify(bypasslist.toArray())}`);
-      if (!this.foreground) {
-        // Send message to PAC script updating proxy information
-        await sendMessage(Target.PAC, Type.UPDATE_PAC_INFO, {
-          payload: this.PACify(region),
-          bypasslist: bypasslist.toArray(),
-        });
-      }
-      icon.online();
-      settingsmanager.handleConnect();
-      storage.setItem('online', 'true');
-
-      return this;
+      const port = settings.getItem(MACE_KEY) ? region.macePort : region.port;
+      const pacMessage = Proxy.createPacMessage(region, port, bypasslist.toArray());
+      await this.set(pacMessage);
     }
-    catch (err) {
-      Proxy.debug('error disabling proxy', err);
-      throw err;
-    }
+    await this.get({ levelOfControl: ChromeSetting.controlled });
+    Proxy.debug('enabled');
+
+    return this;
   }
 
   async disable() {
-    try {
-      // short circuit if no browser.proxy
-      if (!browser.proxy) {
-        Proxy.debug('unable to disable proxy, browser.proxy not available');
-        return this;
-      }
-
-      const {
-        adapter,
-        util: {
-          icon,
-          settingsmanager,
-          storage,
-        },
-      } = this.app;
-
-      if (this.foreground) {
-        await adapter.sendMessage(Type.PROXY_DISABLE);
-      }
-      else {
-        await browser.proxy.unregister();
-      }
-      this.setEnabled(false);
-      if (!this.foreground) {
-        await adapter.sendMessage(Type.PROXY_SET_ENABLED, { value: false });
-      }
-      Proxy.debug('unregistered PAC script');
-      icon.offline();
-      settingsmanager.handleDisconnect();
-      storage.setItem('online', String(false));
-
-      return this;
+    if (this.foreground) {
+      await this.app.adapter.sendMessage(Type.PROXY_DISABLE);
     }
-    catch (err) {
-      Proxy.debug('error disabling proxy', err);
-      throw err;
+    else {
+      await this.clear();
     }
+    await this.get({ levelOfControl: ChromeSetting.controllable });
+    Proxy.debug('disabled');
+
+    return this;
   }
 
-  PACify(region) {
-    const { settings } = this.app.util;
+  async set(value) {
+    await browser.proxy.register('js/pac.js');
+    await sendMessage(Target.PAC, Type.PAC_UPDATE, value);
+    this.applied = true;
+  }
 
+  async clear() {
+    await browser.proxy.unregister();
+    this.applied = false;
+  }
+
+  async get(overload = {}) {
+    const details = Object.assign(
+      { levelOfControl: this.levelOfControl },
+      overload,
+    );
+    await Promise.resolve(this.onChange(details));
+    return details;
+  }
+
+  static createPacMessage(region, port, bypassList) {
+    if (!Array.isArray(bypassList)) {
+      throw new Error('expected bypassList to be array');
+    }
     return {
-      type: 'https',
-      host: region.host,
-      port: settings.getItem('maceprotection') ? region.macePort : region.port,
+      payload: {
+        type: region.scheme,
+        host: region.host,
+        port,
+      },
+      bypassList,
     };
   }
 
   static debug(msg, err) {
-    const debugMsg = `proxy.js: ${msg}`;
-    debug(debugMsg);
-    console.log(debugMsg);
-    if (err) {
-      const errMsg = `error: ${JSON.stringify(err, Object.getOwnPropertyNames(err))}`;
-      debug(errMsg);
-      console.error(errMsg);
-    }
-    return new Error(debugMsg);
+    return ChromeSetting.debug('proxy', msg, err);
   }
 }
 

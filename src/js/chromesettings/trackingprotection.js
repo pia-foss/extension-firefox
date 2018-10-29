@@ -1,42 +1,49 @@
-import ChromeSetting from "chromesettings/chromesetting";
+import ChromeSetting from 'chromesettings/chromesetting';
 
-export default function(app) {
-  let setting;
-  if (chrome.privacy && chrome.privacy.websites && chrome.privacy.websites.trackingProtectionMode) {
-    setting = chrome.privacy.websites.trackingProtectionMode;
+class TrackingProtection extends ChromeSetting {
+  constructor() {
+    super(TrackingProtection.getSetting());
+
+    // functions
+    this.applySetting = this.createApplySetting(
+      'always',
+      'trackingprotection',
+      'block',
+    );
+
+    // bindings
+    this.clearSetting = this.clearSetting.bind(this);
+    this.onChange = this.onChange.bind(this);
+
+    // init
+    this.settingDefault = true;
+    this.available = Boolean(this.setting);
+    this.settingID = 'trackingprotection';
   }
 
-  const self = Object.create(ChromeSetting(setting, (details) => {
-    return details.value === "always";
-  }));
+  async clearSetting() {
+    try {
+      await this.set({ value: false }, { applyValue: true });
+      ChromeSetting.debug('trackingprotection', 'unblock ok');
+    }
+    catch (err) {
+      ChromeSetting.debug('trackingprotection', 'unblock failed', err);
+    }
 
-  self.settingDefault = true;
-  self.available = Boolean(setting);
-  self.settingID = "trackingprotection";
-
-  self.applySetting = () => {
-    return self._set({value: "always"})
-    .then(() => {
-      debug("trackingprotection.js: block ok");
-      return self;
-    })
-    .catch((error) => {
-      debug(`trackingprotection.js: block failed (${error})`);
-      return self;
-    });
+    return this;
   }
 
-  self.clearSetting = () => {
-    return self._set({value: false}, {applyValue: true})
-    .then(() => {
-      debug(`trackingprotection.js: unblock ok`);
-      return self;
-    })
-    .catch((error) => {
-      debug(`trackingprotection.js: unblock failed (${error})`);
-      return self;
-    });
+  onChange(details) {
+    this.setLevelOfControl(details.levelOfControl);
+    this.setBlocked(details.value === 'always');
   }
 
-  return self;
+  static getSetting() {
+    if (chrome.privacy && chrome.privacy.websites) {
+      return chrome.privacy.websites.trackingProtectionMode;
+    }
+    return undefined;
+  }
 }
+
+export default TrackingProtection;

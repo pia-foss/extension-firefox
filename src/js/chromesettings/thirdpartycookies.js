@@ -1,42 +1,40 @@
-import ChromeSetting from "chromesettings/chromesetting";
+import ChromeSetting from 'chromesettings/chromesetting';
 
-export default function(app) {
-  let setting;
-  if (chrome.privacy && chrome.privacy.websites && chrome.privacy.websites.thirdPartyCookiesAllowed) {
-    setting = chrome.privacy.websites.thirdPartyCookiesAllowed;
+class ThirdPartyCookies extends ChromeSetting {
+  constructor() {
+    super(ThirdPartyCookies.getSetting());
+
+    // functions
+    this.applySetting(
+      false,
+      'thirdpartycookies',
+      'block',
+    );
+    this.clearSetting = this.createClearSetting(
+      'thirdpartycookies',
+      'block',
+    );
+
+    // bindings
+    this.onChange = this.onChange.bind(this);
+
+    // init
+    this.settingDefault = true;
+    this.available = Boolean(this.setting);
+    this.settingID = 'blockthirdpartycookies';
   }
 
-  const self = Object.create(ChromeSetting(setting, (details) => {
-    return details.value === false;
-  }));
-
-  self.settingDefault = true;
-  self.available = Boolean(setting);
-  self.settingID = "blockthirdpartycookies";
-
-  self.applySetting = () => {
-    return self._set({value: false})
-    .then(() => {
-      debug("thirdpartycookies.js: block ok");
-      return self;
-    })
-    .catch((error) => {
-      debug(`thirdpartycookies.js: block failed (${error})`);
-      return self;
-    });
+  onChange(details) {
+    this.setLevelOfControl(details.levelOfControl);
+    this.setBlocked(details.value === false);
   }
 
-  self.clearSetting = () => {
-    return self._clear({})
-    .then(() => {
-      debug("thirdpartycookies.js: unblock ok");
-      return self;
-    })
-    .catch((error) => {
-      debug(`thirdpartycookies.js: unblock failed (${error})`);
-      return self;
-    });
+  static getSetting() {
+    if (chrome.privacy && chrome.privacy.websites) {
+      return chrome.privacy.websites.thirdPartyCookiesAllowed;
+    }
+    return undefined;
   }
-
-  return self;
 }
+
+export default ThirdPartyCookies;

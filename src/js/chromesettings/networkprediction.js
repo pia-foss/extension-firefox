@@ -1,42 +1,40 @@
-import ChromeSetting from "chromesettings/chromesetting";
+import ChromeSetting from 'chromesettings/chromesetting';
 
-export default function(app) {
-  let setting;
-  if (chrome.privacy && chrome.privacy.network && chrome.privacy.network.networkPredictionEnabled) {
-    setting = chrome.privacy.network.networkPredictionEnabled;
+class NetworkPredication extends ChromeSetting {
+  constructor() {
+    super(NetworkPredication.getSetting());
+
+    // functions
+    this.applySetting = this.createApplySetting(
+      false,
+      'networkprediction',
+      'block',
+    );
+    this.clearSetting = this.createClearSetting(
+      'networkprediction',
+      'unblock',
+    );
+
+    // bindings
+    this.onChange = this.onChange.bind(this);
+
+    // init
+    this.settingDefault = true;
+    this.available = Boolean(this.setting);
+    this.settingID = 'blocknetworkprediction';
   }
 
-  const self = Object.create(ChromeSetting(setting, (details) => {
-    return details.value === false;
-  }));
-
-  self.settingDefault = true;
-  self.available = Boolean(setting);
-  self.settingID = "blocknetworkprediction";
-
-  self.applySetting = () => {
-    return self._set({value: false})
-    .then(() => {
-      debug("networkprediction.js: block ok");
-      return self;
-    })
-    .catch((error) => {
-      debug(`networkprediction.js: block failed (${error})`);
-      return self;
-    });
+  onChange(details) {
+    this.setLevelOfControl(details.levelOfControl);
+    this.setBlocked(details.value === false);
   }
 
-  self.clearSetting = () => {
-    return self._clear()
-    .then(() => {
-      debug(`networkprediction.js: unblock ok`);
-      return self;
-    })
-    .catch((error) => {
-      debug(`networkprediction.js: unblock failed (${error})`);
-      return self;
-    });
+  static getSetting() {
+    if (chrome.privacy && chrome.privacy.network) {
+      return chrome.privacy.network.networkPredictionEnabled;
+    }
+    return undefined;
   }
-
-  return self;
 }
+
+export default NetworkPredication;

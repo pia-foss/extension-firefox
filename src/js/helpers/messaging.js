@@ -23,15 +23,17 @@ const Type = {
   SET_SELECTED_REGION: `${Namespace.REGIONLIST}.setSelectedRegion`,
   IMPORT_REGIONS: `${Namespace.REGIONLIST}.import`,
   SET_FAVORITE_REGION: `${Namespace.REGIONLIST}.setFavoriteRegion`,
-  PROXY_GET_ENABLED: `${Namespace.PROXY}.getEnabled`,
-  PROXY_SET_ENABLED: `${Namespace.PROXY}.setEnabled`,
   PROXY_ENABLE: `${Namespace.PROXY}.enable`,
   PROXY_DISABLE: `${Namespace.PROXY}.disable`,
+  PAC_UPDATE: `${Target.PAC}/update`,
 };
 
-function sendMessage(target, type, data) {
+async function sendMessage(target, type, data) {
   if (!Object.values(Target).includes(target)) {
     throw new Error(`invalid target: ${target}`);
+  }
+  if (!type) {
+    throw new Error('invalid type');
   }
   const msg = {
     type,

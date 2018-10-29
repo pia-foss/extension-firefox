@@ -145,7 +145,7 @@ class RegionList {
         if (favoriteRegions.includes(regionID)) { region.isFavorite = true; }
         this.regionMap.set(regionID, region);
       });
-      this.setSelectedRegion(storage.getItem('activeproxy') || RegionList.defaultRegionID);
+      await this.setSelectedRegion(storage.getItem('activeproxy') || RegionList.defaultRegionID);
       this.syncing = false;
       this.synced = true;
       bypasslist.updatePingGateways();

@@ -92,7 +92,7 @@ export default class MockAppAdapter {
         res = this.handleRegionList(message);
       }
       else if (message.type.startsWith(Namespace.PROXY)) {
-        res = this.handleProxy(message);
+        res = this.handleProxyMessage(message);
       }
 
       return resolve(res);
@@ -129,35 +129,30 @@ export default class MockAppAdapter {
       });
   }
 
-  handleProxy(message) {
+  handleProxyMessage(message) {
     return Promise.resolve(message)
-      .then(async ({ data, type }) => {
+      .then(async ({ type }) => {
         const { proxy } = this.app;
 
         switch (type) {
-          case Type.PROXY_GET_ENABLED: {
-            return proxy.getEnabled();
-          }
-          case Type.PROXY_SET_ENABLED: {
-            const { value } = data;
-            return proxy.setEnabled(value);
-          }
           case Type.PROXY_ENABLE: {
             await proxy.enable();
-            return undefined;
+            return;
           }
+
           case Type.PROXY_DISABLE: {
             await proxy.disable();
-            return undefined;
+            return;
           }
-          default: throw new Error(`no handler for ${type}`);
+
+          default: throw new Error(`no handler for type '${type}'`);
         }
       });
   }
 
   initialize() {
     const payload = {
-      proxy: { enabled: this.app.proxy.enabled() },
+      proxy: { levelOfControl: this.app.proxy.getLevelOfControl() },
       online: this.app.util.storage.getItem('online'),
       util: {
         user: {
