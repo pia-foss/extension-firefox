@@ -119,8 +119,8 @@ export default class MockApp {
         this.util.regionlist.resetFavoriteRegions(app.util.regionlist.favorites);
 
         // set bypasslist rules
-        const userRuleKey = this.util.bypasslist._storageKeys.userrk;
-        const popRuleKey = this.util.bypasslist._storageKeys.poprk;
+        const userRuleKey = this.util.bypasslist.storageKeys.userrk;
+        const popRuleKey = this.util.bypasslist.storageKeys.poprk;
         this.util.storage.setItem(userRuleKey, app.util.bypasslist.user);
         this.util.storage.setItem(popRuleKey, app.util.bypasslist.popular);
         this.util.bypasslist.resetPopularRules();

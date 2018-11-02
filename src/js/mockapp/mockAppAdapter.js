@@ -94,6 +94,9 @@ export default class MockAppAdapter {
       else if (message.type.startsWith(Namespace.PROXY)) {
         res = this.handleProxyMessage(message);
       }
+      else if (message.type.startsWith(Namespace.BYPASSLIST)) {
+        res = this.handleBypasslistMessage(message);
+      }
 
       return resolve(res);
     })
@@ -146,6 +149,23 @@ export default class MockAppAdapter {
           }
 
           default: throw new Error(`no handler for type '${type}'`);
+        }
+      });
+  }
+
+
+  handleBypasslistMessage(message) {
+    return Promise.resolve(message)
+      .then(async ({ type }) => {
+        const { util: { bypasslist } } = this.app;
+
+        switch (type) {
+          case Type.DOWNLOAD_BYPASS_JSON: {
+            await bypasslist.saveRulesToFile();
+            return;
+          }
+
+          default: throw new Error(`no handler for type: ${type}`);
         }
       });
   }
