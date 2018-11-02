@@ -15,6 +15,7 @@ const Target = {
 const Namespace = {
   REGIONLIST: 'util.regionlist',
   PROXY: 'proxy',
+  BYPASSLIST: 'util.bypasslist',
 };
 
 const Type = {
@@ -26,6 +27,7 @@ const Type = {
   PROXY_ENABLE: `${Namespace.PROXY}.enable`,
   PROXY_DISABLE: `${Namespace.PROXY}.disable`,
   PAC_UPDATE: `${Target.PAC}/update`,
+  DOWNLOAD_BYPASS_JSON: `${Namespace.BYPASSLIST}.saveRulesToFile`,
 };
 
 async function sendMessage(target, type, data) {

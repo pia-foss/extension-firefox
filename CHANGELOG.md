@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.16__
+
+* Fixed bypasslist export in private browsing
+
 __v1.2.15__
 
 * Improved http error handling
