@@ -51,6 +51,8 @@ export default function onSubmit(renderer, app, event) {
         }
         default: {
           errorDiv.innerHTML = t('UnknownError');
+          console.error('onSubmit.js: unknown error');
+          console.error(`error: ${JSON.stringify(res, Object.getOwnPropertyNames(res))}`);
           break;
         }
       }

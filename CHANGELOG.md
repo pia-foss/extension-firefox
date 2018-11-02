@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.15__
+
+* Improved http error handling
+
 __v1.2.14__
 
 * Converted proxy to chrome setting
