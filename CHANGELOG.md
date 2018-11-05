@@ -1,5 +1,10 @@
 __HEAD__
 
+__v1.2.17__
+
+* Fixed spelling mistake in import window
+* Added instructional message to import window
+
 __v1.2.16__
 
 * Fixed bypasslist export in private browsing
