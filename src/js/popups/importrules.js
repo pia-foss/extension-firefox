@@ -9,23 +9,22 @@ browser.runtime.getBackgroundPage().then(async ({ app }) => {
     logger: { debug },
   } = app;
 
-  /**
-   * Get the file input
-   *
-   * @returns {HTMLInputElement}
-   */
-  function getInput() {
-    return document.getElementById('import-file-input');
-  }
-
-  /**
-   * Get the input label
-   *
-   * @returns {HTMLLabelElement}
-   */
-  function getLabel() {
-    return document.getElementById('import-file-label');
-  }
+  const Element = {
+    input: {
+      id: 'import-file-input',
+    },
+    error: {
+      id: 'import-error',
+    },
+    label: {
+      id: 'import-file-label',
+      key: 'ImportLabel',
+    },
+    message: {
+      id: 'import-message',
+      key: 'ImportFileMessage',
+    },
+  };
 
   async function getCurrentWindowID() {
     const { id: windowID } = await browser.windows.getCurrent();
@@ -58,7 +57,7 @@ browser.runtime.getBackgroundPage().then(async ({ app }) => {
    */
   function setError(msg) {
     debug(`importrules.js: ${msg}`);
-    const [errElement] = document.getElementsByClassName('import-error');
+    const errElement = document.getElementById(Element.error.id);
     errElement.innerHTML = msg;
 
     return new Error(`importrules.js: ${msg}`);
@@ -156,20 +155,15 @@ browser.runtime.getBackgroundPage().then(async ({ app }) => {
     this.addEventListener('change', onFileChange);
   }
 
-  /**
-   * Update the label text
-   *
-   * @param label {HTMLLabelElement}
-   */
-  function updateLabel(label) {
-    // eslint-disable-next-line no-param-reassign
-    label.innerHTML = t('ImportLabel');
+  function updateTranslation({ id, key }) {
+    document.getElementById(id).innerHTML = t(key);
   }
 
-  const label = getLabel();
-  const input = getInput();
-  updateLabel(label);
-  input.addEventListener('click', onImportClick);
+  updateTranslation(Element.message);
+  updateTranslation(Element.label);
+
+  document.getElementById(Element.input.id).addEventListener('click', onImportClick);
+
   // TODO: Remove when https://bugzilla.mozilla.org/show_bug.cgi?id=1425829 has been resolved
   await updateSize();
 });
