@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.18__
+
+* Fixed i18n util only replacing first dash in locale
+
 __v1.2.17__
 
 * Fixed spelling mistake in import window
