@@ -324,16 +324,11 @@ export default class BypassList {
   /**
    * Create a new popup window for importing rules file
    *
-   * @returns {void}
+   * @returns {Promise<void>}
    */
-  spawnImportTab() { // eslint-disable-line class-methods-use-this
-    const width = 400;
-    const height = 400;
-    browser.windows.create({
+  async spawnImportTab() { // eslint-disable-line class-methods-use-this
+    await browser.tabs.create({
       url: browser.extension.getURL('html/popups/importrules.html'),
-      type: 'popup',
-      width,
-      height,
     });
   }
 }

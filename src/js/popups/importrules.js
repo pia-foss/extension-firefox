@@ -26,24 +26,16 @@ browser.runtime.getBackgroundPage().then(async ({ app }) => {
     },
   };
 
-  async function getCurrentWindowID() {
-    const { id: windowID } = await browser.windows.getCurrent();
+  async function getCurrentTabID() {
+    const { id: tabID } = await browser.tabs.getCurrent();
 
-    return windowID;
+    return tabID;
   }
 
   async function closeWindow() {
-    const windowID = await getCurrentWindowID();
+    const tabID = await getCurrentTabID();
 
-    return browser.windows.remove(windowID);
-  }
-
-  async function updateSize() {
-    const { width, height, id } = await browser.windows.getCurrent();
-    return browser.windows.update(id, {
-      width: width + 2,
-      height: height + 2,
-    });
+    return browser.tabs.remove(tabID);
   }
 
   /**
@@ -163,7 +155,4 @@ browser.runtime.getBackgroundPage().then(async ({ app }) => {
   updateTranslation(Element.label);
 
   document.getElementById(Element.input.id).addEventListener('click', onImportClick);
-
-  // TODO: Remove when https://bugzilla.mozilla.org/show_bug.cgi?id=1425829 has been resolved
-  await updateSize();
 });

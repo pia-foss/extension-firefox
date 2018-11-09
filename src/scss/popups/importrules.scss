@@ -9,6 +9,9 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    overflow-wrap: break-word;
+    max-width: 70%;
+    text-align: center;
 
     #import-file-label {
       width: 200px;
