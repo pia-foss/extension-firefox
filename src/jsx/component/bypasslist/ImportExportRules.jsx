@@ -16,8 +16,9 @@ class ImportExportRules extends Component {
     this.onImportClick = this.onImportClick.bind(this);
   }
 
-  onImportClick() {
-    this.bypasslist.spawnImportTab();
+  async onImportClick() {
+    await this.bypasslist.spawnImportTab();
+    window.close();
   }
 
   render() {
