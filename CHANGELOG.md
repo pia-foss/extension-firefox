@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.22__
+
+* Added missing flags
+
 __v1.2.21__
 
 * Remove download dialog from Bypass Export

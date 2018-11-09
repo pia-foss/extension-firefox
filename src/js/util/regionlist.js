@@ -266,7 +266,7 @@ class RegionList {
       host: region.dns,
       port: region.port,
       macePort: region.mace,
-      flag: `/images/flags/${region.iso}_64.png`,
+      flag: `/images/flags/${region.iso}_icon_64.png`,
       active: false,
       latency: 0,
       offline: false,
