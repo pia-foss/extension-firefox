@@ -1,5 +1,6 @@
 import ChromeSetting from './chromesetting';
 import { sendMessage, Type, Target } from '../helpers/messaging';
+import http from '../helpers/http';
 
 const ONLINE_KEY = 'online';
 const MACE_KEY = 'maceprotection';
@@ -89,6 +90,11 @@ class Proxy extends ChromeSetting {
       const port = settings.getItem(MACE_KEY) ? region.macePort : region.port;
       const pacMessage = Proxy.createPacMessage(region, port, bypasslist.toArray());
       await this.set(pacMessage);
+      // Immediately make request to force handshake with proxy
+      // server to occur on background script. Browsers can block
+      // `webrequest` API on certain domains, so this is necessary
+      // to ensure `onauthrequired` can always perform handshake
+      http.head('https://privateinternetaccess.com');
     }
     await this.get({ levelOfControl: ChromeSetting.controlled });
     Proxy.debug('enabled');

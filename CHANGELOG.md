@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.19__
+
+* Improved proxy authentication
+
 __v1.2.18__
 
 * Fixed i18n util only replacing first dash in locale
