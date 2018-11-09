@@ -8,12 +8,19 @@ class File {
    * @param {string} fileType Type of file
    * @param {any[]} fileParts Parts to include in file blob
    */
-  constructor (fileType, fileParts) {
+  constructor(fileType, fileParts) {
     // Bindings
     this.download = this.download.bind(this);
+    this.downloadViaApi = this.downloadViaApi.bind(this);
+    this.onChangedListener = this.onChangedListener.bind(this);
 
     // Init
-    this._blob = new Blob(fileParts, {type: fileType});
+    this.url = '';
+    this.blobId = undefined;
+    this.filenameRequiredError = 'File: Filename is required';
+    this.apiUnavailableError = 'File: Extension Download API Unavailable';
+    this.NoDownloadableFileError = 'File: Could Not Create Downloadable Object';
+    this.blob = new Blob(fileParts, { type: fileType });
   }
 
   /**
@@ -22,18 +29,21 @@ class File {
    * @param {string} filename Name for file
    * @returns {Promise<void>} Resolves after cleanup has completed
    */
-  download (filename) {
-    debug(`initiating download of ${filename}`);
+  download(filename) {
+    if (!filename) {
+      debug(this.filenameRequiredError);
+      return Promise.reject(new Error(this.filenameRequiredError));
+    }
+
+    debug(`File: initiating download of ${filename}`);
     return new Promise((resolve, reject) => {
-      if ((chrome && chrome.downloads) || (browser && browser.downloads)) {
-        debug('extension api available for download');
-        const url = URL.createObjectURL(this._blob);
-        this._downloadViaApi(filename, url, resolve);
-      } else {
-        const msg = 'extension api unavailable';
-        debug(msg);
-        reject(new Error(msg));
+      if (browser && browser.downloads) {
+        this.url = URL.createObjectURL(this.blob);
+        return this.downloadViaApi(this.url, filename);
       }
+
+      debug(this.apiUnavailableError);
+      return reject(new Error(this.apiUnavailableError));
     });
   }
 
@@ -42,20 +52,41 @@ class File {
    *
    * @param {string} filename Name of file
    * @param {string} url Url for file
-   * @param {function} resolve Promise resolution function
-   * @returns {void}
+   * @returns {Promise<number>} The download promise resolving the id of the download item
    */
-  _downloadViaApi (filename, url, resolve) {
-    const {download} = (chrome || browser).downloads;
-    download(
-      {
-        url,
-        filename,
-        saveAs: true,
-      },
-      () => resolve()
-    );
+  downloadViaApi(url, filename) {
+    if (!url) {
+      debug(this.NoDownloadableFileError);
+      return Promise.reject(new Error(this.NoDownloadableFileError));
+    }
+
+    const { downloads } = browser;
+    const { download } = downloads;
+
+    // handle revoking object url here
+    downloads.onChanged.addListener(this.onChangedListener);
+    return download({ url, filename })
+      .then((id) => { this.blobId = id; })
+      .catch((err) => {
+        browser.downloads.onChanged.removeListener(this.onChangedListener);
+        throw err;
+      });
+  }
+
+  /**
+   * OnChanged listener that reports the state of the download item
+   *
+   * @param {object} delta The delta of download item
+   * @returns undefined
+   */
+  onChangedListener(delta) {
+    const hasId = this.blobId && this.blobId === delta.id;
+    const isComplete = delta.state && delta.state.current === 'complete';
+    if (hasId && isComplete) {
+      URL.revokeObjectURL(this.url);
+      browser.downloads.onChanged.removeListener(this.onChangedListener);
+    }
   }
 }
 
-export {File};
+export default File;

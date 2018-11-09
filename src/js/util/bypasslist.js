@@ -1,4 +1,4 @@
-import { File } from '../helpers/file';
+import File from '../helpers/file';
 import { Type } from '../helpers/messaging';
 
 export default class BypassList {
