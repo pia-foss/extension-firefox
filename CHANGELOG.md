@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.23__
+
+* Ensured fingerprint disclaimer is shown upon first opening extension
+
 __v1.2.22__
 
 * Added missing flags
