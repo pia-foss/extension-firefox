@@ -97,7 +97,7 @@ init
   })
   // render view
   .then((needsUpgrade) => {
-    const firstRun = app.util.settings.getItem('firstRun');
+    const firstRun = app.util.settings.getItem('firstRun', true);
     if (needsUpgrade) { renderer.renderTemplate('upgrade_chrome'); }
     else if (firstRun) { renderer.renderTemplate('fingerprint'); }
     else if (app.util.user.loggedIn) { renderer.renderTemplate('authenticated'); }

@@ -238,13 +238,14 @@ class Settings {
    *
    * @throws {Error} if settingID is not valid
    */
-  getItem(settingID) {
+  getItem(settingID, defaultValue = null) {
     if (this._validID(settingID)) {
-      return this._storage.getItem(`settings:${settingID}`) === 'true';
+      const value = this._storage.getItem(`settings:${settingID}`);
+      if (value === null) { return defaultValue; }
+      return value === String(true);
     }
-    else {
-      throw new Error('settings.js: cannot perform get without valid settingID');
-    }
+
+    throw new Error('settings.js: cannot perform get without valid settingID');
   }
 
   /**
