@@ -101,11 +101,20 @@ import EventHandler from 'eventhandler/eventhandler';
 
   userPromise
     // enable proxy if online and previously enabled
-    .then(() => {
-      const { storage } = self.util;
-      const proxyOnline = storage.getItem('online') === 'true';
-      if (user.loggedIn && proxyOnline) { return proxy.enable(); }
-      return proxy.disable();
+    .then(async () => {
+      const { proxy, util: { user, storage } } = self;
+      const shouldSetProxyOnline = storage.getItem('online') === String(true);
+      const controllable = proxy.isControllable();
+      if (user.loggedIn && user.logOutOnClose) {
+        await proxy.disable();
+        await user.logout();
+      }
+      else if (controllable && user.loggedIn && shouldSetProxyOnline) {
+        await proxy.enable();
+      }
+      else {
+        await proxy.disable();
+      }
     })
     .catch((err) => {
       debug(err);
