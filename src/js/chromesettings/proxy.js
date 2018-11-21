@@ -7,7 +7,7 @@ const MACE_KEY = 'maceprotection';
 
 class Proxy extends ChromeSetting {
   constructor(app, foreground) {
-    super();
+    super(browser.proxy.settings);
 
     // bindings
     this.onChange = this.onChange.bind(this);
@@ -19,7 +19,6 @@ class Proxy extends ChromeSetting {
     this.set = this.set.bind(this);
     this.get = this.get.bind(this);
     this.clear = this.clear.bind(this);
-    this.init = this.init.bind(this);
 
     // init
     this.app = app;
@@ -29,10 +28,6 @@ class Proxy extends ChromeSetting {
     this.areSettingsInMemory = false;
     // This is not blocked despite not having a setting
     this.setBlocked(false);
-  }
-
-  async init() {
-    await this.get({ levelOfControl: this.levelOfControl || ChromeSetting.controllable });
   }
 
   onChange(details) {
@@ -89,14 +84,18 @@ class Proxy extends ChromeSetting {
       const region = regionlist.getSelectedRegion();
       const port = settings.getItem(MACE_KEY) ? region.macePort : region.port;
       const pacMessage = Proxy.createPacMessage(region, port, bypasslist.toArray());
-      await this.set(pacMessage);
+      await browser.proxy.register('js/pac.js');
+      await sendMessage(Target.PAC, Type.PAC_UPDATE, pacMessage);
+      await this.set({ value: { proxyType: 'manual' } });
       // Immediately make request to force handshake with proxy
       // server to occur on background script. Browsers can block
       // `webrequest` API on certain domains, so this is necessary
       // to ensure `onauthrequired` can always perform handshake
       http.head('https://privateinternetaccess.com');
     }
-    await this.get({ levelOfControl: ChromeSetting.controlled });
+    if (this.setting && !this.setting.onChange) {
+      await this.get();
+    }
     Proxy.debug('enabled');
 
     return this;
@@ -107,32 +106,15 @@ class Proxy extends ChromeSetting {
       await this.app.adapter.sendMessage(Type.PROXY_DISABLE);
     }
     else {
+      await browser.proxy.unregister();
       await this.clear();
     }
-    await this.get({ levelOfControl: ChromeSetting.controllable });
+    if (this.setting && !this.setting.onChange) {
+      await this.get();
+    }
     Proxy.debug('disabled');
 
     return this;
-  }
-
-  async set(value) {
-    await browser.proxy.register('js/pac.js');
-    await sendMessage(Target.PAC, Type.PAC_UPDATE, value);
-    this.applied = true;
-  }
-
-  async clear() {
-    await browser.proxy.unregister();
-    this.applied = false;
-  }
-
-  async get(overload = {}) {
-    const details = Object.assign(
-      { levelOfControl: this.levelOfControl },
-      overload,
-    );
-    await Promise.resolve(this.onChange(details));
-    return details;
   }
 
   static createPacMessage(region, port, bypassList) {

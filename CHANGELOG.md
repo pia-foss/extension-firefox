@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.24__
+
+* Fixed proxy init
+
 __v1.2.23__
 
 * Ensured fingerprint disclaimer is shown upon first opening extension
