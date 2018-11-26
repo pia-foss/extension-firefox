@@ -109,14 +109,14 @@ class SettingItem extends Component {
             </div>
           </label>
         </a>
-
         <WarningSpan />
-
-        <div className={settingID}>
-          <a className="learnmore" href={learnMoreHref} target={target}>
-            { learnMore }
-          </a>
-        </div>
+        { controllable && (
+          <div className={settingID}>
+            <a className="learnmore" href={learnMoreHref} target={target}>
+              { learnMore }
+            </a>
+          </div>
+        ) }
       </div>
     );
   }

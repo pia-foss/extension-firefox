@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.25__
+
+* Removed links when setting disabled
+
 __v1.2.24__
 
 * Fixed proxy init
