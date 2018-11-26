@@ -72,7 +72,7 @@ class Settings {
 
   get _apiIDs() { return this._apiSettings.map((setting) => setting.settingID); }
 
-  get _allIDs() { return [...this._appIDs, ...this._apiIDs]; }
+  get settingIDs() { return [...this._appIDs, ...this._apiIDs]; }
 
   /* ------------------------------------ */
   /*              Private                 */
@@ -89,7 +89,7 @@ class Settings {
   }
 
   _validID(settingID) {
-    if (!this._allIDs.includes(settingID)) {
+    if (!this.settingIDs.includes(settingID)) {
       console.error(debug(`invalid settingID: ${settingID}`));
       return false;
     }
@@ -254,7 +254,7 @@ class Settings {
    * @returns {Setting[]} list of settings
    */
   getAll() {
-    return this._allIDs.map((settingID) => {
+    return this.settingIDs.map((settingID) => {
       return {
         settingID,
         value: this.getItem(settingID),
@@ -287,6 +287,23 @@ class Settings {
     }
   }
 
+  getAvailable(settingID) {
+    if (this._validID(settingID)) {
+      if (Object.values(ApplicationIDs).includes(settingID)) {
+        return true;
+      }
+      if (this._apiIDs.includes(settingID)) {
+        const setting = this._getApiSetting(settingID);
+        if (typeof setting.isAvailable === 'function') {
+          return setting.isAvailable();
+        }
+        return true;
+      }
+      return true;
+    }
+
+    throw new Error('settings.js: cannot get available w/o valid settingID');
+  }
 
   /**
    * Determine whether specified setting is controllable by user

@@ -97,9 +97,15 @@ function createSettingsData({
   ];
 
   return data.map((setting) => {
+    const controllable = settings.getControllable(setting.settingID);
+    const available = settings.getAvailable(setting.settingID);
+    const value = (available && controllable)
+      ? settings.getItem(setting.settingID)
+      : !!setting.disabledValue;
     return Object.assign({}, setting, {
-      controllable: settings.getControllable(setting.settingID),
-      value: settings.getItem(setting.settingID),
+      controllable,
+      value,
+      available,
     });
   });
 }
@@ -113,6 +119,7 @@ function createSettingsData({
 function getSectionSettings(sectionKey, settingsData) {
   const sectionName = getSectionName(sectionKey);
   return settingsData
+    .filter((s) => { return s.available !== false; })
     .filter((setting) => {
       return setting.section === sectionName;
     });
