@@ -130,25 +130,25 @@ class SettingItem extends Component {
       checked,
       settingID,
       controllable,
-      disabledValue,
+      available,
     } = this.props;
 
-    const isChecked = controllable ? checked : Boolean(disabledValue);
-
-    return (
-      <div className="field settingitem noselect">
-        <div className="col-xs-10 settingblock">
-          { this.buildLabel() }
+    return (available)
+      ? (
+        <div className="field settingitem noselect">
+          <div className="col-xs-10 settingblock">
+            { this.buildLabel() }
+          </div>
+          <Checkbox
+            id={settingID}
+            className="col-xs-2"
+            checked={checked}
+            disabled={!controllable}
+            onChange={this.toggle}
+          />
         </div>
-        <Checkbox
-          id={settingID}
-          className="col-xs-2"
-          checked={isChecked}
-          disabled={!controllable}
-          onChange={this.toggle}
-        />
-      </div>
-    );
+      )
+      : '';
   }
 }
 
@@ -162,8 +162,8 @@ SettingItem.propTypes = {
   controllable: PropTypes.bool,
   warning: PropTypes.string,
   sectionName: PropTypes.string.isRequired,
-  disabledValue: PropTypes.bool,
   checked: PropTypes.bool.isRequired,
+  available: PropTypes.bool.isRequired,
 };
 
 SettingItem.defaultProps = {
@@ -172,7 +172,6 @@ SettingItem.defaultProps = {
   learnMoreHref: '#',
   learnMore: '',
   warning: '',
-  disabledValue: false,
 };
 
 export default SettingItem;

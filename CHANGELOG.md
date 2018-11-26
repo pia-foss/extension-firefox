@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.26__
+
+* Fixed disabled settings being displayed as checked
+
 __v1.2.25__
 
 * Removed links when setting disabled

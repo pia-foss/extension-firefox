@@ -1,20 +1,22 @@
+function filterAvailable(setting) {
+  return setting.isAvailable ? setting.isAvailable() : true;
+}
+
+function clear(csettings) {
+  Object.values(csettings)
+    .filter(filterAvailable)
+    .filter((s) => { return !s.alwaysActive; })
+    .forEach((s) => { s.clearSetting(); });
+}
+
+function apply(csettings, settings) {
+  Object.values(csettings)
+    .filter(filterAvailable)
+    .filter((s) => { return settings.getItem(s.settingID); })
+    .forEach((s) => { s.applySetting(); });
+}
+
 export default function (app) {
-  const apply = (csettings, settings) => {
-    Object.keys(csettings).forEach((name) => {
-      if (settings.getItem(csettings[name].settingID)) {
-        csettings[name].applySetting();
-      }
-    });
-  };
-
-  const clear = (csettings) => {
-    Object.keys(csettings).forEach((name) => {
-      if (!csettings[name].alwaysActive) {
-        csettings[name].clearSetting();
-      }
-    });
-  };
-
   this.handleConnect = () => {
     const { settings } = app.util;
     const { chromesettings } = app;

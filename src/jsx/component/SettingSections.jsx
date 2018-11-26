@@ -74,19 +74,18 @@ class SettingSections extends Component {
     const {
       value,
       controllable,
-      disabledValue,
       tooltip,
       label,
       warning,
       learnMore,
       learnMoreHref,
       section,
+      available,
     } = getSetting(settingID, settingsData);
 
     return {
       settingID,
       controllable,
-      disabledValue,
       tooltip,
       label,
       warning,
@@ -95,6 +94,7 @@ class SettingSections extends Component {
       sectionName: section,
       key: settingID,
       checked: value,
+      available,
       onSettingChange: this.onSettingChange,
     };
   }

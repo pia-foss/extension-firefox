@@ -16,25 +16,27 @@ class ChromeSetting {
   static get defaultClearOptions() { return { scope: 'regular' }; }
 
   constructor(setting) {
-    if (!setting) {
-      // setting not available
-      this.levelOfControl = ChromeSetting.notControllable;
-      this.blocked = true;
-    }
-
     // init
     this.setting = setting;
   }
 
-  init() {
-    if (!this.setting) { return Promise.resolve(); }
-    // This API is currently missing on Firefox but documented as existing:
-    // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/types/BrowserSetting/onChange
-    if (this.setting.onChange) {
-      this.setting.onChange.addListener(this.onChange);
+  async init() {
+    if (this.isAvailable()) {
+      // This API is currently missing on Firefox but documented as existing:
+      // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/types/BrowserSetting/onChange
+      if (this.setting.onChange) {
+        this.setting.onChange.addListener(this.onChange);
+      }
+      await this.get();
     }
+    else {
+      this.setLevelOfControl(ChromeSetting.notControllable);
+      this.setBlocked(true);
+    }
+  }
 
-    return this.get();
+  isAvailable() {
+    return !!this.setting;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -94,7 +96,7 @@ class ChromeSetting {
 
   get() {
     return new Promise((resolve, reject) => {
-      if (this.setting) {
+      if (this.isAvailable()) {
         this.setting.get(ChromeSetting.defaultGetOptions, async (details) => {
           await Promise.resolve(this.onChange(details));
           if (chrome.runtime.lastError === null) {
