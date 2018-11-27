@@ -1,5 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+
+import listenOnline from 'hoc/listenOnline';
 import Checkbox from './checkbox';
 
 class SettingItem extends Component {
@@ -91,6 +93,7 @@ class SettingItem extends Component {
       learnMore,
       controllable,
       learnMoreHref,
+      online,
     } = this.props;
     const WarningSpan = this.buildWarningSpan;
     const target = learnMoreHref === '#' ? undefined : '_blank';
@@ -112,7 +115,14 @@ class SettingItem extends Component {
         <WarningSpan />
         { controllable && (
           <div className={settingID}>
-            <a className="learnmore" href={learnMoreHref} target={target}>
+            <a
+              className={[
+                'learnmore',
+                ...(online ? [] : ['disabled']),
+              ].join(' ')}
+              href={online ? learnMoreHref : undefined}
+              target={target}
+            >
               { learnMore }
             </a>
           </div>
@@ -174,4 +184,4 @@ SettingItem.defaultProps = {
   warning: '',
 };
 
-export default SettingItem;
+export default listenOnline(SettingItem);

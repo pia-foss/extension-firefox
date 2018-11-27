@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+
+import listenOnline from 'hoc/listenOnline';
 import Switch from '../component/Switch';
 import CompanyLogo from '../component/CompanyLogo';
 import SettingsIcon from '../component/SettingsIcon';
@@ -7,7 +10,7 @@ import CurrentRegion from '../component/CurrentRegion';
 import OfflineWarning from '../component/OfflineWarning';
 
 export default function () {
-  return class AuthenticatedTemplate extends Component {
+  class AuthenticatedTemplate extends Component {
     constructor(props) {
       super(props);
 
@@ -28,6 +31,8 @@ export default function () {
     }
 
     render() {
+      const { props: { online } } = this;
+
       return (
         <div id="authenticated-template" className="row">
           <OfflineWarning />
@@ -48,10 +53,16 @@ export default function () {
 
               <a
                 title={t('AccountSettingsText')}
-                className="col-xs-4 btn-icon btn-account invokepop"
-                href={this.autologinURL()}
                 target="_blank"
                 rel="noopener noreferrer"
+                href={online ? this.autologinURL() : undefined}
+                className={[
+                  'col-xs-4',
+                  'btn-icon',
+                  'btn-account',
+                  'invokepop',
+                  ...(online ? [] : ['disabled']),
+                ].join(' ')}
               >
                 <div className="popover darkpopover arrow-bottom">
                   { t('AccountSettingsText') }
@@ -60,10 +71,15 @@ export default function () {
 
               <a
                 title={t('SupportText')}
-                className="col-xs-4 btn-icon btn-help"
-                href="https://www.privateinternetaccess.com/helpdesk/"
                 target="_blank"
                 rel="noopener noreferrer"
+                href={online ? 'https://www.privateinternetaccess.com/helpdesk/' : undefined}
+                className={[
+                  'col-xs-4',
+                  'btn-icon',
+                  'btn-help',
+                  ...(online ? [] : ['disabled']),
+                ].join(' ')}
               >
                 <div className="popover darkpopover arrow-bottom">
                   { t('SupportText') }
@@ -76,5 +92,11 @@ export default function () {
         </div>
       );
     }
+  }
+
+  AuthenticatedTemplate.propTypes = {
+    online: PropTypes.bool.isRequired,
   };
+
+  return listenOnline(AuthenticatedTemplate);
 }

@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+
+import listenOnline from 'hoc/listenOnline';
 import LoginForm from '../component/LoginForm';
 import CompanyLogo from '../component/CompanyLogo';
 import OfflineWarning from '../component/OfflineWarning';
 
 export default function () {
-  return class LoginTemplate extends Component {
+  class LoginTemplate extends Component {
     constructor(props) {
       super(props);
 
@@ -23,6 +26,8 @@ export default function () {
     }
 
     render() {
+      const { props: { online } } = this;
+
       return (
         <div id="login-template" className="row">
           <OfflineWarning />
@@ -42,10 +47,15 @@ export default function () {
               <div className="col-xs-1" />
 
               <a
-                className="col-xs-10 btn-info btn-signup"
                 target="_blank"
                 rel="noopener noreferrer"
-                href={this.joinURL()}
+                href={online ? this.joinURL() : undefined}
+                className={[
+                  'col-xs-10',
+                  'btn-info',
+                  'btn-signup',
+                  ...(online ? [] : ['disabled']),
+                ].join(' ')}
               >
                 { t('JoinText') }
               </a>
@@ -54,5 +64,11 @@ export default function () {
         </div>
       );
     }
+  }
+
+  LoginTemplate.propTypes = {
+    online: PropTypes.bool.isRequired,
   };
+
+  return listenOnline(LoginTemplate);
 }

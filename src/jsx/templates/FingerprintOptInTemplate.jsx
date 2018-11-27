@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+
+import listenOnline from 'hoc/listenOnline';
 import CompanyLogo from '../component/CompanyLogo';
 
 export default function () {
-  return class FingerprintOptIn extends Component {
+  class FingerprintOptIn extends Component {
     constructor(props) {
       super(props);
 
@@ -66,6 +69,10 @@ export default function () {
     }
 
     render() {
+      const {
+        props: { online },
+      } = this;
+
       return (
         <div className="row page fingerprint-opt-in">
           <CompanyLogo />
@@ -81,9 +88,12 @@ export default function () {
 
             <div className="fingerprint-disclaimer-link">
               <a
-                href="https://wiki.mozilla.org/Security/Fingerprinting"
+                href={online ? 'https://wiki.mozilla.org/Security/Fingerprinting' : undefined}
                 target="_blank"
                 rel="noopener noreferrer"
+                className={[
+                  ...(online ? [] : ['disabled']),
+                ].join(' ')}
               >
                 Mozilla Wiki - Security/Fingerprinting
               </a>
@@ -120,5 +130,11 @@ export default function () {
         </div>
       );
     }
-  };
+  }
+
+  FingerprintOptIn.propTypes = {
+    online: PropTypes.bool.isRequired,
+  }
+
+  return listenOnline(FingerprintOptIn);
 }
