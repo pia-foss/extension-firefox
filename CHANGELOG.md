@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.27__
+
+* Disabled links when extension offline
+
 __v1.2.26__
 
 * Fixed disabled settings being displayed as checked

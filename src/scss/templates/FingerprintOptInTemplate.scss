@@ -15,6 +15,10 @@
   .fingerprint-disclaimer-link {
     text-align: center;
     padding-top: 10px;
+
+    > a.disabled {
+      cursor: not-allowed;
+    }
   }
 
   .fingerprint-options{
