@@ -1,12 +1,15 @@
-const {compileCode, firefox} = require('./util');
+const {
+  compileCode,
+  firefox,
+  setEnv,
+  print,
+} = require('./util');
 
 // set up env vars
-process.env.build = 'debug'; // eslint-disable-line no-process-env
-process.env.gitinfo = 'yes'; // eslint-disable-line no-process-env
-
-console.log(`BUILD=${process.env.build}`); // eslint-disable-line no-process-env
-console.log(`GITINFO=${process.env.gitinfo}`); // eslint-disable-line no-process-env
+setEnv('build', 'debug');
+setEnv('audience', 'internal');
+setEnv('gitinfo', 'yes');
 
 // --- Opera ---
 compileCode(firefox)
-.catch((err) => { console.log(err); });
+  .catch((err) => { print(err); });

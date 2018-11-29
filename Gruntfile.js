@@ -12,32 +12,29 @@ const {build, freezeApp, audience, browser} = process.env; // eslint-disable-lin
 
 // helper functions
 const stringify = (s) => {
-  return typeof(s) === "string" ? s : JSON.stringify(s);
+  return (typeof s === 'string') ? s : JSON.stringify(s);
 };
 
 const info = (s) => {
-  return echomd(`${color.yellow("INFO")}: ${stringify(s)}`);
+  return echomd(`${color.yellow('INFO')}: ${stringify(s)}`);
 };
 
 const panic = (s) => {
-  echomd(`${color.red("PANIC")}: ${stringify(s)}`);
+  echomd(`${color.red('PANIC')}: ${stringify(s)}`);
   process.exit(1); // eslint-disable-line no-process-exit
 };
 
 
-module.exports = function(grunt) {
+module.exports = function gruntFile(grunt) {
   const browserName = browser;
   const pkgVersion = grunt.file.read('./VERSION').trim();
-  const getZipPath = (buildname) => `./zips/private_internet_access-${browserName}-v${pkgVersion}.zip`;
+  const getZipPath = () => { return `./zips/private_internet_access-${browserName}-v${pkgVersion}.zip`; };
 
   grunt.initConfig(config);
   grunt.loadNpmTasks('grunt-gitinfo');
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-babel');
   grunt.loadNpmTasks('grunt-sass');
-  grunt.loadNpmTasks('grunt-contrib-cssmin');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-htmlmin');
   grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-config');
   grunt.loadNpmTasks('grunt-replace');
@@ -47,86 +44,86 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-env');
   grunt.loadNpmTasks('grunt-purifycss');
 
-  grunt.registerTask("build", "Builds the extension.", () => {
+  grunt.registerTask('build', 'Builds the extension.', () => {
     if (browserName !== 'firefox') {
-      return panic("The $browser variable was not set, set $browser and rerun this task.");
+      return panic('The $browser variable was not set, set $browser and rerun this task.');
     }
 
     let tasks = [];
     switch(build) {
-      case "debug":
-        tasks = ["env:debug", "config:debug", "gitinfo", "deletebuild", "createbuild", "babel", "replace", "sass", "browserify", "copyfiles", "changelog", "removeartifacts"];
+      case 'debug':
+        tasks = ['env:debug', 'config:debug', 'gitinfo', 'deletebuild', 'createbuild', 'babel', 'replace', 'sass', 'browserify', 'copyfiles', 'changelog', 'removeartifacts'];
         break;
-      case "webstore":
-        tasks = ["env:webstore", "config:webstore", "gitinfo", "deletebuild", "createbuild", "babel", "replace", "sass", "browserify", "uglify", "copyfiles",
-                     "purifycss", "cssmin", "changelog", "htmlmin", "removeartifacts"];
+      case 'webstore':
+        tasks = ['env:webstore', 'config:webstore', 'gitinfo', 'deletebuild', 'createbuild', 'babel', 'replace', 'sass', 'browserify', 'copyfiles',
+                     'purifycss', 'changelog', 'removeartifacts'];
         break;
       default:
-        panic("The build name was not set, set $build and then rerun this task.");
+        panic('The build name was not set, set $build and then rerun this task.');
         break;
     }
     grunt.task.run(tasks);
   });
 
-  grunt.registerTask("default", "build");
+  grunt.registerTask('default', 'build');
 
-  grunt.registerTask("release", ["setreleaseenv", "build", "createzip", "compress"]);
+  grunt.registerTask('release', ['setreleaseenv', 'build', 'createzip', 'compress']);
 
-  grunt.freezeApp = () => { return freezeApp !== "0"; };
+  grunt.freezeApp = () => { return freezeApp !== '0'; };
 
   grunt.getCommit = () => {
-    if(["yes", "1", "true"].includes(gitinfo)) {
+    if(['yes', '1', 'true'].includes(gitinfo)) {
       return grunt.config.get('gitinfo').local.branch.current.SHA;
     }
   };
 
   grunt.getBranch = () => {
-    if(["yes", "1", "true"].includes(gitinfo)) {
+    if(['yes', '1', 'true'].includes(gitinfo)) {
       return grunt.config.get('gitinfo').local.branch.current.name;
     }
   };
 
   grunt.zipName = () => { return getZipPath(build); };
 
-  grunt.registerTask("setreleaseenv", "set release env vars", () => {
+  grunt.registerTask('setreleaseenv', 'set release env vars', () => {
     const empty = (s) => !s || (s.trim && s.trim().length === 0);
-    if(audience === "internal" && empty(gitinfo)) { gitinfo = "yes"; }
+    if(audience === 'internal' && empty(gitinfo)) { gitinfo = 'yes'; }
   });
 
-  grunt.registerTask("changelog", "Convert CHANGELOG.md from markdown to HTML", () => {
+  grunt.registerTask('changelog', 'Convert CHANGELOG.md from markdown to HTML', () => {
     const marked    = require('marked');
     const changelog = grunt.file.read('./CHANGELOG.md');
     marked.setOptions({sanitize: false, smartypants: true, gfm: true});
     grunt.file.write(`${grunt.config.get('buildpath')}/html/CHANGELOG.html`, marked(changelog));
   });
 
-  grunt.registerTask("createzip", "Builds the extension, and then creates a .zip file from the build directory.", () => {
-    if(!build) {
-      return panic("The build name was not set, set $build and then rerun this task.");
+  grunt.registerTask('createzip', 'Builds the extension, and then creates a .zip file from the build directory.', () => {
+    if (!build) {
+      return panic('The build name was not set, set $build and then rerun this task.');
     }
 
-    if(!browserName) {
-      return panic("The $browser variable was not set, set $browser and then rerun this task.");
+    if (!browserName) {
+      return panic('The $browser variable was not set, set $browser and then rerun this task.');
     }
 
-    info("Building extension");
+    info('Building extension');
     fs.mkdirpSync('zips');
-    info("Building zip archive");
+    info('Building zip archive');
   });
 
-  grunt.registerTask("deletebuild", "Delete a build directory.", () => {
+  grunt.registerTask('deletebuild', 'Delete a build directory.', () => {
     return fs.removeSync(grunt.config.get('buildpath'));
   });
 
-  grunt.registerTask("createbuild", "Create a build directory.", () => {
+  grunt.registerTask('createbuild', 'Create a build directory.', () => {
     return fs.mkdirpSync(grunt.config.get('buildpath'));
   });
 
-  grunt.registerTask("copyfiles", "Copy static assets to a build directory.", () => {
+  grunt.registerTask('copyfiles', 'Copy static assets to a build directory.', () => {
     const buildPath = grunt.config.get('buildpath');
 
     switch(browserName) {
-      case "opera":
+      case 'opera':
         fs.copySync(buildPath + '/manifest.opera.json', buildPath + '/manifest.json');
         break;
       default:
@@ -142,7 +139,7 @@ module.exports = function(grunt) {
     fs.copySync('src/js/pac.js', buildPath + '/js/pac.js');
   });
 
-  grunt.registerTask("removeartifacts", "Remove artifacts created during the build process.", () => {
+  grunt.registerTask('removeartifacts', 'Remove artifacts created during the build process.', () => {
     fs.removeSync('src/js/templates');
     fs.removeSync('src/js/component');
     fs.removeSync('src/js/hoc');
