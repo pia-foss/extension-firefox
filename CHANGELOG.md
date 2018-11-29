@@ -1,5 +1,7 @@
 __HEAD__
 
+* Update Translations
+
 __v1.2.29__
 
 * Fix proxy using invalid callback API
