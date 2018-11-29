@@ -6,9 +6,9 @@ const {
 } = require('./util');
 
 setEnv('build', 'webstore');
-setEnv('audience', 'internal');
-setEnv('gitinfo', 'yes');
+setEnv('gitinfo', 'no');
+setEnv('audience', 'public');
 
-// --- Firefox ---
+// --- Opera ---
 generateExtension(firefox)
   .catch((err) => { print(err); });

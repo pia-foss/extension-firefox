@@ -1,5 +1,9 @@
 __HEAD__
 
+__v1.2.28__
+
+* Updated beta & release scripts
+
 __v1.2.27__
 
 * Disabled links when extension offline

@@ -13,8 +13,19 @@ const webstoreDir = path.join(buildsDir, 'webstore');
 const artifactsDir = path.join(buildsDir, 'webstore', 'web-ext-artifacts');
 const VERSION = fs.readFileSync(path.join(__dirname, '..', 'VERSION')).toString().trim();
 
+const NamingScheme = {
+  internal(browser) { return `private_internet_access-${browser}-v${VERSION}`; },
+  beta(browser) { return `private_internet_access-${browser}-v${VERSION}-beta`; },
+  public(browser) { return `private_internet_access-${browser}-v${VERSION}-release`; },
+};
+
 function print(msg) {
   console.log(msg); // eslint-disable-line no-console
+}
+
+function setEnv(key, value) {
+  process.env[key] = value;
+  print(`${key}=${value}`);
 }
 
 function root(...filesOrDirs) {
@@ -27,8 +38,8 @@ function remove(target) {
     rimraf(target, (err) => {
       if (err) reject(err);
       else resolve();
-    })
-  })
+    });
+  });
 }
 
 function execWithOutput(command, rejectOnErr = false) {
@@ -71,38 +82,41 @@ function generatePackCommand(browser) {
   const source = `--source-dir ${webstoreDir}`;
   const artifacts = `--artifacts-dir ${artifactsDir}`;
 
-  let command = `web-ext sign ${source} ${artifacts} ${key} ${secret}`;
+  const command = `web-ext sign ${source} ${artifacts} ${key} ${secret}`;
 
   return command;
-};
+}
 
 function generateWebstoreFilePath(browser) {
   const filePath = artifactsDir;
   const fileName = `private_internet_access-${VERSION}-an+fx.xpi`;
   return path.join(filePath, fileName);
-};
+}
 
 function generateFilePath(browser, directory) {
-  return path.join(directory, `private_internet_access-${browser}-v${VERSION}.xpi`);
-};
+  const audience = process.env.audience || 'internal';
+  let filename = NamingScheme[audience](browser);
+  filename += '.xpi';
+  return path.join(directory, filename);
+}
 
 function compileCode(browser, release = false) {
   // generate a build and pack the extension
   return new Promise((resolve, reject) => {
-    console.log(`--- Building for ${browser}`);
+    print(`--- Building for ${browser}`);
     process.env.browser = browser; // eslint-disable-line no-process-env
 
-    console.log('compiling code...');
+    print('compiling code...');
     const grunt = exec('grunt');
     grunt.stdout.pipe(process.stdout);
     grunt.stderr.on('data', (err) => { return reject(err); });
     grunt.on('exit', () => { return resolve(); });
   });
-};
+}
 
 // package using Firefox browser
 function packExtension(browser) {
-  console.log('packing through browser...');
+  print('packing through browser...');
   return new Promise((resolve, reject) => {
     const command = generatePackCommand(browser);
     print(`\n\n -- running command --\n${command}\n\n`);
@@ -111,17 +125,17 @@ function packExtension(browser) {
     pack.stderr.on('data', (err) => { return reject(err); });
     pack.on('exit', () => { return resolve(); });
   });
-};
+}
 
 function renameExtension(browser, directory) {
-   return fs.moveSync(generateWebstoreFilePath(browser), generateFilePath(browser, directory));
-};
+  return fs.moveSync(generateWebstoreFilePath(browser), generateFilePath(browser, directory));
+}
 
 function logInfo() {
   // User Output
-  console.log(`Launching from directory: ${__dirname}`);
-  console.log(`Building extension version: ${VERSION}`);
-  console.log(`Detected Platform: ${platform}`);
+  print(`Launching from directory: ${__dirname}`);
+  print(`Building extension version: ${VERSION}`);
+  print(`Detected Platform: ${platform}`);
 }
 
 /**
@@ -138,8 +152,8 @@ function generateExtension(browser, destDir = buildsDir) {
   return compileCode(browser)
     .then(() => { return packExtension(browser); })
     .then(() => { return renameExtension(browser, destDir); })
-    .then(() => { console.log(`${browser} done`); });
-};
+    .then(() => { print(`${browser} done`); });
+}
 
 function runMochaTests() {
   const mochaPath = path.join(executablesDir, 'mocha');
@@ -148,11 +162,12 @@ function runMochaTests() {
 }
 
 module.exports = {
+  print,
+  setEnv,
   firefox,
   compileCode,
   generateExtension,
   runMochaTests,
-  print,
   root,
   remove,
 };
