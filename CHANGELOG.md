@@ -1,5 +1,10 @@
 __HEAD__
 
+__v1.2.29__
+
+* Fix proxy using invalid callback API
+* Fix unhandled rejection in bypasslist
+
 __v1.2.28__
 
 * Updated beta & release scripts

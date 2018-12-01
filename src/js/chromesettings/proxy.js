@@ -117,6 +117,35 @@ class Proxy extends ChromeSetting {
     return this;
   }
 
+  /**
+   * Must override set as it uses Promise API for proxy
+   */
+  async set(options, override) {
+    if (this.isControllable()) {
+      await this.setting.set(Object.assign({}, ChromeSetting.defaultSetOptions, options));
+      if (browser.runtime.lastError !== null) { throw browser.runtime.lastError; }
+      if (override && override.applyValue) { this.applied = options.value; }
+      else { this.applied = true; }
+    }
+    else {
+      throw new Error(`${this.settingID}: extension cannot control this setting`);
+    }
+  }
+
+  /**
+   * Must override get as it uses Promise API for proxy
+   */
+  async get() {
+    if (this.isAvailable()) {
+      const details = await this.setting.get(ChromeSetting.defaultGetOptions);
+      await Promise.resolve(this.onChange(details));
+      if (chrome.runtime.lastError !== null) { throw chrome.runtime.lastError; }
+    }
+    else {
+      throw new Error(`${this.settingID} setting is not available`);
+    }
+  }
+
   static createPacMessage(region, port, bypassList) {
     if (!Array.isArray(bypassList)) {
       throw new Error('expected bypassList to be array');

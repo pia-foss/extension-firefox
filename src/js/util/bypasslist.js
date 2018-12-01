@@ -174,8 +174,10 @@ export default class BypassList {
   }
 
   enablePopularRule(name, bridged, restartProxy = true) {
-    if (!this.popularRulesByName().includes(name)) { return Promise.reject(); }
-    if (this.enabledPopularRules().includes(name)) { return Promise.reject(); }
+    if (!this.popularRulesByName().includes(name)) {
+      return Promise.reject(new Error(`${name} is not a valid popular rule`));
+    }
+    if (this.enabledPopularRules().includes(name)) { return Promise.resolve(); }
 
     const { adapter } = this.app;
 
@@ -201,8 +203,10 @@ export default class BypassList {
   }
 
   disablePopularRule(name, bridged, restartProxy = true) {
-    if (!this.popularRulesByName().includes(name)) { return Promise.reject(); }
-    if (!this.enabledPopularRules().includes(name)) { return Promise.reject(); }
+    if (!this.popularRulesByName().includes(name)) {
+      return Promise.reject(new Error(`no such popular rule: ${name}`));
+    }
+    if (!this.enabledPopularRules().includes(name)) { return Promise.resolve(); }
 
     const { adapter } = this.app;
 
