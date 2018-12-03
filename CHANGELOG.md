@@ -1,5 +1,8 @@
 __HEAD__
 
+__v1.3.0__
+
+* 1.3.0 Release
 * Update Translations
 
 __v1.2.29__
