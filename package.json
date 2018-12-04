@@ -5,7 +5,7 @@
     "test": "node script/e2e",
     "dev": "node script/dev",
     "qa": "node script/qa",
-    "beta": "node script/beta",
+    "beta": "node script/beta && node script/betaInfo",
     "public": "node script/public",
     "translation:import": "grunt oneskyImport",
     "translation:export": "grunt oneskyExport",
