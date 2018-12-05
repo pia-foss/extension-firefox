@@ -16,11 +16,13 @@ const Namespace = {
   REGIONLIST: 'util.regionlist',
   PROXY: 'proxy',
   BYPASSLIST: 'util.bypasslist',
+  I18N: 'util.i18n',
 };
 
 const Type = {
   FOREGROUND_OPEN: 'foreground_open',
   UPDATE_PAC_INFO: 'update_pac_info',
+  DEBUG: 'debug',
   SET_SELECTED_REGION: `${Namespace.REGIONLIST}.setSelectedRegion`,
   IMPORT_REGIONS: `${Namespace.REGIONLIST}.import`,
   SET_FAVORITE_REGION: `${Namespace.REGIONLIST}.setFavoriteRegion`,
@@ -28,6 +30,8 @@ const Type = {
   PROXY_DISABLE: `${Namespace.PROXY}.disable`,
   PAC_UPDATE: `${Target.PAC}/update`,
   DOWNLOAD_BYPASS_JSON: `${Namespace.BYPASSLIST}.saveRulesToFile`,
+  IMPORT_RULES: `${Namespace.BYPASSLIST}.importRules`,
+  I18N_TRANSLATE: `${Namespace.I18N}.t`,
 };
 
 async function sendMessage(target, type, data) {

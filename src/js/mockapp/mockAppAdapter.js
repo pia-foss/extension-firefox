@@ -88,6 +88,10 @@ export default class MockAppAdapter {
       else if (message.type === 'setUserRules') {
         this.app.util.bypasslist.setUserRules(message.data, true);
       }
+      else if (message.type === Type.DEBUG) {
+        const { data: { debugMsg } } = message;
+        debug(debugMsg);
+      }
       else if (message.type.startsWith(Namespace.REGIONLIST)) {
         res = this.handleRegionList(message);
       }
@@ -97,6 +101,9 @@ export default class MockAppAdapter {
       else if (message.type.startsWith(Namespace.BYPASSLIST)) {
         res = this.handleBypasslistMessage(message);
       }
+      else if (message.type.startsWith(Namespace.I18N)) {
+        res = this.handleI18nMessage(message);
+      }
 
       return resolve(res);
     })
@@ -105,6 +112,22 @@ export default class MockAppAdapter {
 
     // must return true here to keep the response callback alive
     return true;
+  }
+
+  handleI18nMessage(message) {
+    return Promise.resolve(message)
+      .then(({ data, type }) => {
+        const { util: { i18n } } = this.app;
+
+        switch (type) {
+          case Type.I18N_TRANSLATE: {
+            const { key, opts = {} } = data;
+            return i18n.t(key, opts);
+          }
+
+          default: throw new Error(`no handler for type ${type}`);
+        }
+      });
   }
 
   /**
@@ -156,13 +179,18 @@ export default class MockAppAdapter {
 
   handleBypasslistMessage(message) {
     return Promise.resolve(message)
-      .then(async ({ type }) => {
+      .then(async ({ type, data }) => {
         const { util: { bypasslist } } = this.app;
 
         switch (type) {
           case Type.DOWNLOAD_BYPASS_JSON: {
             await bypasslist.saveRulesToFile();
             return;
+          }
+
+          case Type.IMPORT_RULES: {
+            const { rules } = data;
+            bypasslist.importRules(rules);
           }
 
           default: throw new Error(`no handler for type: ${type}`);
