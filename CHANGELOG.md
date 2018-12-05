@@ -4,6 +4,7 @@ __v1.3.0__
 
 * 1.3.0 Release
 * Update Translations
+* Fixed region sort styling
 * Fixed import tab not rendering in private window
 
 __v1.2.29__
