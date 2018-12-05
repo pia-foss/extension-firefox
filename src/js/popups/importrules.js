@@ -1,13 +1,15 @@
 import 'babel-polyfill';
 
-browser.runtime.getBackgroundPage().then(async ({ app }) => {
-  const {
-    util: {
-      bypasslist,
-      i18n: { t },
-    },
-    logger: { debug },
-  } = app;
+import { sendMessage, Target, Type } from 'helpers/messaging';
+
+(async () => {
+  function debug(debugMsg) {
+    sendMessage(Target.BACKGROUND, Type.DEBUG, { debugMsg });
+  }
+
+  function t(key, opts = {}) {
+    return sendMessage(Target.BACKGROUND, Type.I18N_TRANSLATE, { key, opts });
+  }
 
   const Element = {
     input: {
@@ -58,15 +60,15 @@ browser.runtime.getBackgroundPage().then(async ({ app }) => {
   /**
    * Set error for invalid file
    */
-  function setInvalidFileError() {
-    setError(t('InvalidImportFileStructure'));
+  async function setInvalidFileError() {
+    return setError(await t('InvalidImportFileStructure'));
   }
 
   /**
    * Clear the error message
    */
   function clearError() {
-    setError('');
+    return setError('');
   }
 
   /**
@@ -74,28 +76,30 @@ browser.runtime.getBackgroundPage().then(async ({ app }) => {
    *
    * Sets error message if parsing fails
    */
-  function parse(result) {
+  async function parse(result) {
     let rules = null;
     try {
       rules = JSON.parse(result);
     }
     catch (_) {
-      throw setInvalidFileError();
+      throw await setInvalidFileError();
     }
 
     const { popularRules, userRules } = rules;
     if (!Array.isArray(popularRules) || !Array.isArray(userRules)) {
-      throw setInvalidFileError();
+      throw await setInvalidFileError();
     }
 
     const allRules = [...popularRules, ...userRules];
-    allRules.forEach((rule) => {
-      if (typeof rule !== 'string') {
-        throw setInvalidFileError();
-      }
-    });
+    await Promise.all(
+      allRules.map(async (rule) => {
+        if (typeof rule !== 'string') {
+          throw await setInvalidFileError();
+        }
+      }),
+    );
 
-    clearError();
+    await clearError();
 
     return rules;
   }
@@ -105,17 +109,17 @@ browser.runtime.getBackgroundPage().then(async ({ app }) => {
    *
    * @returns {Promise<void>}
    */
-  function loadEndListener() {
+  async function loadEndListener() {
     const { result } = this;
     let rules;
     try {
-      rules = parse(result);
+      rules = await parse(result);
     }
     catch (err) {
       debug('importrules.js: failed to parse rules file, ensure valid JSON');
       return Promise.resolve();
     }
-    bypasslist.importRules(rules);
+    await sendMessage(Target.BACKGROUND, Type.IMPORT_RULES, { rules });
 
     return closeWindow();
   }
@@ -147,12 +151,12 @@ browser.runtime.getBackgroundPage().then(async ({ app }) => {
     this.addEventListener('change', onFileChange);
   }
 
-  function updateTranslation({ id, key }) {
-    document.getElementById(id).innerHTML = t(key);
+  async function updateTranslation({ id, key }) {
+    document.getElementById(id).innerHTML = await t(key);
   }
 
   updateTranslation(Element.message);
   updateTranslation(Element.label);
 
   document.getElementById(Element.input.id).addEventListener('click', onImportClick);
-});
+})();
