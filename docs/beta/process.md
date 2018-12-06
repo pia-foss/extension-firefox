@@ -8,13 +8,13 @@
 
 ###  Update VERSION / CHANGELOG and commit
 - Update VERSION and CHANGELOG files to latest Beta Version Number
+- Update CHANGELOG by clearing out all patch versions
 - Create a commit for this change with the commit message `{versionNumber} Beta Release`
 
 ###  Create CRX file, ZIP file, and info.md files
 - `npm run beta`
 
 ###  Update info.md file in `./builds/info.md`
-- The changelog in this file should be updated so that no patch numbers are referenced
 - Changelog should only include work since last beta release
 - Update the Date of Release to when the Beta should go out to the public
 
