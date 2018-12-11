@@ -1,37 +1,27 @@
 ## Firefox Beta Release Process:
 
-###  Update Translations and commit
-- `grunt oneskyImport` will upload the `src/_locales/en/messages.json` to OneSky
-- Order translations from the OneSky website (should take around 3 days)
-- `grunt oneskyExport` will update all the other locale files
+### Init
+- Please start in in the Chrome repo and return when directed to this repo
+
+### Update .env file
+- Update RELEASE_DATE
+- UPDATE CHANGELOG_START and CHANGELOG_END
+
+### Update Translation files in FF repo
+- `grunt oneskyExport` in the FF repo
 - Create a commit for these updated translations with the commit message "Update Translations"
 
-###  Update VERSION / CHANGELOG and commit
+### Update VERSION / CHANGELOG and commit
 - Update VERSION and CHANGELOG files to latest Beta Version Number
 - Update CHANGELOG by clearing out all patch versions
 - Create a commit for this change with the commit message `{versionNumber} Beta Release`
 
-###  Create CRX file, ZIP file, and info.md files
+### Create CRX file, ZIP file, and info.md files
 - `npm run beta`
 
-###  Update info.md file in `./builds/info.md`
-- Changelog should only include work since last beta release
-- Update the Date of Release to when the Beta should go out to the public
-
-### Create master zip file with all generated files
-- `node script/betaMasterZip`
-- This should create a zip file with the ending `*-beta-release.zip` with all three files included.
-
-### Notify Web team to update the client portal
-- Send the master zip file to the web team through the #general-escalation channel
-- Slack message template: `@web Here's the files for Firefox v{versionNumber} Extension Beta Release`
-- Include the master zip file in the above slack message
-- clean up any files that aren't needed anymore
-
-
-## Firefox Zip File Contents:
-- INFO.md
-- XPI File
+### Return to the Chrome Repo for final instructions
+- Build Chrome/Opera Beta distributables
+- Master zip containing all files
 
 
 ## Beta/Release Git Branching Model
