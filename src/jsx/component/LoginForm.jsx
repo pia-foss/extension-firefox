@@ -38,7 +38,6 @@ class LoginForm extends Component {
       }
 
       default: {
-        console.error(`invalid name for login field: ${value}`);
         debug(`invalid name for login field: ${value}`);
       }
     }

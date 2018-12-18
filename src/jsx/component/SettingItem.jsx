@@ -38,7 +38,6 @@ class SettingItem extends Component {
       if (onSettingChange) { onSettingChange(settingID, newValue); }
     }
     catch (err) {
-      console.error(err);
       debug(err);
     }
   }

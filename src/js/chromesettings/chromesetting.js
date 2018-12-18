@@ -166,11 +166,9 @@ class ChromeSetting {
   static debug(name, msg, err) {
     const debugMsg = `${name}.js: ${msg}`;
     debug(debugMsg);
-    console.log(debugMsg);
     if (err) {
       const errMsg = `error: ${JSON.stringify(err, Object.getOwnPropertyNames(err))}`;
       debug(errMsg);
-      console.error(errMsg);
     }
     return new Error(debugMsg);
   }
