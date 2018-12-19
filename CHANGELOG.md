@@ -1,9 +1,13 @@
 __HEAD__
 
+__v1.3.1__
+
+* 1.3.1 Release
+* Fixed extension breaking on startup with proxy enabled
+
 __v1.3.0__
 
 * 1.3.0 Release
-* Fixed extension breaking on startup with proxy enabled
 * Update Changelog to follow version releases
 * Update Translations
 * Fixed region sort styling
