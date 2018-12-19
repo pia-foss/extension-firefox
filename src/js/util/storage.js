@@ -25,7 +25,7 @@ class Storage {
         return true;
 
       default:
-        console.error(debug(`no such storage type: ${store}`));
+        debug(`no such storage type: ${store}`);
         return false;
     }
   }
@@ -42,7 +42,7 @@ class Storage {
       else {
         msg += 'was: empty string';
       }
-      console.error(debug(msg));
+      console.debug(msg);
       return false;
     }
     return true;

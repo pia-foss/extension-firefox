@@ -129,8 +129,8 @@ export default class MockApp {
       await this.proxy.init();
     }
     catch (err) {
-      console.error(debug('mockApp.js: error occurred'));
-      console.error(debug(`error: ${JSON.stringify(err, Object.getOwnPropertyNames(err))}`));
+      debug('mockApp.js: error occurred');
+      debug(`error: ${JSON.stringify(err, Object.getOwnPropertyNames(err))}`);
     }
   }
 

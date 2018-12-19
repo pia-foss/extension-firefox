@@ -9,7 +9,7 @@ const ErrorBoundary = function (ReactClass) {
     }
 
     componentDidCatch (err) {
-      console.error(err);
+      debug(err);
       const msg = JSON.stringify(err, Object.getOwnPropertyNames(err));
       this.setState(() => ({isError: true, msg}));
     }
