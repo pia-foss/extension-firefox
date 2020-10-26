@@ -1,6 +1,7 @@
 import { idescribe, iit, ibeforeEach } from '../core';
 import { LoginPage } from '../pages/login';
 import { AuthenticatedPage } from '../pages/authenticated';
+import { SettingsPage } from '../pages/settings';
 import { LeakCheckPage } from '../pages/leaks';
 import { expect } from 'chai';
 import { FingerprintPage } from '../pages/fingerprint';
@@ -8,12 +9,14 @@ import { FingerprintPage } from '../pages/fingerprint';
 idescribe('The block WebRTC setting', function () {
   let loginPage: LoginPage;
   let authPage: AuthenticatedPage;
+  let settingsPage: SettingsPage;
   let leakPage: LeakCheckPage;
   let fingerprintPage: FingerprintPage;
 
   ibeforeEach(async function () {
     loginPage = new LoginPage();
     authPage = new AuthenticatedPage();
+    settingsPage = new SettingsPage();
     leakPage = new LeakCheckPage();
     fingerprintPage = new FingerprintPage();
 
@@ -24,6 +27,7 @@ idescribe('The block WebRTC setting', function () {
 
   idescribe('when enabled', function () {
     ibeforeEach(async function () {
+      await authPage.waitForLatencyTest();
       await authPage.switchOn();
       await leakPage.navigate();
     });
@@ -46,6 +50,11 @@ idescribe('The block WebRTC setting', function () {
 
   idescribe('when disabled', function () {
     ibeforeEach(async function () {
+      await authPage.menu.toggleDropdown();
+      await authPage.menu.settings.click();
+      const { securitySection } = settingsPage;
+      await securitySection.expand();
+      await securitySection.preventWebRtcLeak.toggle();
       await leakPage.navigate();
     });
 

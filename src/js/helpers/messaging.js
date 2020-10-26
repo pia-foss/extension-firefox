@@ -8,8 +8,7 @@ const Target = {
   ALL: '@all',
   POPUPS: '@popups',
   FOREGROUND: '@foreground',
-  BACKGROUND: '@background',
-  PAC: '@pac',
+  BACKGROUND: '@background'
 };
 
 const Namespace = {
@@ -25,7 +24,10 @@ const Type = {
   DEBUG: 'debug',
   SET_SELECTED_REGION: `${Namespace.REGIONLIST}.setSelectedRegion`,
   IMPORT_REGIONS: `${Namespace.REGIONLIST}.import`,
+  IMPORT_AUTO_REGION: `${Namespace.REGIONLIST}.setAutoRegion`,
   SET_FAVORITE_REGION: `${Namespace.REGIONLIST}.setFavoriteRegion`,
+  ADD_OVERRIDE_REGION: `${Namespace.REGIONLIST}.addOverrideRegion`,
+  REMOVE_OVERRIDE_REGION: `${Namespace.REGIONLIST}.removeOverrideRegion`,
   PROXY_ENABLE: `${Namespace.PROXY}.enable`,
   PROXY_DISABLE: `${Namespace.PROXY}.disable`,
   PAC_UPDATE: `${Target.PAC}/update`,
@@ -46,11 +48,8 @@ async function sendMessage(target, type, data) {
     target,
     data: data || {},
   };
-  const opts = {
-    toProxyScript: target === Target.PAC || target === Target.ALL,
-  };
 
-  return browser.runtime.sendMessage(msg, opts);
+  return browser.runtime.sendMessage(msg);
 }
 
 function isTarget(message, target) {

@@ -65,3 +65,4 @@ function FindProxyForURL(url, host) {
   if (bypassFilter(url, host)) { return [{ type: 'DIRECT' }]; }
   return [payload];
 }
+global.FindProxyForURL = FindProxyForURL;

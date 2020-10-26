@@ -15,7 +15,7 @@ function getVersion(): Promise<string> {
 }
 
 function getExtensionName(version: string) {
-  return `private_internet_access-firefox-v${version}.xpi`;
+  return `private_internet_access-firefox-v${version}-e2e.xpi`;
 }
 
 async function getExtensionPath() {

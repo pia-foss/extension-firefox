@@ -1,19 +1,21 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+
+import listenOnline from '@hoc/listenOnline';
+import withAppContext from '@hoc/withAppContext';
 
 class PageTitle extends Component {
   constructor(props) {
     super(props);
 
-    const background = browser.extension.getBackgroundPage();
-    if (background) { this.renderer = background.renderer; }
-    else { this.renderer = window.renderer; }
-    if (background) { this.app = background.app; }
-    else { this.app = window.app; }
+    // properties
+    this.app = props.context.app;
+    this.history = props.history;
 
     // bindings
     this.onKeyPressed = this.onKeyPressed.bind(this);
-    this.renderPreviousTemplate = this.renderPreviousTemplate.bind(this);
+    this.renderPreviousPage = this.renderPreviousPage.bind(this);
   }
 
   componentDidMount() {
@@ -29,34 +31,37 @@ class PageTitle extends Component {
     const ignoredFields = ['textarea', 'text'];
 
     if (ignoredFields.indexOf(currentType) < 0 && event.keyCode === 37) {
-      this.renderPreviousTemplate();
+      this.renderPreviousPage();
     }
   }
 
-  renderPreviousTemplate() {
-    const { previousTemplate } = this.props;
-    this.renderer.renderTemplate(previousTemplate || this.renderer.previousTemplate);
+  renderPreviousPage() {
+    this.history.goBack();
   }
 
   render() {
-    const { text } = this.props;
+    const { text, online, context: { theme } } = this.props;
+    let content = text;
+
+    // Offline Case: display no network warning above all else
+    let offlineClass = '';
+    if (!online) {
+      offlineClass = 'offline';
+      content = t('NoNetworkConnection');
+    }
 
     return (
-      <div className="header">
-        <div className="back-row">
-          <div className="col-xs-2">
-            <div
-              role="button"
-              tabIndex="-1"
-              className="back-icon"
-              onClick={this.renderPreviousTemplate}
-              onKeyPress={this.renderPreviousTemplate}
-            />
-          </div>
+      <div className={`header ${theme} ${offlineClass}`}>
+        <div
+          role="button"
+          tabIndex="-1"
+          className="back-icon"
+          onClick={this.renderPreviousPage}
+          onKeyPress={this.renderPreviousPage}
+        />
 
-          <div className="col-xs-8 upcase text">
-            { text }
-          </div>
+        <div className="text">
+          { content }
         </div>
       </div>
     );
@@ -65,11 +70,9 @@ class PageTitle extends Component {
 
 PageTitle.propTypes = {
   text: PropTypes.string.isRequired,
-  previousTemplate: PropTypes.string,
+  online: PropTypes.bool.isRequired,
+  context: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired,
 };
 
-PageTitle.defaultProps = {
-  previousTemplate: '',
-};
-
-export default PageTitle;
+export default withRouter(listenOnline(withAppContext(PageTitle)));

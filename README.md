@@ -1,6 +1,6 @@
 [![PIA logo][pia-image]][pia-url]
 
-README v0.2 / 31 May 2018
+README v0.3 / 15 January 2019
 
 # Private Internet Access
 Private Internet Access is the world's leading consumer VPN service. At Private Internet Access we believe in unfettered access for all, and as a firm supporter of the open source ecosystem we have made the decision to open source our VPN clients. For more information about the PIA service, please visit our website [privateinternetaccess.com](https://privateinternetaccess.com).
@@ -23,6 +23,7 @@ This client allows a user to sign-in to their PIA account and choose a particula
  - Remove UTM Parameters
  - PIA MACE™ (block ads, trackers, and malicious content)
  - Allow direct connections for whitelisted sites
+ - Upgrade requests to HTTPS when supported
 
 
 ## Usage
@@ -30,14 +31,7 @@ Please start by ensuring that all the requirements in the [Installation](#instal
 
 Building the client is as simple as running the build command:
 
-    browser=firefox build=debug grunt
-
-For Windows users, please set your environment variables using:
-
-    set browser=firefox
-    set build=debug
-    grunt
-
+  `yarn run dev`
 
 The unpacked extension can be installed from the following url in firefox [about:debugging](about:debugging)
 
@@ -45,8 +39,9 @@ The unpacked extension can be installed from the following url in firefox [about
 ## Installation
 #### Requirements
  - Git (latest)
- - NodeJS 8.1.0 or greater
+ - NodeJS 10.15.1 or greater
  - Firefox Browser (support for v57 and above)
+ - API Keys
 
 **Git**
 Please use these instructions to install Git on your computer if it is not already installed: [Installing Git](https://gist.github.com/derhuerst/1b15ff4652a867391f03)
@@ -54,51 +49,35 @@ Please use these instructions to install Git on your computer if it is not alrea
 **NodeJS**
 We recommend installing NodeJS via [nvm](https://github.com/creationix/nvm) on MacOS and Linux. On Windows, you can simply use the node installer found [here](https://nodejs.org/en/).
 
+**API Keys**
+API keys can be aqcuired by signing up with mozilla as a developer. Currently, the only means to do so is to post a question in the online forums for Mozilla. After doing so you can create a developer account and create your API keys. You can create your API keys here: https://addons.mozilla.org/en-US/developers/addon/api/key/
 
 #### Download Codebase
-Using the terminal:
+Using the PowerShell/Terminal:
 
-    git clone https://github.com/pia-foss/extension-firefox.git
+    `git clone https://github.com/pia-foss/extension-firefox.git`
 
 or use a graphical interface like [Git Desktop](https://desktop.github.com/) to download this repository into a directory of your choosing.
 
 
 #### Setup
-The extension uses NodeJS and NPM to build itself. NPM comes packaged with every NodeJS installation.
+The extension uses NodeJS and yarn to build itself. yarn comes packaged with every NodeJS installation.
 
-To install all dependencies the extension needs to build run:
+To install all dependencies the extension needs to build run the following command in PowerShell/Terminal:
 
-    npm install
-
+    `yarn install`
 
 #### Building
-Before building the extension, the Grunt CLI tool will need to be installed. Grunt can be install by
-running the following command:
+To build the extension, start by locating the `.env` file inside the root directory of the extension you are building. You will need to open the file inside of a text editor. At the bottom you will find where to insert your API keys. Before running the commands to build the extension, first be sure that node and yarn are updated to the latest version. Afterwords, run the command below in PowerShell/Terminal at the project root. When the build is finished `./builds/firefox-<build>` will have been created, and it can be loaded as a temporary add-on in Firefox (if using option 1 below).
 
-    npm install -g grunt
+  **option 1: (a build that makes debugging easier)**
 
-To build the extension, run the command below. When the build is finished `./builds/<build name>` will have been created, and it can be loaded as a temporary add-on in Firefox.
+    `yarn run dev`
 
-    browser=firefox build=debug grunt
+  **option 2: (a production build, that targets the webstore)**  
+  This requires that the **FIREFOX_KEY** and **FIREFOX_SECRET** environment variables are declared in a .env file at the root of the project. [Link to obtaining web-ext credentials](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Getting_started_with_web-ext#Signing_your_extension_for_distribution).
 
-For windows users, please use:
-
-    set browser=firefox
-    set build=debug
-    grunt
-
-A build can be configured to include the git branch and commit SHA it is being built from by including gitinfo=yes at command line:
-
-    browser=firefox build=debug gitinfo=yes grunt
-
-For Windows users, please use:
-
-    set browser=firefox
-    set build=debug
-    set gitinfo=yes
-    grunt
-
-The git information is shown on the extension settings page if the build was configured to include it. By default this feature is turned off but enabled when publishing a QA build to the add-on store.
+    `yarn run public`
 
 
 #### Loading Extension
@@ -113,13 +92,13 @@ The git information is shown on the extension settings page if the build was con
 
 **Requirements**
 
-- npm
+- yarn
 
 **Running Tests**
 
-Simply run the npm command
+Simply run the yarn command
 
-    `npm test`
+    `yarn test`
 
 ## Translations
 
@@ -128,31 +107,27 @@ Simply run the npm command
 
 The extension supports all locales found in `src/_locales`. The translations are
 translated by the 1sky service. `src/_locales/en/messages.json` can be uploaded to 1sky
-using the following grunt task:
+using the following yarn task:
 
-    grunt oneskyImport
+    `yarn run translation:import`
 
 Translations for all locales can be downloaded with the following task:
 
-    grunt oneskyExport
-
+    `yarn run translation:export`
 
 ## Deployment
+
 #### Deploying to the Firefox Add-on Store
 
 **These instructions are still in flux.**
 
 **Ensure that you've created a web-ext api key and secret beforehand**
-**Ensure that the `web-ext` npm package is installed globally**
 
-First build the extension as per the instructions in the [Building Section](#Building) of this README.
-Ensure that you have an account on addons.mozilla.org and have your api key and secret ready.
-Detailed information on the signing procedure and the account creation process can be found  [here](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Getting_started_with_web-ext).
-Change into the `./build/debug` directory and run the following:
+At the root of the project, run the following command
 
-    web-ext sign --api-key {apiKey} --api-secret {secretKey}
+`yarn run public`
 
-This should create a new `.xpi` file that can be uploaded to the add-on store via the addons website. This is a manual process for now until an automated procedure can be established.
+This should create a new `.xpi` file in `builds/firefox-public` that can be uploaded to the add-on store via the addons website. This is a manual process for now until an automated procedure can be established.
 
 
 ## Contributing
@@ -162,10 +137,13 @@ By contributing to this project you are agreeing to the terms stated in the Cont
 ## Authors
  - Robert Gleeson
  - Edward Kim
+ - Brad Pfannmuller
  - Amir Malik
  - Manish Jethani
  - Pericles
-
+ - Brennan Conner
+ - Bogdan Pitaroiu
+ - Stefan Nedelcu
 
 ## License
 This project is licensed under the [MIT (Expat) license](https://choosealicense.com/licenses/mit/), which can be found [here](/LICENSE).

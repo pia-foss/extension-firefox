@@ -1,35 +1,49 @@
-import http from 'helpers/http';
+import http from '@helpers/http';
 
 const USERNAME_KEY = 'form:username';
 const PASSWORD_KEY = 'form:password';
 const LOGGED_IN_KEY = 'loggedIn';
+const REMEMBER_ME_KEY = 'rememberme';
+const AUTH_TOKEN_KEY = 'authToken';
+const AUTH_TIMEOUT = 5000;
+const AUTH_ENDPOINT = 'https://www.privateinternetaccess.com/api/client/v2/token';
+const ACCOUNT_ENDPOINT = 'https://www.privateinternetaccess.com/api/client/v2/account';
 
 class User {
-  constructor(app) {
+  constructor(app, foreground = false) {
     // bindings
-    this.storageBackend = this.storageBackend.bind(this);
+    this.getLoggedIn = this.getLoggedIn.bind(this);
+    this.setLoggedIn = this.setLoggedIn.bind(this);
+    this.getRememberMe = this.getRememberMe.bind(this);
     this.setRememberMe = this.setRememberMe.bind(this);
-    this.inLocalStorage = this.inLocalStorage.bind(this);
-    this.username = this.username.bind(this);
-    this.password = this.password.bind(this);
     this.getUsername = this.getUsername.bind(this);
-    this.getPassword = this.getPassword.bind(this);
     this.setUsername = this.setUsername.bind(this);
-    this.setPassword = this.setPassword.bind(this);
-    this.removeUsernameAndPasswordFromStorage = this
-      .removeUsernameAndPasswordFromStorage.bind(this);
+    this.getPassword = this.getPassword.bind(this);
+    this.getAuthToken = this.getAuthToken.bind(this);
+    this.setAuthToken = this.setAuthToken.bind(this);
+    this.setAccount = this.setAccount.bind(this);
+    this.updateAccount = this.updateAccount.bind(this);
+    this.checkUserName = this.checkUserName.bind(this);
     this.auth = this.auth.bind(this);
     this.logout = this.logout.bind(this);
-    this.getRememberMe = this.getRememberMe.bind(this);
-    this.getLoggedInStorageItem = this.getLoggedInStorageItem.bind(this);
-    this.setLoggedInStorageItem = this.setLoggedInStorageItem.bind(this);
-    this.removeLoggedInStorageItem = this.removeLoggedInStorageItem.bind(this);
+    this.init = this.init.bind(this);
 
     // init
     this.app = app;
-    this.authed = false;
-    this.authing = false;
-    this.authTimeout = 5000;
+    this.foreground = foreground;
+
+    // handle getting account info from localStorage
+    this.account = undefined;
+    const accountString = this.storage.getItem('account');
+    if (accountString) {
+      try { this.account = JSON.parse(accountString); }
+      catch (err) { /* noop */ }
+    }
+
+    // get credentials and loggedIn from storage
+    this.username = app.util.storage.getItem(USERNAME_KEY) || '';
+    this.authToken = app.util.storage.getItem(AUTH_TOKEN_KEY) || '';
+    this.loggedIn = app.util.storage.getItem(LOGGED_IN_KEY) === 'true' || false;
   }
 
   /* ------------------------------------ */
@@ -46,169 +60,153 @@ class User {
 
   get proxy() { return this.app.proxy; }
 
-  get loggedIn() {
-    const loggedInStorageItem = this.getLoggedInStorageItem();
-    const credentialsStored = Boolean(
-      this.getUsername().length
-      && this.getPassword().length,
-    );
-
-    if (loggedInStorageItem && !credentialsStored) {
-      debug('user is expecting to be logged in, but no credentials exist');
+  async init() {
+    const { util: { storage } } = this.app;
+    const password = storage.getItem(PASSWORD_KEY) || null;
+    // If credentials exists and loggedIn, re-auth using token
+    // NOTE: This should be removed after all users are no longer using the old auth system
+    if (password && this.username && this.getLoggedIn()) {
+      try { await this.auth(this.username, password); }
+      catch (_) { this.setLoggedIn(false); }
     }
-
-    return loggedInStorageItem && credentialsStored;
-  }
-
-  get logOutOnClose() {
-    return this.settings.getItem('logoutOnClose');
-  }
-
-  getLoggedInStorageItem() {
-    return this.storage.getItem(LOGGED_IN_KEY, this.storageBackend()) === 'true';
-  }
-
-  setLoggedInStorageItem (value, bridged) {
-    this.storage.setItem(LOGGED_IN_KEY, value, this.storageBackend());
-    if (!bridged) {
-      this.adapter.sendMessage('util.user.setLoggedInStorageItem', { value });
+    else {
+      // call setLoggedIn to setup other modules relying on user
+      this.setLoggedIn(this.getLoggedIn());
     }
+    // clear legacy password
+    this.password = null;
+    storage.removeItem(PASSWORD_KEY);
   }
 
-  removeLoggedInStorageItem (bridged) {
-    this.storage.removeItem(LOGGED_IN_KEY, this.storageBackend());
-    if (!bridged) {
-      this.adapter.sendMessage('util.user.removeLoggedInStorageItem');
+  getLoggedIn() { return this.loggedIn; }
+
+  setLoggedIn(value) {
+    this.loggedIn = value;
+    this.storage.setItem(LOGGED_IN_KEY, value);
+
+    if (this.foreground) {
+      this.adapter.sendMessage('util.user.setLoggedIn', { value });
     }
-  }
-
-  storageBackend() {
-    return this.settings.getItem('rememberme') ? 'localStorage' : 'memoryStorage';
-  }
-
-  /**
-   * Set the value of remember me, and swap credentials over to new storage medium
-   *
-   * @param {boolean} rememberMe Whether the user should be remembered past the current session
-   * @param {boolean} bridged Whether this should trigger changes on the backend
-   *
-   * @returns {void}
-   */
-  setRememberMe(rememberMe, bridged) {
-    const prevRememberMe = this.getRememberMe();
-    if (rememberMe !== prevRememberMe) {
-      // Get username and password and remove from previous storage
-      const username = this.getUsername();
-      const password = this.getPassword();
-      const loggedIn = this.getLoggedInStorageItem();
-
-      // Remove from current storage medium
-      this.removeUsernameAndPasswordFromStorage(true);
-      this.removeLoggedInStorageItem(true);
-
-      // Swap storage
-      this.settings.setItem('rememberme', Boolean(rememberMe), true);
-      this.setLoggedInStorageItem(loggedIn);
-
-      // Set username and password in new storage
-      this.setUsername(username, true);
-      this.setPassword(password, true);
-      if (!bridged) {
-        this.adapter.sendMessage('util.user.setRememberMe', { rememberMe });
+    else {
+      const { util: { settingsmanager } } = this.app;
+      if (value) {
+        settingsmanager.apply();
+      }
+      else {
+        settingsmanager.disable();
       }
     }
   }
 
-  getRememberMe() {
-    return this.settings.getItem('rememberme');
-  }
+  getRememberMe() { return this.settings.getItem(REMEMBER_ME_KEY); }
 
-  inLocalStorage() {
-    return this.storageBackend() === 'localStorage';
-  }
+  setRememberMe(rememberMe) {
+    let username = '';
+    if (rememberMe) { username = this.getUsername(); }
 
-  getUsername() {
-    const username = this.storage.getItem(USERNAME_KEY, this.storageBackend());
-    return typeof username === 'string' ? username.trim() : '';
-  }
+    // update username and rememberMe in localStorage
+    this.storage.setItem(USERNAME_KEY, username);
+    this.settings.setItem(REMEMBER_ME_KEY, Boolean(rememberMe), this.foreground);
 
-  getPassword() {
-    const password = this.storage.getItem(PASSWORD_KEY, this.storageBackend());
-    return password || '';
-  }
-
-  password() {
-    console.log('user.password() is deprecated, please use user.getPassword() instead');
-    if (console.trace) { console.trace(); }
-    return this.getPassword();
-  }
-
-  username() {
-    console.log('user.username() is deprecated, please use user.getUsername() instead');
-    if (console.trace) { console.trace(); }
-    return this.getUsername();
-  }
-
-  setUsername(username, bridged) {
-    this.storage.setItem(USERNAME_KEY, username, this.storageBackend());
-    if (!bridged) {
-      this.adapter.sendMessage('util.user.setUsername', { username });
+    if (this.foreground) {
+      this.adapter.sendMessage('util.user.setRememberMe', { rememberMe });
     }
   }
 
-  setPassword(password, bridged) {
-    this.storage.setItem(PASSWORD_KEY, password, this.storageBackend());
-    if (!bridged) {
-      this.adapter.sendMessage('util.user.setPassword', { password });
+  getUsername() { return this.username || ''; }
+
+  setUsername(username) {
+    this.username = username.trim();
+
+    if (this.getRememberMe()) {
+      this.storage.setItem(USERNAME_KEY, this.username);
+    }
+
+    if (this.foreground) {
+      this.adapter.sendMessage('util.user.setUsername', { username: this.username });
     }
   }
 
-  removeUsernameAndPasswordFromStorage(bridged) {
-    this.storage.removeItem(USERNAME_KEY, this.storageBackend());
-    this.storage.removeItem(PASSWORD_KEY, this.storageBackend());
-    if (!bridged) {
-      this.adapter.sendMessage('util.user.removeUsernameAndPasswordFromStorage');
+  checkUserName(){
+    if (!this.getRememberMe()) {
+      this.username = '';
+      this.storage.setItem(USERNAME_KEY, this.username);
     }
   }
 
-  auth() {
-    const username = this.getUsername();
-    const password = this.getPassword();
-    const headers = { Authorization: `Basic ${btoa(unescape(encodeURIComponent(`${username}:${password}`)))}` };
-    debug('user.js: start auth');
-    return http.head('https://www.privateinternetaccess.com/api/client/auth', { headers, timeout: this.authTimeout }).then((res) => {
-      this.authing = false;
-      this.adapter.sendMessage('util.user.authing', false);
-      this.authed = true;
-      this.setLoggedInStorageItem(true);
-      this.adapter.sendMessage('util.user.authed', true);
-      this.icon.updateTooltip();
-      debug('user.js: auth ok');
-      return res;
-    }).catch((res) => {
-      this.setLoggedInStorageItem(false);
-      this.authing = false;
-      this.adapter.sendMessage('util.user.authing', false);
-      this.authed = false;
-      this.adapter.sendMessage('util.user.authed', false);
-      debug(`user.js: auth error, ${res.cause}`);
-      throw res;
-    });
+
+  getPassword() { return this.password || ''; }
+
+  getAuthToken() { return this.authToken || ''; }
+
+  setAuthToken(authToken) {
+    this.authToken = authToken;
+    this.storage.setItem(AUTH_TOKEN_KEY, authToken);
+
+    if (this.foreground) {
+      this.adapter.sendMessage('util.user.setAuthToken', { authToken });
+    }
   }
 
-  logout(afterLogout) {
-    return this.proxy.disable().then(() => {
-      this.authed = false;
-      this.adapter.sendMessage('util.user.authed', false);
-      if (!this.getRememberMe()) {
-        this.removeUsernameAndPasswordFromStorage();
-      }
-      this.setLoggedInStorageItem(false);
-      this.icon.updateTooltip();
-      if (afterLogout) {
-        afterLogout();
-      }
-    });
+  setAccount(account) {
+    if (!account) { return; }
+    this.account = account;
+    delete this.account.email;
+    this.storage.setItem('account', JSON.stringify(account));
+
+    if (this.foreground) {
+      this.adapter.sendMessage('util.user.setAccount', account);
+    }
+  }
+
+  updateAccount() {
+    debug('user.js: start account info');
+    const headers = { Authorization: `Token ${this.authToken}` };
+    return http.get(ACCOUNT_ENDPOINT, { headers })
+      .then((res) => {
+        debug('user.js: account info ok');
+        return res.json();
+      })
+      .then((body) => {
+        this.setAccount(body);
+        return body;
+      })
+      .catch((res) => {
+        debug(`user.js: account info error, ${res.cause}`);
+      });
+  }
+
+  auth(rawUsername, password) {
+    const username = rawUsername.trim();
+    const body = JSON.stringify({ username, password });
+    const headers = { 'Content-Type': 'application/json' };
+    const options = { headers, body, timeout: AUTH_TIMEOUT };
+    return http.post(AUTH_ENDPOINT, options)
+      .then((res) => { return res.json(); })
+      .then((resBody) => {
+        // set user as authenticated
+        this.setAuthToken(resBody.token);
+        this.setLoggedIn(true);
+        this.icon.updateTooltip();
+
+        // update account information
+        this.updateAccount();
+        return resBody;
+      })
+      .catch((res) => {
+        this.setLoggedIn(false);
+        throw res;
+      });
+  }
+
+  logout(cb) {
+    return this.proxy.disable()
+      .then(() => {
+        this.setLoggedIn(false);
+        this.setAuthToken(null);
+        this.icon.updateTooltip();
+        if (cb) { cb(); }
+      });
   }
 }
 

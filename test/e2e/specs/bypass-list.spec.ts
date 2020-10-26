@@ -25,7 +25,9 @@ idescribe('the bypass list page', function () {
     await loginPage.navigate();
     await fingerprintPage.optIn();
     await loginPage.signIn();
+    await authPage.waitForLatencyTest();
     await authPage.switchOn();
+    await authPage.menu.toggleDropdown();
     await authPage.menu.settings.click();
     await settingsPage.bypassList.click();
   });

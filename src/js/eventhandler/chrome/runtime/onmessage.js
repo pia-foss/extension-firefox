@@ -1,20 +1,18 @@
-export default function (app) {
-  return function onMessage(msg, sender, sendResponse) {
-    switch (msg.request) {
-      case 'RequestCredentials': {
-        const { user, i18n } = app.util;
-        const domains = i18n.domainMap.values();
-        const allowedUrls = Array
-          .from(domains)
-          .map((v) => {
-            return `https://${v}/xpages/sign-in`;
-          });
-        if (user.authed && allowedUrls.includes(msg.url)) {
-          sendResponse({ user: user.getUsername(), pass: user.getPassword() });
-        }
+/*
+  *** WARNING ***
+  This event handler is always active. It could be run while a direct connection is being
+  used, while another proxy extension is active, or while the Private Internet Access
+  extension is active.
 
-        break;
-      }
+  Being unaware of this could introduce serious bugs that compromise the security of the
+  extension.
+
+*/
+import createApplyListener from '@helpers/applyListener';
+
+function initOnMessage(app) {
+  return (msg, _sender, sendResponse) => {
+    switch (msg.request) {
       case 'RequestErrorInfo': {
         const { errorinfo } = app.util;
         sendResponse(errorinfo.get(msg.id));
@@ -41,3 +39,7 @@ export default function (app) {
     }
   };
 }
+
+export default createApplyListener((app, addListener) => {
+  addListener(initOnMessage(app));
+});

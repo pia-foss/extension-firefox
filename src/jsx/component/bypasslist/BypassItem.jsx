@@ -1,9 +1,9 @@
 import React from 'react';
-import PropType from 'prop-types';
+import PropTypes from 'prop-types';
 
-const BypassItem = ({ onRemoveRule, rule }) => {
+const BypassItem = ({ rule, theme, onRemoveRule }) => {
   return (
-    <div className="bypass-rule">
+    <div className={`bypass-rule ${theme}`}>
       <span className="name">
         { rule }
       </span>
@@ -20,8 +20,9 @@ const BypassItem = ({ onRemoveRule, rule }) => {
 };
 
 BypassItem.propTypes = {
-  rule: PropType.string.isRequired,
-  onRemoveRule: PropType.func.isRequired,
+  rule: PropTypes.string.isRequired,
+  theme: PropTypes.string.isRequired,
+  onRemoveRule: PropTypes.func.isRequired,
 };
 
 export default BypassItem;

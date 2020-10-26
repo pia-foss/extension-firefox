@@ -1,13 +1,14 @@
-import 'babel-polyfill';
-
-import { t } from 'errorpages/utils';
+import '@babel/polyfill';
 import URLParser from 'url';
 import escapeHTML from 'escape-html';
+
+import { t } from '@errorpages/utils';
+import '@style/errorpage.scss';
 
 /*
  * This IIFE is necessary for top-level async functions
  *
- * Removing this results in async functions being hoisted above the 'babel-polyfill'
+ * Removing this results in async functions being hoisted above the '@babel/polyfill'
  * import, and a ReferenceError occurring
  */
 (function scope() {

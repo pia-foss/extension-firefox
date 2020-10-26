@@ -1,3 +1,5 @@
+import reportError from '@helpers/reportError';
+
 /* Types
 
   interface AppSetting {
@@ -21,17 +23,24 @@
 
 const ApplicationIDs = {
   BLOCK_UTM: 'blockutm',
+  BLOCK_FBCLID: 'blockfbclid',
   MACE_PROTECTION: 'maceprotection',
   DEBUG_MODE: 'debugmode',
   REMEMBER_ME: 'rememberme',
-  LOGOUT_ON_CLOSE: 'logoutOnClose',
   FIRST_RUN: 'firstRun',
+  DARK_THEME: 'darkTheme',
+  HTTPS_UPGRADE: 'httpsUpgrade',
+  ALWAYS_ACTIVE: 'alwaysActive',
 };
 
 
 class Settings {
   constructor(app) {
-    // Bindings
+    // properties
+    this.app = app;
+    this.appDefaults = Settings.appDefaults;
+
+    // bindings
     this.init = this.init.bind(this);
     this.toggle = this.toggle.bind(this);
     this.hasItem = this.hasItem.bind(this);
@@ -39,56 +48,57 @@ class Settings {
     this.setItem = this.setItem.bind(this);
     this.getAll = this.getAll.bind(this);
     this.getControllable = this.getControllable.bind(this);
-
-    // Init
-    this._app = app;
   }
 
   /* ------------------------------------ */
   /*              Getters                 */
   /* ------------------------------------ */
 
-  get _storage() { return this._app.util.storage; }
+  get storage() { return this.app.util.storage; }
 
-  get _regionList() { return this._app.util.regionlist; }
+  get regionList() { return this.app.util.regionlist; }
 
-  get _adapter() { return this._app.adapter; }
+  get adapter() { return this.app.adapter; }
+  
+  get contentSettings() { 
+    const contentSettings = this.app.contentsettings ? this.app.contentsettings : {}; 
+    return contentSettings }
 
-  get _proxy() { return this._app.proxy; }
+  get proxy() { return this.app.proxy; }
 
-  get _logger() { return this._app.logger; }
+  get logger() { return this.app.logger; }
 
-  get _chromeSettings() { return this._app.chromesettings; }
+  get chromeSettings() { return this.app.chromesettings; }
 
   /* ------------------------------------ */
   /*          Transformations             */
   /* ------------------------------------ */
 
-  get _apiSettings() { return [...Object.values(this._chromeSettings)]; }
+  get apiSettings() { return [...Object.values(this.contentSettings),...Object.values(this.chromeSettings)]; }
 
-  get _allSettings() { return [...Settings._appDefaults, ...this._apiSettings]; }
+  get allSettings() { return [...this.appDefaults, ...this.apiSettings]; }
 
-  get _appIDs() { return Settings._appDefaults.map((setting) => { return setting.settingID; }); }
+  get appIDs() { return this.appDefaults.map((setting) => { return setting.settingID; }); }
 
-  get _apiIDs() { return this._apiSettings.map((setting) => setting.settingID); }
+  get apiIDs() { return this.apiSettings.map((setting) => { return setting.settingID; }); }
 
-  get settingIDs() { return [...this._appIDs, ...this._apiIDs]; }
+  get settingIDs() { return [...this.appIDs, ...this.apiIDs]; }
 
   /* ------------------------------------ */
   /*              Private                 */
   /* ------------------------------------ */
 
-  _getApiSetting(settingID) {
-    return this._apiSettings.find((setting) => { return setting.settingID === settingID; });
+  getInternalApiSetting(settingID) {
+    return this.apiSettings.find((setting) => { return setting.settingID === settingID; });
   }
 
-  _existsApplicationSetting(settingID) {
-    return Boolean(Settings._appDefaults.find((setting) => {
+  existsApplicationSetting(settingID) {
+    return Boolean(this.appDefaults.find((setting) => {
       return setting.settingID === settingID;
     }));
   }
 
-  _validID(settingID) {
+  validID(settingID) {
     if (!this.settingIDs.includes(settingID)) {
       debug(`invalid settingID: ${settingID}`);
       return false;
@@ -97,7 +107,7 @@ class Settings {
     return true;
   }
 
-  _toggleSetting(settingID) {
+  toggleSetting(settingID) {
     const newValue = !this.getItem(settingID);
     this.setItem(settingID, newValue, true);
     return newValue;
@@ -110,21 +120,30 @@ class Settings {
    *
    * @returns {boolean} new value of setting
    */
-  _toggleApplicationSetting(settingID) {
-    const newValue = this._toggleSetting(settingID);
+  toggleApplicationSetting(settingID) {
+    const newValue = this.toggleSetting(settingID);
 
     switch (settingID) {
       case ApplicationIDs.MACE_PROTECTION:
-        if (this._proxy.enabled()) {
+        if (this.app.proxy.enabled()) {
           // No bridged mode for enable
-          this._proxy.enable().catch(debug);
+          this.app.proxy.enable().catch(reportError('settings.js'));
         }
         break;
 
       case ApplicationIDs.DEBUG_MODE:
         if (!newValue) {
-          this._logger.removeEntries();
+          this.logger.removeEntries();
         }
+        break;
+
+      case ApplicationIDs.ALWAYS_ACTIVE:
+          if (!newValue) {
+            this.logger.removeEntries();
+          }
+          break;
+
+      default:
         break;
     }
     return newValue;
@@ -139,7 +158,7 @@ class Settings {
    *
    * @returns {Promise<boolean>} new value of setting;
    */
-  async _toggleApiSetting(setting) {
+  async toggleApiSetting(setting) {
     const toggle = setting.isApplied() ? setting.clearSetting : setting.applySetting;
     try {
       await toggle.call(setting);
@@ -154,10 +173,38 @@ class Settings {
     return newValue;
   }
 
+    /**
+   * Check if specified setting is active
+   *
+   * @param {string} settingID
+   */
+  isActive(settingID) {
+    if(settingID){
+    if (this.validID(settingID)) {
+      const loggedIn = this.app.util.user.getLoggedIn();
+      if (!loggedIn) { return false; }
+      const value = this.getItem(settingID);
+      if (!value) { return false; }
+      const alwaysActive = this.getItem('alwaysActive');
+      if (alwaysActive) { return value; }
+      const proxyValue = this.app.proxy.enabled();
+      if(proxyValue){
+        return value;
+      }
+    }
+    throw new Error('settings.js: cannot perform isActive without valid settingID');
+   } 
+  }
+
 
   /* ------------------------------------ */
   /*               Public                 */
   /* ------------------------------------ */
+
+  enabled() {
+    const { app: { util: { user } } } = this;
+    return user.getLoggedIn();
+  }
 
   /**
    * Initialize the setting values
@@ -168,7 +215,7 @@ class Settings {
    * @returns {void}
    */
   init() {
-    this._allSettings.forEach((setting) => {
+    this.allSettings.forEach((setting) => {
       if (!this.hasItem(setting.settingID)) {
         // We call this in bridged mode because we do not want it setting items on the background
         this.setItem(setting.settingID, setting.settingDefault, true);
@@ -190,21 +237,17 @@ class Settings {
    */
   async toggle(settingID, bridged) {
     if (!bridged) {
-      this._adapter.sendMessage('util.settings.toggle', { settingID });
+      this.adapter.sendMessage('util.settings.toggle', { settingID });
     }
 
     // Look for setting in application settings
-    if (this._existsApplicationSetting(settingID)) {
-      return this._toggleApplicationSetting(settingID);
+    if (this.existsApplicationSetting(settingID)) {
+      return this.toggleApplicationSetting(settingID);
     }
 
-    const apiSetting = this._getApiSetting(settingID);
-    if (apiSetting && (apiSetting.alwaysActive || this._proxy.enabled())) {
-      return this._toggleApiSetting(apiSetting);
-    }
-
+    const apiSetting = this.getInternalApiSetting(settingID);
     if (apiSetting) {
-      return this._toggleSetting(settingID);
+      return this.toggleApiSetting(apiSetting);
     }
 
     // No such setting
@@ -221,12 +264,11 @@ class Settings {
    * @throws {Error} if settingID is not valid
    */
   hasItem(settingID) {
-    if (this._validID(settingID)) {
-      return this._storage.hasItem(`settings:${settingID}`);
+    if (this.validID(settingID)) {
+      return this.storage.hasItem(`settings:${settingID}`);
     }
-    else {
-      throw new Error('settings.js: cannot perform hasItem with invalid settingID');
-    }
+
+    throw new Error('settings.js: cannot perform hasItem with invalid settingID');
   }
 
   /**
@@ -239,8 +281,8 @@ class Settings {
    * @throws {Error} if settingID is not valid
    */
   getItem(settingID, defaultValue = null) {
-    if (this._validID(settingID)) {
-      const value = this._storage.getItem(`settings:${settingID}`);
+    if (this.validID(settingID)) {
+      const value = this.storage.getItem(`settings:${settingID}`);
       if (value === null) { return defaultValue; }
       return value === String(true);
     }
@@ -274,12 +316,12 @@ class Settings {
    * @returns {void}
    */
   setItem(settingID, value, bridged) {
-    if (this._validID(settingID)) {
+    if (this.validID(settingID)) {
       const newValue = String(value) === 'true';
       const key = `settings:${settingID}`;
-      this._storage.setItem(key, newValue);
+      this.storage.setItem(key, newValue);
       if (!bridged) {
-        this._adapter.sendMessage('updateSettings', { settingID, value: newValue });
+        this.adapter.sendMessage('updateSettings', { settingID, value: newValue });
       }
     }
     else {
@@ -288,12 +330,12 @@ class Settings {
   }
 
   getAvailable(settingID) {
-    if (this._validID(settingID)) {
+    if (this.validID(settingID)) {
       if (Object.values(ApplicationIDs).includes(settingID)) {
         return true;
       }
-      if (this._apiIDs.includes(settingID)) {
-        const setting = this._getApiSetting(settingID);
+      if (this.apiIDs.includes(settingID)) {
+        const setting = this.getApiSetting(settingID);
         if (typeof setting.isAvailable === 'function') {
           return setting.isAvailable();
         }
@@ -315,30 +357,22 @@ class Settings {
    * @throws {Error} if settingID is not valid
    */
   getControllable(settingID) {
-    if (this._validID(settingID)) {
-      // LogoutOnClose depends on rememberme
-      if (settingID === ApplicationIDs.LOGOUT_ON_CLOSE) {
-        return this.getItem(ApplicationIDs.REMEMBER_ME);
-      }
-
-      else if (this._apiIDs.includes(settingID)) {
-        const setting = this._getApiSetting(settingID);
+    if (this.validID(settingID)) {
+      if (this.apiIDs.includes(settingID)) {
+        const setting = this.getInternalApiSetting(settingID);
         // Chromesettings have function
         if (typeof setting.isControllable === 'function') {
           return setting.isControllable();
         }
-        else {
-          return true;
-        }
-      }
-      // By default controllable is true
-      else {
+
         return true;
       }
+
+      // By default controllable is true
+      return true;
     }
-    else {
-      throw new Error('settings.js: cannot get controllable without valid settingID');
-    }
+
+    throw new Error('settings.js: cannot get controllable without valid settingID');
   }
 
   /**
@@ -351,11 +385,11 @@ class Settings {
    * @throws {Error} if settingID is not valid API setting
    */
   getApiSetting(settingID) {
-    if (!this._validID(settingID)) {
+    if (!this.validID(settingID)) {
       throw new Error('invalid settingID');
     }
-    else if (this._apiIDs.includes(settingID)) {
-      return this._apiSettings.find((s) => s.settingID === settingID);
+    else if (this.apiIDs.includes(settingID)) {
+      return this.apiSettings.find((s) => { return s.settingID === settingID; });
     }
     else {
       throw new Error('settings.js: getApiSetting requires settingID for ApiSetting, not AppSetting');
@@ -372,10 +406,14 @@ class Settings {
    *
    * Also used as list of acceptable application settingID's
    */
-  static get _appDefaults() {
+  static get appDefaults() {
     return [
       {
         settingID: ApplicationIDs.BLOCK_UTM,
+        settingDefault: true,
+      },
+      {
+        settingID: ApplicationIDs.BLOCK_FBCLID,
         settingDefault: true,
       },
       {
@@ -391,11 +429,19 @@ class Settings {
         settingDefault: true,
       },
       {
-        settingID: ApplicationIDs.LOGOUT_ON_CLOSE,
-        settingDefault: false,
+        settingID: ApplicationIDs.FIRST_RUN,
+        settingDefault: true,
       },
       {
-        settingID: ApplicationIDs.FIRST_RUN,
+        settingID: ApplicationIDs.DARK_THEME,
+        settingDefault: true,
+      },
+      {
+        settingID: ApplicationIDs.HTTPS_UPGRADE,
+        settingDefault: true,
+      },
+      {
+        settingID: ApplicationIDs.ALWAYS_ACTIVE,
         settingDefault: true,
       },
     ];

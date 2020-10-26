@@ -1,55 +1,54 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+
+import withAppContext from '@hoc/withAppContext';
 
 class BypassSettingSection extends Component {
   constructor(props) {
     super(props);
 
-    const background = browser.extension.getBackgroundPage();
-    if (background) { this.renderer = background.renderer; }
-    else { this.renderer = window.renderer; }
-    if (background) { this.app = background.app; }
-    else { this.app = window.app; }
-
     // properties
+    this.app = props.context.app;
+    this.history = props.history;
     this.bypasslist = this.app.util.bypasslist;
-
+    this.i18n = this.app.util.i18n;
     // bindings
-    this.renderBypassTemplate = this.renderBypassTemplate.bind(this);
+    this.renderBypassPage = this.renderBypassPage.bind(this);
   }
 
-  renderBypassTemplate() {
-    return this.renderer.renderTemplate('bypasslist');
+  renderBypassPage() {
+    return this.history.push('/bypasslist');
   }
 
   render() {
     let listDetails = '';
+    const { context: { theme } } = this.props;
     const count = this.bypasslist.visibleSize();
-
+    const lang = this.i18n.locale ? this.i18n.locale : 'en';
     if (count === 0) { listDetails = t('NoRulesAdded'); }
     else if (count === 1) { listDetails = t('OneRuleAdded'); }
     else { listDetails = t('MultipleRulesAdded', { count }); }
 
     return (
-      <div className="setting-section">
+      <div className={`section-wrapper bypass ${theme}`}>
         <div
           role="button"
           tabIndex="-1"
-          className="firstfield field"
-          onClick={this.renderBypassTemplate}
-          onKeyPress={this.renderBypassTemplate}
+          className="section-header noselect"
+          onClick={this.renderBypassPage}
+          onKeyPress={this.renderBypassPage}
         >
-          <div className="col-xs-12 settingblock settingheader noselect">
-            <span className="sectiontitle col-xs-6">
-              { t('ProxyBypassList') }
+          <span className="section-label">
+            { t('ProxyBypassList') }
+          </span>
+
+          <div className="rightalign">
+            <span className="counts">
+              { listDetails }
             </span>
 
-            <div className="rightalign">
-              <span className="counts">
-                { listDetails }
-              </span>
-
-              <span className="expandicon lefticon" />
-            </div>
+            <span className="expandicon lefticon" />
           </div>
         </div>
       </div>
@@ -57,4 +56,9 @@ class BypassSettingSection extends Component {
   }
 }
 
-export default BypassSettingSection;
+BypassSettingSection.propTypes = {
+  context: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired,
+};
+
+export default withRouter(withAppContext(BypassSettingSection));

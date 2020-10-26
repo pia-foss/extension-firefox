@@ -1,63 +1,48 @@
-import React, { Component } from 'react';
-import StatusText from 'component/StatusText';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-class Switch extends Component {
-  constructor(props) {
-    super(props);
+const Switch = (props) => {
+  const {
+    mode,
+    theme,
+    classes,
+    connection,
+    onToggleConnection,
+  } = props;
 
-    const background = browser.extension.getBackgroundPage();
-    if (background) { this.app = background.app; }
-    else { this.app = window.app; }
+  // noop if connection is 'error'
+  let handler = onToggleConnection;
+  if (connection === 'error') { handler = () => {}; }
 
-    // properties
-    this.debounce = null;
-    this.proxy = this.app.proxy;
-    this.regionlist = this.app.util.regionlist;
-    this.state = {
-      enabled: this.proxy.enabled(),
-      region: this.regionlist.getSelectedRegion(),
-    };
+  return (
+    <div
+      role="button"
+      tabIndex="-1"
+      className={`outer-circle ${theme} ${connection} ${mode} ${classes}`}
+      onClick={handler}
+      onKeyPress={handler}
+    >
+      <div className="spinner">
+        <div className="spinner-gradient" />
 
-    // bindings
-    this.onChange = this.onChange.bind(this);
-    this.handleProxy = this.handleProxy.bind(this);
-  }
-
-  onChange() {
-    // debounce the calls to the proxy handler by 175ms
-    clearTimeout(this.debounce);
-    this.debounce = setTimeout(() => { this.handleProxy(); }, 175);
-  }
-
-  handleProxy() {
-    let promise;
-
-    if (this.proxy.enabled()) { promise = this.proxy.disable(); }
-    else { promise = this.proxy.enable(); }
-
-    return promise.then((proxy) => {
-      this.setState({ enabled: proxy.enabled() });
-    });
-  }
-
-  render() {
-    const { enabled, region } = this.state;
-    return (
-      <div>
-        <StatusText enabled={enabled} hasRegion={!!region} />
-
-        <div className="switch-container">
-          <input
-            type="checkbox"
-            className="switch"
-            checked={enabled}
-            disabled={!region}
-            onChange={this.onChange}
-          />
+        <div className="spinner-inner">
+          <div className="power-icon" />
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
+
+Switch.propTypes = {
+  classes: PropTypes.string,
+  mode: PropTypes.string.isRequired,
+  theme: PropTypes.string.isRequired,
+  connection: PropTypes.string.isRequired,
+  onToggleConnection: PropTypes.func.isRequired,
+};
+
+Switch.defaultProps = {
+  classes: '',
+};
 
 export default Switch;

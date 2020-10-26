@@ -45,15 +45,15 @@ function createData(): SettingData[] {
     },
     {
       sectionName: 'tracking',
-      settingName: 'piaMace',
-      settingID: 'maceprotection',
+      settingName: 'removeFbclidParameters',
+      settingID: 'blockfbclid',
       expectedDefault: true,
     },
     {
-      sectionName: 'extension',
-      settingName: 'logoutOnClose',
-      settingID: 'logoutOnClose',
-      expectedDefault: false,
+      sectionName: 'tracking',
+      settingName: 'piaMace',
+      settingID: 'maceprotection',
+      expectedDefault: true,
     },
     {
       sectionName: 'extension',

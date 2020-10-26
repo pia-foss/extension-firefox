@@ -1,12 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Tooltip = ({
-  message,
-  orientation,
-}) => {
+const Tooltip = ({ theme, message, orientation }) => {
   switch (orientation) {
-    case 'left':
+    case 'bottom':
     case 'right':
     case 'top':
       break;
@@ -15,15 +12,16 @@ const Tooltip = ({
   }
 
   return (
-    <div className={`popover arrow-${orientation}`}>
+    <div className={`popover arrow-${orientation} ${theme}`}>
       { message }
     </div>
   );
 };
 
 Tooltip.propTypes = {
-  message: PropTypes.string.isRequired,
   orientation: PropTypes.string,
+  theme: PropTypes.string.isRequired,
+  message: PropTypes.string.isRequired,
 };
 
 Tooltip.defaultProps = {

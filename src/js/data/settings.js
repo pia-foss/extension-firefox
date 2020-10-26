@@ -1,4 +1,4 @@
-import { getSectionName } from './sections';
+import { getSectionName } from '@data/sections';
 
 /**
   interface SettingData {
@@ -20,18 +20,19 @@ import { getSectionName } from './sections';
  *
  * @param {*} deps Dependencies to calculate settings data
  */
-function createSettingsData({
-  t,
-  settings,
-  browser,
-  user,
-}) {
+function createSettingsData({ t, settings, browser }) {
   const data = [
     {
       settingID: 'preventwebrtcleak',
       section: getSectionName('security'),
       label: t('WebRTCLeakProtection'),
       tooltip: t('WebRTCTooltip', { browser }),
+    },
+    {
+      settingID: 'httpsUpgrade',
+      section: getSectionName('security'),
+      label: t('HttpsUpgrade'),
+      tooltip: t('HttpsUpgradeTooltip'),
     },
     {
       settingID: 'blocknetworkprediction',
@@ -72,6 +73,12 @@ function createSettingsData({
       tooltip: t('BlockUTMTooltip'),
     },
     {
+      settingID: 'blockfbclid',
+      section: getSectionName('tracking'),
+      label: t('BlockFBCLID'),
+      tooltip: t('BlockFBCLIDTooltip'),
+    },
+    {
       settingID: 'maceprotection',
       section: getSectionName('tracking'),
       label: t('MaceProtection'),
@@ -80,19 +87,22 @@ function createSettingsData({
       learnMoreHref: 'https://www.privateinternetaccess.com/helpdesk/kb/articles/what-is-mace',
     },
     {
-      settingID: 'logoutOnClose',
+      settingID: 'darkTheme',
       section: getSectionName('extension'),
-      label: t('LogMeOutOnClose'),
-      tooltip: t('LogMeOutOnCloseTooltip'),
-      warning: t('LogMeOutOnCloseDisabled'),
-      controllable: user.getRememberMe(),
-      disabledValue: true,
+      label: t('DarkTheme'),
+      tooltip: t('DarkThemeTooltip'),
     },
     {
       settingID: 'debugmode',
       section: getSectionName('extension'),
       label: t('DebugMode'),
       tooltip: t('DebugModeTooltip'),
+    },
+    {
+      settingID: 'alwaysActive',
+      section: getSectionName('extension'),
+      label: t('AlwaysActive'),
+      tooltip: t('AlwaysActiveTooltip'),
     },
   ];
 

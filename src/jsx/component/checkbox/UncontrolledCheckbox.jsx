@@ -1,6 +1,8 @@
-import PropType from 'prop-types';
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Checkbox from '.';
+
+import Checkbox from '@component/checkbox';
+import withAppContext from '@hoc/withAppContext';
 
 /**
  * Uncontrolled version of Checkbox
@@ -36,13 +38,14 @@ class UncontrolledCheckbox extends Component {
 
   render() {
     const { checked } = this.state;
-    const { id, className } = this.props;
+    const { id, context: { theme }, className } = this.props;
 
     return (
       <Checkbox
         id={id}
-        className={className}
+        theme={theme}
         checked={checked}
+        className={className}
         onChange={this.onChange}
       />
     );
@@ -50,10 +53,11 @@ class UncontrolledCheckbox extends Component {
 }
 
 UncontrolledCheckbox.propTypes = {
-  id: PropType.string.isRequired,
-  className: PropType.string,
-  defaultChecked: PropType.bool,
-  onChange: PropType.func.isRequired,
+  className: PropTypes.string,
+  defaultChecked: PropTypes.bool,
+  id: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  context: PropTypes.object.isRequired,
 };
 
 UncontrolledCheckbox.defaultProps = {
@@ -61,4 +65,4 @@ UncontrolledCheckbox.defaultProps = {
   defaultChecked: false,
 };
 
-export default UncontrolledCheckbox;
+export default withAppContext(UncontrolledCheckbox);

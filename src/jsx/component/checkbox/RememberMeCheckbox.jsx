@@ -1,7 +1,9 @@
-import PropType from 'prop-types';
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Tooltip from 'component/Tooltip';
-import UncontrolledCheckbox from './UncontrolledCheckbox';
+
+import Tooltip from '@component/Tooltip';
+import withAppContext from '@hoc/withAppContext';
+import UncontrolledCheckbox from '@component/checkbox/UncontrolledCheckbox';
 
 /**
  * Checkbox to toggle where user credentials are stored (memory/localStorage)
@@ -12,11 +14,8 @@ class RememberMeCheckbox extends Component {
   constructor(props) {
     super(props);
 
-    const background = browser.extension.getBackgroundPage();
-    if (background) { this.app = background.app; }
-    else { this.app = window.app; }
-
     // properties
+    this.app = props.context.app;
     this.user = this.app.util.user;
     this.settings = this.app.util.settings;
     this.rememberMe = this.settings.getItem('rememberme');
@@ -30,24 +29,26 @@ class RememberMeCheckbox extends Component {
   }
 
   render() {
-    const { labelLocaleKey } = this.props;
+    const { context: { theme }, labelLocaleKey } = this.props;
 
     return (
       <div className="remember-me-container">
         <UncontrolledCheckbox
           id="remember-checkbox"
-          defaultChecked={this.rememberMe}
-          onChange={this.onChange}
           className="popover-trigger"
+          onChange={this.onChange}
+          defaultChecked={this.rememberMe}
         />
         <label
           htmlFor="remember-checkbox"
           className="checkbox-label popover-trigger"
-        >{ t(labelLocaleKey) }
+        >
+          { t(labelLocaleKey) }
         </label>
         <Tooltip
-          message={t('RememberMeTooltip')}
+          theme={theme}
           orientation="right"
+          message={t('RememberMeTooltip')}
         />
       </div>
     );
@@ -55,7 +56,8 @@ class RememberMeCheckbox extends Component {
 }
 
 RememberMeCheckbox.propTypes = {
-  labelLocaleKey: PropType.string.isRequired,
+  context: PropTypes.object.isRequired,
+  labelLocaleKey: PropTypes.string.isRequired,
 };
 
-export default RememberMeCheckbox;
+export default withAppContext(RememberMeCheckbox);

@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const DebugSettingItem = ({ onClick }) => {
+const DebugSettingItem = ({ onClick, theme }) => {
   return (
-    <div className="field settingitem noselect">
-      <div className="col-xs-12 dlviewbtn">
+    <div className={`setting-item ${theme} noselect`}>
+      <div className="dlviewbtn">
         <button
           type="button"
-          className="col-xs-12 btn btn-success"
+          className="btn btn-success"
           onClick={onClick}
         >
           { t('ViewDebugLog') }
@@ -18,6 +18,7 @@ const DebugSettingItem = ({ onClick }) => {
 };
 
 DebugSettingItem.propTypes = {
+  theme: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
 };
 

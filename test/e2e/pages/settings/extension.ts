@@ -4,7 +4,6 @@ import { Checkbox } from '../../elements';
 import { createSelector } from '../../core/entities/selector';
 
 class ExtensionSection extends SectionBase {
-  public logoutOnClose: Checkbox;
   public debugMode: Checkbox;
   public viewDebugLog: Checkbox;
   public uiLanguages: Checkbox;
@@ -13,20 +12,11 @@ class ExtensionSection extends SectionBase {
     super(
       {
         selector: createSelector({
-          value: '.sectionwrapper.developer',
+          value: '.section-wrapper.developer',
         }),
         name: 'extension settings',
       },
       parent,
-    );
-    this.logoutOnClose = new Checkbox(
-      {
-        selector: createSelector({
-          value: '#logoutOnClose',
-        }),
-        name: 'logoutOnClose',
-      },
-      this,
     );
     this.debugMode = new Checkbox(
       {
@@ -49,7 +39,7 @@ class ExtensionSection extends SectionBase {
     this.uiLanguages = new Checkbox(
       {
         selector: createSelector({
-          value: '#languages',
+          value: '.languages',
         }),
         name: 'uiLanguages',
       },

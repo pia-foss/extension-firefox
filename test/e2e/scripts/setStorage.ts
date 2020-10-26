@@ -21,11 +21,7 @@ function setStorage(script: Script, { value, key, storage }: Payload) {
     ({ value, key, storage }, done) => {
       browser.runtime.getBackgroundPage().then((window: any) => {
         const { app } = window;
-        app.util.storage.setItem(
-          key,
-          value,
-          storage || app.util.user.storageBackend(),
-        );
+        app.util.storage.setItem(key, value, storage);
         done(void 0);
       });
     },

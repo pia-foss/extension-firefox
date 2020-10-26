@@ -1,22 +1,20 @@
-import PropType from 'prop-types';
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Checkbox from '../checkbox';
-import ErrorBoundary from '../../hoc/errorboundary';
+
+import Checkbox from '@component/checkbox';
+import ErrorBoundary from '@hoc/errorboundary';
+import withAppContext from '@hoc/withAppContext';
 
 class PopularRule extends Component {
   constructor(props) {
     super(props);
 
-    const background = browser.extension.getBackgroundPage();
-    if (background) { this.app = background.app; }
-    else { this.app = window.app; }
-
     // properties
-    const { defaultName } = props;
-    this.defaultName = defaultName;
+    this.app = props.context.app;
+    this.defaultName = props.defaultName;
     this.bypasslist = this.app.util.bypasslist;
     this.region = this.app.util.regionlist.getSelectedRegion();
-    this.state = { checked: this.bypasslist.isRuleEnabled(defaultName) };
+    this.state = { checked: this.bypasslist.isRuleEnabled(this.defaultName) };
 
     // bindings
     this.onChange = this.onChange.bind(this);
@@ -30,18 +28,19 @@ class PopularRule extends Component {
 
   render() {
     const { checked } = this.state;
+    const { context: { theme } } = this.props;
     return (
-      <li className="list-group-item col-xs-4 popular-rule">
+      <li className={`popular-rule ${theme}`}>
         <label
           htmlFor={this.defaultName}
-          className="noselect col-xs-8 popular-rule-name"
+          className="noselect popular-rule-name"
         >
           { this.defaultName }
         </label>
 
         <Checkbox
           id={this.defaultName}
-          className="col-xs-2"
+          theme={theme}
           checked={checked}
           disabled={!this.region}
           onChange={this.onChange}
@@ -52,7 +51,8 @@ class PopularRule extends Component {
 }
 
 PopularRule.propTypes = {
-  defaultName: PropType.string.isRequired,
+  context: PropTypes.object.isRequired,
+  defaultName: PropTypes.string.isRequired,
 };
 
-export default ErrorBoundary(PopularRule);
+export default ErrorBoundary(withAppContext(PopularRule));

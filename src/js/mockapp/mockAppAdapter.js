@@ -4,7 +4,7 @@ import {
   isTarget,
   sendMessage,
   Namespace,
-} from 'helpers/messaging';
+} from '@helpers/messaging';
 
 export default class MockAppAdapter {
   constructor(app) {
@@ -33,39 +33,33 @@ export default class MockAppAdapter {
       if (message.type === 'initialize') {
         res = this.initialize();
       }
-      else if (message.type === 'util.user.authed') {
-        this.app.util.user.authed = message.data;
-      }
-      else if (message.type === 'util.user.authing') {
-        this.app.util.user.authing = message.data;
-      }
       else if (message.type === 'util.user.setUsername') {
         const { username } = message.data;
-        this.app.util.user.setUsername(username, true);
+        this.app.util.user.setUsername(username);
       }
-      else if (message.type === 'util.user.setPassword') {
-        const { password } = message.data;
-        this.app.util.user.setPassword(password, true);
+      else if (message.type === 'util.user.setAccount') {
+        this.app.util.user.setAccount(message.data);
       }
       else if (message.type === 'util.user.setRememberMe') {
         const { rememberMe } = message.data;
-        this.app.util.user.setRememberMe(rememberMe, true);
+        this.app.util.user.setRememberMe(rememberMe);
       }
-      else if (message.type === 'util.user.removeUsernameAndPasswordFromStorage') {
-        this.app.util.user.removeUsernameAndPasswordFromStorage(true);
-      }
-      else if (message.type === 'util.user.setLoggedInStorageItem') {
+      else if (message.type === 'util.user.setLoggedIn') {
         const { value } = message.data;
-        this.app.util.user.setLoggedInStorageItem(value, true);
+        this.app.util.user.setLoggedIn(value);
       }
-      else if (message.type === 'util.user.removeLoggedInStorageItem') {
-        this.app.util.user.removeLoggedInStorageItem(true);
+      else if (message.type === 'util.user.setAuthToken') {
+        const { authToken } = message.data;
+        this.app.util.user.setAuthToken(authToken);
       }
       else if (message.type === 'updateSettings') {
         const { settingID, value } = message.data;
         this.app.util.settings.setItem(settingID, value, true);
       }
-      else if (message.type === 'util.settings.toggle') {
+      else if (message.type === 'smartLocation') {
+        const { settingID, value } = message.data;
+        this.app.util.smartlocation.saveToStorage(settingID, value, true);
+      }  else if (message.type === 'util.settings.toggle') {
         const { settingID } = message.data;
         this.app.util.settings.toggle(settingID, true);
       }
@@ -88,6 +82,12 @@ export default class MockAppAdapter {
       else if (message.type === 'setUserRules') {
         this.app.util.bypasslist.setUserRules(message.data, true);
       }
+      else if (message.type === 'tiles') {
+        this.app.util.storage.setItem('tiles', JSON.stringify(message.data));
+      }
+      else if (message.type === 'drawerState') {
+        this.app.util.storage.setItem('drawerState', message.data);
+      }
       else if (message.type === Type.DEBUG) {
         const { data: { debugMsg } } = message;
         debug(debugMsg);
@@ -104,7 +104,6 @@ export default class MockAppAdapter {
       else if (message.type.startsWith(Namespace.I18N)) {
         res = this.handleI18nMessage(message);
       }
-
       return resolve(res);
     })
       .then(response)
@@ -146,8 +145,17 @@ export default class MockAppAdapter {
           case Type.IMPORT_REGIONS: {
             return regionlist.import(data);
           }
+          case Type.IMPORT_AUTO_REGION: {
+            return regionlist.importAutoRegion(data, true);
+          }
           case Type.SET_FAVORITE_REGION: {
             return regionlist.setFavoriteRegion(data, true);
+          }
+          case Type.ADD_OVERRIDE_REGION: {
+            return regionlist.addOverrideRegion(data, true);
+          }
+          case Type.REMOVE_OVERRIDE_REGION: {
+            return regionlist.removeOverrideRegion(data, true);
           }
 
           default: throw new Error(`no handler for ${type}`);
@@ -199,29 +207,51 @@ export default class MockAppAdapter {
   }
 
   initialize() {
+    const isAuto = this.app.util.regionlist.getIsAuto();
+    const regionId = this.app.util.regionlist.getSelectedRegion().id;
+    const id = isAuto ? 'auto' : regionId;
     const payload = {
-      proxy: { levelOfControl: this.app.proxy.getLevelOfControl() },
+      proxy: {
+        levelOfControl: this.app.proxy.getLevelOfControl(),
+        enabled: this.app.proxy.enabled()
+      },
       online: this.app.util.storage.getItem('online'),
       util: {
         user: {
-          authed: this.app.util.user.authed,
-          authing: this.app.util.user.authing,
+          account: this.app.util.user.account,
           loggedIn: this.app.util.user.loggedIn,
           username: this.app.util.user.getUsername(),
-          password: this.app.util.user.getPassword(),
+          authToken: this.app.util.user.getAuthToken(),
         },
         regionlist: {
-          region: { id: this.app.util.regionlist.getSelectedRegion().id },
+          region: { id },
           regions: this.app.util.regionlist.export(),
+          isAuto: this.app.util.regionlist.getIsAuto(),
+          autoRegion: this.app.util.regionlist.exportAutoRegion(),
           favorites: this.app.util.storage.getItem('favoriteregions'),
         },
         bypasslist: {
           user: this.app.util.bypasslist.getUserRules(),
           popular: this.app.util.bypasslist.enabledPopularRules().join(','),
         },
+        smartlocation: {
+          smartLocationRules: this.app.util.smartlocation.getSmartLocationRules('smartLocationRules'),
+          checkSmartLocation: this.app.util.smartlocation.getSmartLocationRules('checkSmartLocation')
+        },
         settings: this.app.util.settings.getAll(),
       },
     };
+
+    const tiles = this.app.util.storage.getItem('tiles');
+    const drawerState = this.app.util.storage.getItem('drawerState');
+    if (tiles) {
+      try { payload.tiles = tiles; }
+      catch (err) { /* noop */ }
+    }
+    if (drawerState) {
+      try { payload.drawerState = drawerState; }
+      catch (err) { /* noop */ }
+    }
 
     return payload;
   }

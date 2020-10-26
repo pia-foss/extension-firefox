@@ -14,8 +14,11 @@
   "Extension": {
     "message": "Extension"
   },
-  "ResetPasswordText": {
-    "message": "Reset Password"
+  "ForgotPassword": {
+    "message": "Forgot Password"
+  },
+  "BuyAccount": {
+    "message": "Buy Account"
   },
   "DeleteDebugLog": {
     "message": "Clear Log"
@@ -57,7 +60,7 @@
     "message": "Disable"
   },
   "FingerprintProtectionAfterword": {
-    "message": "This settings can also be changed from the \"Extension Settings\" panel after logging into the extension."
+    "message": "This setting can also be changed from the \"Extension Settings\" panel after logging into the extension."
   },
   "TrackingProtection": {
     "message": "Tracking protection"
@@ -80,6 +83,24 @@
   "DebugModeTooltip": {
     "message": "Write messages to the debug log. Press the 'ctrl' key followed by the 'd' key to show the debug log."
   },
+  "DarkTheme": {
+    "message": "Dark theme"
+  },
+  "DarkThemeTooltip": {
+    "message": "Enable a darker theme for the extension to use in low light conditions"
+  },
+  "IpReal": {
+    "message": "IP"
+  },
+  "AlwaysActive": {
+    "message": "Always active settings"
+  },
+  "AlwaysActiveTooltip": {
+    "message": "Cause settings to always remain active, regardless of whether proxy is connected or not"
+  },
+  "IpProxy": {
+    "message": "Proxy IP"
+  },
   "LogMeOutOnClose": {
     "message": "Log me out on browser close"
   },
@@ -91,6 +112,9 @@
   },
   "DebugLogIsEmpty": {
     "message": "The debug log is empty."
+  },
+  "PersistentSettingsDisclaimer": {
+    "message": "Enabled settings are now always active whether you are connected to a region or not, with the exception of PIA MACE™ which is only active when you are connected to a region."
   },
   "UsernamePlaceholder": {
     "message": "Username"
@@ -137,12 +161,6 @@
   "CopiedToClipboard": {
     "message": "Debug log copied"
   },
-  "NoAccountQuestion": {
-    "message": "Don't have an account?"
-  },
-  "JoinText": {
-    "message": "SIGN UP FOR A VPN ACCOUNT"
-  },
   "JoinURL": {
     "message": "https://www.privateinternetaccess.com/pages/buy-vpn/"
   },
@@ -170,23 +188,20 @@
   "BypassWarning": {
     "message": "Requests made to websites found on the Bypass List use a <span class=\"bold-underline\">direct connection</span> that is <span class=\"bold-underline\">not</span> protected by Private Internet Access™."
   },
+  "trial":{
+    "message":"Trial"
+  },
+  "days_left": {
+    "message":"days left"
+  },
   "AccountSettingsText": {
     "message": "Account Settings"
-  },
-  "AutoLoginURL": {
-    "message": "https://www.privateinternetaccess.com/xpages/sign-in"
   },
   "AddUrlToBypassList": {
     "message": "Add URL to bypass list"
   },
-  "SupportURL": {
-    "message": "https://www.privateinternetaccess.com/pages/client-support/"
-  },
   "SupportText": {
     "message": "Help & Support"
-  },
-  "StatusText": {
-    "message": "Status"
   },
   "OfflineText": {
     "message": "OFFLINE"
@@ -207,7 +222,7 @@
     "message": "What is MACE™?"
   },
   "MaceTooltip": {
-    "message": "PIA MACE™ helps protect your privacy and security by blocking malicious content, trackers and ads."
+    "message": "PIA MACE™ helps protect your privacy and security by blocking malicious content, trackers and ads. Only active when connected to a region"
   },
   "WebRTCLeakProtection": {
     "message": "Block WebRTC IP Detection"
@@ -221,11 +236,23 @@
   "AdobeFlashTooltip": {
     "message": "Block %{browser} from running Adobe Flash. Adobe Flash can be used to reveal your public IP address. Not recommended to disable."
   },
+  "HttpsUpgrade": {
+    "message": "Browse websites using HTTPS"
+  },
+  "HttpsUpgradeTooltip": {
+    "message": "Automatically converts supported websites or links using an unencrypted connection (HTTP) to a more secure HTTPS connection before leaving your browser. Made possible because of HTTPS Everywhere and the EFF."
+  },
   "BlockUTM": {
     "message": "Remove UTM parameters"
   },
   "BlockUTMTooltip": {
     "message": "Remove Urchin Tracking Model(UTM) parameters from URLs you click on. UTM parameters are used to track information about your visit to a website."
+  },
+  "BlockFBCLID": {
+    "message": "Remove FBCLID parameters"
+  },
+  "BlockFBCLIDTooltip": {
+    "message": "Remove Facebook FBCLID parameters from outgoing links in Facebook. FBCLID parameters are used to track information about your visit to a website"
   },
   "BypassListPlaceholder": {
     "message": "hello1.com, *.hello2.com, *.hello3.com/page.html"
@@ -238,6 +265,24 @@
   },
   "ProxyBypassList": {
     "message": "Bypass List"
+  },
+  "SmartLocation": {
+    "message": "Smart Location"
+  },
+  "WebAlreadyAdded":{
+    "message":"Websites already added"
+  },
+  "AddSmartLocation":{
+    "message":"Add smart location"
+  },
+  "NoLocation":{
+    "message":"No location added"
+  },
+  "MultipleLocations":{
+    "message":"locations"
+  },
+  "OneLocation":{
+    "message":"location added"
   },
   "SaveProxyBypassList": {
     "message": "Save"
@@ -279,7 +324,7 @@
     "message": "Disable %{browser} from making direct connections to a network service that has privacy concerns around keeping logs. PIA Mace™ mitigates the risk in disabling this service."
   },
   "BlockAutofill": {
-    "message": "Disable Autofill"
+    "message": "Disable autofill"
   },
   "BlockAutofillTooltip": {
     "message": "Disable %{browser} from automatically filling in forms. This could leak personal data via hidden form fields."
@@ -353,6 +398,9 @@
   "NoRegionSelected": {
     "message": "No Region Selected"
   },
+  "ChooseAutomatically": {
+    "message": "Choose Automatically"
+  },
   "ChangeExtensionSettings": {
     "message": "Extension Settings"
   },
@@ -368,8 +416,8 @@
   "RegionLatency": {
     "message": "Latency"
   },
-  "SortBy": {
-    "message": "Sort by:"
+  "RegionSearch": {
+    "message": "Search..."
   },
   "CloseText": {
     "message": "Close"
@@ -413,29 +461,110 @@
   "enabled": {
     "message": "enabled"
   },
-  "disabled": {
-    "message": "disabled"
-  },
-  "unavailable": {
-    "message": "unavailable"
-  },
   "RememberMe": {
     "message": "Remember me"
   },
   "RememberMeTooltip": {
-    "message": "Saves these credentials between browser restarts"
+    "message": "Saves username between browser restarts"
   },
-  "AllRegions": {
-    "message": "ALL REGIONS"
+  "Auto": {
+    "message": "Auto"
   },
-  "FavoriteRegions": {
-    "message": "FAVORITE REGIONS"
+  "CalculatingLatency": {
+    "message": "Calculating Latency"
   },
   "NoRegionsFound": {
     "message": "No Regions Found"
   },
   "RefreshRegions": {
     "message": "Refresh Regions"
+  },
+  "ViewChangelog": {
+    "message": "view changelog"
+  },
+  "ChangelogTitle": {
+    "message": "Changelog"
+  },
+  "UnknownProxyError": {
+    "message": "Unknown Proxy Error Occured"
+  },
+  "Connecting": {
+    "message": "connecting"
+  },
+  "Disconnecting": {
+    "message": "disconnecting"
+  },
+  "Connected": {
+    "message": "connected"
+  },
+  "DefaultDisplay": {
+    "message": "DEFAULT DISPLAY"
+  },
+  "QuickConnect": {
+    "message": "QUICK CONNECT"
+  },
+  "QuickSettings": {
+    "message": "QUICK SETTINGS"
+  },
+  "MACE": {
+    "message": "MACE"
+  },
+  "HTTPREFERRER": {
+    "message": "DISABLE HTTP REFERRER"
+  },
+  "DEBUGLOGGING": {
+    "message": "DEBUG LOGGING"
+  },
+  "LIGHTTHEME": {
+    "message": "LIGHT THEME"
+  },
+  "FPPROTECTION": {
+    "message": "FINGERPRINT PROTECTION"
+  },
+  "BLOCKCAMERA": {
+    "message": "BLOCK CAMERA ACCESS"
+  },
+  "BLOCKMICROPHONE": {
+    "message": "BLOCK MICROPHONE ACCESS"
+  },
+  "VIEWALL": {
+    "message": "VIEW ALL SETTINGS..."
+  },
+  "Subscription": {
+    "message": "SUBSCRIPTION"
+  },
+  "NoSubscriptionData": {
+    "message": "No User Information Found"
+  },
+  "AddToBypassRules": {
+    "message": "ADD TO BYPASS RULES"
+  },
+  "RuleAlreadyIncluded": {
+    "message": "Rule Already Included"
+  },
+  "RemoveRule": {
+    "message": "remove"
+  },
+  "PrivateBrowsingChangeLead": {
+    "message": "Firefox has recently changed the way addons handle proxy connections. Allowing the addon to run in Private Windows is now required for proxy settings to be updated."
+  },
+  "PrivateBrowsingChangeDirections": {
+    "message": "Please visit the URL below to view your addons page. Then click on the \"Private Internet Access\" addon to modify its settings. From here, change the \"Run in Private Windows\" setting to \"Allow\"."
+  },
+  "us": {
+    "message": "United States"
+  },
+  "gb": {
+    "message": "United Kingdom"
+  },
+  "de": {
+    "message": "Germany"
+  },
+  "au": {
+    "message": "Australia"
+  },
+  "canada": {
+    "message": "Canada"
   },
   "us_california": {
     "message": "US California"
@@ -508,6 +637,9 @@
   },
   "aus_melbourne": {
     "message": "AU Melbourne"
+  },
+  "aus_perth": {
+    "message": " AU Perth"
   },
   "nl": {
     "message": "Netherlands"

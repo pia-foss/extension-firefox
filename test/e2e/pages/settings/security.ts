@@ -5,11 +5,13 @@ import { createSelector } from '../../core/entities/selector';
 
 class SecuritySection extends SectionBase {
   public preventWebRtcLeak: Checkbox;
+  public httpsUpgrade: Checkbox;
+
   constructor(parent: PageObject) {
     super(
       {
         selector: createSelector({
-          value: '.sectionwrapper.security',
+          value: '.section-wrapper.security',
         }),
         name: 'security settings',
       },
@@ -21,6 +23,15 @@ class SecuritySection extends SectionBase {
           value: '#preventwebrtcleak',
         }),
         name: 'preventWebRtcLeak',
+      },
+      this,
+    );
+    this.httpsUpgrade = new Checkbox(
+      {
+        selector: createSelector({
+          value: '#httpsUpgrade',
+        }),
+        name: 'https upgrade',
       },
       this,
     );

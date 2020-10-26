@@ -3,6 +3,7 @@ import {
   WebElement,
   until,
   Condition,
+  error,
 } from 'selenium-webdriver';
 import { expect } from 'chai';
 
@@ -10,7 +11,6 @@ import { DriverFactory } from '../driver';
 import { bySelector } from '../util/bySelector';
 import { Selector } from './selector';
 import { getConfig } from '../util/config';
-// TODO: Enforce no unused
 
 interface ElementDescriptor {
   name: string;
@@ -102,6 +102,10 @@ class LazyWebElement {
     return operation(by);
   }
 
+  public selectorType() {
+    return this.selector.type;
+  }
+
   public waitAndFindElement(timeoutMultiplier = 1): Promise<WebElement> {
     const condition = until.elementLocated(this.by);
 
@@ -175,8 +179,7 @@ class LazyWebElement {
         return el;
       }
 
-      // TODO: Ensure this matches findElement behavior
-      throw new Error();
+      throw new error.ElementNotVisibleError();
     };
 
     return this.operate(findElOp);

@@ -16,17 +16,51 @@ function apply(csettings, settings) {
     .forEach((s) => { s.applySetting(); });
 }
 
-export default function (app) {
-  this.handleConnect = () => {
-    const { settings } = app.util;
-    const { chromesettings } = app;
-    apply(chromesettings, settings);
-  };
-
-  this.handleDisconnect = () => {
-    const { chromesettings } = app;
-    clear(chromesettings);
-  };
-
-  return this;
+function reapply(contentsettings) {
+  const { app: { util: { settings } } } = this;
+  const enabled = settings.enabled();
+  Object.values(contentsettings)
+    .filter((s) => { return s.isAvailable ? s.isAvailable() : true; })
+    .filter((s) => { return s.isApplied(); })
+    .filter((s) => { return enabled || s.alwaysActive; })
+    .forEach((s) => { s.applySetting(); });
 }
+
+
+class SettingsManager {
+  constructor(app) {
+    this.app = app;
+
+    this.apply = this.apply.bind(this);
+    this.disable = this.disable.bind(this);
+    this.clearAndReapplySettings = this.clearAndReapplySettings.bind(this)
+    reapply = reapply.bind(this);
+  }
+
+  clearAndReapplySettings(setting){
+    if(setting == 'alwaysActive'){
+      const { app: { util:{settings},proxy }} = this;
+      const alwaysActive = settings.getItem('alwaysActive');
+      const boolArray = [alwaysActive,proxy.enabled()];
+      boolArray.includes(true) ? this.apply() : this.disable();
+    }
+  }
+
+
+  apply() {
+    const {
+      app: {
+        util: { settings },
+        chromesettings,
+      },
+    } = this;
+    apply(chromesettings, settings);
+  }
+
+  disable() {
+    const { app: { chromesettings } } = this;
+    clear(chromesettings);
+  }
+}
+
+export default SettingsManager;

@@ -1,6 +1,6 @@
-import { WebElementBase } from '../core';
+import { Node } from '../core';
 
-class Link extends WebElementBase {
+class Link extends Node {
   public async click() {
     const el = await this.element;
 

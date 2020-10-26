@@ -22,6 +22,7 @@ idescribe('the changelog page', function () {
     await loginPage.navigate();
     await fingerprintPage.optIn();
     await loginPage.signIn();
+    await authPage.menu.toggleDropdown();
     await authPage.menu.settings.click();
     await settingsPage.changelogLink.click();
   });

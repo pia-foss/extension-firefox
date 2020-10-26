@@ -1,18 +1,17 @@
-import File from '../helpers/file';
-import { Type } from '../helpers/messaging';
+import File from '@helpers/file';
+import { Type } from '@helpers/messaging';
 
 export default class BypassList {
   constructor(app, foreground) {
     // Bindings
-    this.initialRules = this.initialEnabledRules.bind(this);
     this.init = this.init.bind(this);
     this.generatePingGateways = this.generatePingGateways.bind(this);
     this.updatePingGateways = this.updatePingGateways.bind(this);
     this.isRuleEnabled = this.isRuleEnabled.bind(this);
     this.popularRulesByName = this.popularRulesByName.bind(this);
-    this.getUserRules = this.getUserRules.bind(this);
     this.visibleSize = this.visibleSize.bind(this);
     this.restartProxy = this.restartProxy.bind(this);
+    this.getUserRules = this.getUserRules.bind(this);
     this.setUserRules = this.setUserRules.bind(this);
     this.addUserRule = this.addUserRule.bind(this);
     this.removeUserRule = this.removeUserRule.bind(this);
@@ -29,8 +28,46 @@ export default class BypassList {
     this.app = app;
     this.foreground = foreground;
     this.storage = app.util.storage;
-    this.storageKeys = { userrk: 'bypasslist:customlist', poprk: 'bypasslist:popularrules' };
-    this.enabledRules = this.initialEnabledRules();
+    this.storageKeys = {
+      userrk: 'bypasslist:customlist',
+      poprk: 'bypasslist:popularrules',
+    };
+
+    this.enabledRules = new Map([
+      [
+        'privatenetworks', [
+          '0.0.0.0/8',
+          '10.0.0.0/8',
+          '127.0.0.0/8',
+          '169.254.0.0/16',
+          '192.168.0.0/16',
+          '172.16.0.0/12',
+          '::1',
+          'localhost',
+          '*.local',
+        ],
+      ],
+      ['pinggateways', this.generatePingGateways()],
+      [this.storageKeys.userrk, []],
+      [this.storageKeys.poprk, []],
+    ]);
+
+    this.netflixBypassRules = [
+      'https://netflix.com',
+      'https://*.netflix.com',
+      'https://*.nflxvideo.net',
+      'https://*.nflximg.net',
+    ];
+
+    this.huluBypassRules = [
+      'https://*.hulu.com',
+      'https://*.hulustream.com',
+    ];
+
+    this.popularRules = Object.freeze(new Map([
+      ['netflix', this.netflixBypassRules],
+      ['hulu', this.huluBypassRules],
+    ]));
   }
 
   static trimUserRules(rules) {
@@ -41,48 +78,6 @@ export default class BypassList {
       .filter((e) => {
         return e.length > 0;
       });
-  }
-
-  initialEnabledRules() {
-    return new Map([
-      ['privatenetworks',
-        [
-          '0.0.0.0/8',
-          '10.0.0.0/8',
-          '127.0.0.0/8',
-          '169.254.0.0/16',
-          '192.168.0.0/16',
-          '172.16.0.0/12',
-          '::1',
-          'localhost',
-          '*.local'
-        ]
-      ],
-      ['pinggateways', this.generatePingGateways()],
-      [this.storageKeys.userrk, []],
-      [this.storageKeys.poprk, []],
-    ]);
-  }
-
-  static get popularRules() {
-    const netflix = [
-      'https://netflix.com',
-      'https://*.netflix.com',
-      'https://*.nflxvideo.net',
-      'https://*.nflximg.net',
-    ];
-    const hulu = [
-      'https://*.hulu.com',
-      'https://*.hulustream.com',
-    ];
-    return Object.freeze(new Map([
-      ['netflix', netflix],
-      ['hulu', hulu],
-    ]));
-  }
-
-  static set popularRules(_) {
-    throw new Error(debug('popular rules are read only at runtime'));
   }
 
   init() {
@@ -123,11 +118,7 @@ export default class BypassList {
   }
 
   popularRulesByName() {
-    return Array.from(BypassList.popularRules.keys());
-  }
-
-  getUserRules() {
-    return BypassList.trimUserRules(Array.from(this.enabledRules.get(this.storageKeys.userrk)));
+    return Array.from(this.popularRules.keys());
   }
 
   visibleSize() {
@@ -136,18 +127,13 @@ export default class BypassList {
 
   async restartProxy(cb = () => {}) {
     const { proxy } = this.app;
-    if (!proxy) {
-      throw new Error(debug('proxy not ready'));
-    }
-    if (!proxy) {
-      throw new Error(debug('proxy is not available'));
-    }
-    if (proxy.enabled()) {
-      await proxy.enable().then(cb);
-    }
-    else {
-      await Promise.resolve(cb());
-    }
+    if (!proxy) { throw new Error(debug('proxy not ready')); }
+    if (proxy.enabled()) { await proxy.enable().then(cb); }
+    else { await Promise.resolve(cb()); }
+  }
+
+  getUserRules() {
+    return BypassList.trimUserRules(Array.from(this.enabledRules.get(this.storageKeys.userrk)));
   }
 
   setUserRules(rules, bridged) {
@@ -159,17 +145,19 @@ export default class BypassList {
   }
 
   addUserRule(string, bridged, restartProxy = false) {
-    if (string.endsWith('/')) { string = string.substring(0, string.length - 1); }
+    let userString = string;
+    if (userString.endsWith('/')) { userString = string.substring(0, string.length - 1); }
     const userRules = this.getUserRules();
-    userRules.push(string);
+    userRules.push(userString);
     this.setUserRules([...new Set(userRules)]);
     if (restartProxy) { this.restartProxy(); }
   }
 
   removeUserRule(string, restartProxy = false) {
-    if (string.endsWith('/')) { string = string.substring(0, string.length - 1); }
+    let userString = string;
+    if (userString.endsWith('/')) { userString = string.substring(0, string.length - 1); }
     const rules = this.getUserRules();
-    this.setUserRules(rules.filter((e) => { return e !== string; }));
+    this.setUserRules(rules.filter((e) => { return e !== userString; }));
     if (restartProxy) { this.restartProxy(); }
   }
 
@@ -183,7 +171,7 @@ export default class BypassList {
 
     return new Promise((resolve) => {
       // enable rule
-      this.enabledRules.set(name, BypassList.popularRules.get(name));
+      this.enabledRules.set(name, this.popularRules.get(name));
 
       // ensure mock app is aware of this change
       // TODO: send the restartProxy params over to adapter
@@ -332,7 +320,7 @@ export default class BypassList {
    */
   async spawnImportTab() { // eslint-disable-line class-methods-use-this
     await browser.tabs.create({
-      url: browser.extension.getURL('html/popups/importrules.html'),
+      url: browser.runtime.getURL('html/popups/importrules.html'),
     });
   }
 }

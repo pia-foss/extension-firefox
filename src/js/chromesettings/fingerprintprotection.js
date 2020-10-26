@@ -1,4 +1,4 @@
-import ChromeSetting from './chromesetting';
+import ChromeSetting from '@chromesettings/chromesetting';
 
 class FingerprintProtection extends ChromeSetting {
   constructor() {

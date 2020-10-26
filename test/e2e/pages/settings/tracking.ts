@@ -1,20 +1,22 @@
 import { PageObject } from '../../core';
 import { SectionBase } from './sectionBase';
-import { Checkbox } from '../../elements';
+import { Checkbox, Text } from '../../elements';
 import { createSelector } from '../../core/entities/selector';
 
 class TrackingSection extends SectionBase {
   public disableWebsiteReferrer: Checkbox;
   public disableHyperLinkAuditing: Checkbox;
   public removeUtmParameters: Checkbox;
+  public removeFbclidParameters: Checkbox;
   public piaMace: Checkbox;
   public fingerprintProtection: Checkbox;
+  public hyperLinkAuditMessage: Text;
 
   constructor(parent: PageObject) {
     super(
       {
         selector: createSelector({
-          value: '.sectionwrapper.tracking',
+          value: '.section-wrapper.tracking',
         }),
         name: 'tracking settings',
       },
@@ -62,6 +64,24 @@ class TrackingSection extends SectionBase {
           value: '#fingerprintprotection',
         }),
         name: 'fingerprintProtection',
+      },
+      this,
+    );
+    this.removeFbclidParameters = new Checkbox(
+      {
+        selector: createSelector({
+          value: '#blockfbclid',
+        }),
+        name: 'removeFbclidParameters',
+      },
+      this,
+    );
+    this.hyperLinkAuditMessage = new Text(
+      {
+        selector: createSelector({
+          value: '.blockhyperlinkaudit-item .error-line',
+        }),
+        name: 'hyperlink message',
       },
       this,
     );

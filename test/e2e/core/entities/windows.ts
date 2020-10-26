@@ -1,10 +1,12 @@
 import { expect } from 'chai';
+import { Condition, error } from 'selenium-webdriver';
 
+import { getConfig } from '../util/config';
 import { Driver } from '../driver';
-import { WebElementBase } from './webElementBase';
+import { Node } from './node';
 
 interface WaitOpts {
-  waitForVisible?: WebElementBase;
+  waitForVisible?: Node;
 }
 
 class Windows {
@@ -67,6 +69,22 @@ class Windows {
   }
 
   public async expectCurrentTitleIs(expectedTitle: string) {
+    const message = `waiting for page title to equal "${expectedTitle}"`;
+    const { WAIT_TIME: timeout } = getConfig();
+    try {
+      const condition = new Condition<string>(message, async () => {
+        const title = await this.driver.getTitle();
+        if (title !== expectedTitle) { return false; }
+        return title;
+      });
+      await this.driver.wait(condition, timeout);
+    }
+    catch (err) {
+      if (err instanceof error.TimeoutError) {
+        const title = await this.driver.getTitle();
+        expect.fail(`expected "${title}" to equal "${expectedTitle}"`);
+      }
+    }
     const currentTitle = await this.driver.getTitle();
     expect(currentTitle).to.eq(expectedTitle);
   }

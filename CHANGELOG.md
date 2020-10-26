@@ -1,5 +1,138 @@
 __HEAD__
 
+__v2.2.7__
+
+* Translations and css changes for some of them.
+
+__v2.2.6__
+
+* Fixed proxyIp to update on smartlocation changes and if users connect or disconnect from proxy.
+
+__v2.2.5__
+
+* Fixed smart location not grabbing correct proxy
+* Fixed quickconnect UI not working
+* Remember me now clears when false
+
+__v2.2.4__
+
+* Fixed icon when installing extension
+
+__v2.2.3__
+
+* Fixed incognito mode not working
+* Smartlocation on incognito working
+
+__v2.2.2__
+
+* Changelog updated
+* Fixed extension not working in incognito
+* Fix for region tooltip
+
+__v2.2.1__
+
+* Logout fixes
+* Always on feature now to firefox to
+* Added more functionality to always on to use all options for extension
+
+__v2.2.0__
+
+* Smart location feature added
+
+__v2.1.4__
+
+* Fixed issue with private mode
+* Minor improvements
+
+__v2.1.3.1__
+
+* Fixed issue with removed proxy API calls
+
+__v2.1.2__
+
+* Fix Netflix Rule breaking proxy connections
+
+__v2.1.1__
+
+* Fix bypassing Private Browsing Warning on install
+
+__v2.1.0__
+
+* Add warning page to handle changes in proxy permission in Firefox Beta
+* Fix exclusions for https-upgrade
+* Add unit tests for https-upgrade
+* Fix translated region name spacing on region list
+* Fix Issue with Logout not redirecting back to Login page
+* Fix Issue with displaying Uncontrollable or Upgrade pages
+* Fix failing tests
+* Add unit tests for https-upgrade
+* Improve latency error handling
+* Improve latency test results
+* Fix translation capitalization
+* Decouple security, tracking, privacy settings from proxy
+* Fix navigational keybindings
+* Update https-upgrade to PIA source
+* Add unit test framework
+* Add badge to icon
+* Add build name to settings page
+* Prevent button text in Debug Log from creating horizontal scrollbars
+* Prevent text in Debug Log from creating horizontal scrollbars
+* Add Bypass Rules Tile
+* Adjust CSS to remove green dots from arrows on settings page
+* Fix Tile ordering on startup
+* Disallow selection of Tile text
+* Fix Setting text not updating on language change
+* Refactor React code to use the context API for global data
+* Migrate to Webpack
+* Fix auto region in private browsing
+* Add React Router, Remove Renderer Class
+* Add https upgrade feature
+* Enhanced QA functionality
+
+__v2.0.4__
+
+* Revert latency frequency
+* Convert latency test to use ips rather than domains
+
+__v2.0.3__
+
+* Extend latency test frequency to once a day
+
+__v2.0.2__
+
+* 2.0.2 Release
+* Update Remember Me tooltip wording
+* Add no-op to setAccount if account parameter is undefined
+* Add maxlength to bypass rule input field (32779)
+* Add maxlength to login input fields (253 chars)
+* Backport CSS fixes for text breakout on DebugLog Page
+* Fix Typo on Fingerprint Protection disclaimer page
+* Beta Release
+* Componentize Drawer Handle
+* Add Checkmark on Export button after Bypasslist export completion
+* Fix tile ordering on authenticated view on theme change
+* Adjust spacing for new Translations
+* Update Translations
+* Removed LogoutOnClose setting
+* Added new tests for settings & tiles, improved test core
+* Fixed bug where enabling extension in incognito would sometimes log user out
+* Translated "view changelog"
+* Added homepage to extension page
+* Added setting to filter Facebook fbclid query parameters
+* Refactored user to remove unnecessary properties
+* Add Token Based Authentication
+* Add Quick Settings Tile
+* Add Subscription Tile
+* Add Quick Connect Tile
+* Convert current region component to Quick Region Tile
+* Add Tiles system to main view
+* Add Auto Region
+* Add Region Latency refresh button when no regions found
+* Move Region latency polling to a timer based system
+* Add Region search by name feature
+* Remove Region Grid View
+* Update view components to met new design spec
+
 __v1.3.1__
 
 * 1.3.1 Release

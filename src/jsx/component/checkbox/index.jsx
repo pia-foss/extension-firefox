@@ -1,14 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import ErrorBoundary from '../../hoc/errorboundary';
+
+import ErrorBoundary from '@hoc/errorboundary';
 
 const buildClassName = (postfix, id, ...others) => {
   let classNames = [`checkbox-${postfix}`];
-  if (id) {
-    classNames = [...classNames, `${id}-${postfix}`];
-  }
+  if (id) { classNames.push(`${id}-${postfix}`); }
   classNames = [...classNames, ...others];
-
   return classNames.join(' ');
 };
 
@@ -30,16 +28,16 @@ const buildClassName = (postfix, id, ...others) => {
 const Checkbox = (props) => {
   const {
     id,
+    theme,
     className,
-    onChange,
     checked,
     disabled,
+    onChange,
   } = props;
 
   return (
     <div className={buildClassName('container', id, className)}>
       <input
-        checked={checked}
         id={id}
         name={id}
         onChange={onChange}
@@ -49,11 +47,12 @@ const Checkbox = (props) => {
           ...(disabled ? ['disabled'] : []),
         )}
         type="checkbox"
+        checked={checked}
         disabled={disabled}
       />
       <label
         htmlFor={id}
-        className={buildClassName('facade', id)}
+        className={buildClassName('facade', id, theme)}
       />
     </div>
   );
@@ -61,10 +60,11 @@ const Checkbox = (props) => {
 
 Checkbox.propTypes = {
   id: PropTypes.string.isRequired,
+  theme: PropTypes.string.isRequired,
   className: PropTypes.string,
-  onChange: PropTypes.func.isRequired,
-  checked: PropTypes.bool.isRequired,
   disabled: PropTypes.bool,
+  checked: PropTypes.bool.isRequired,
+  onChange: PropTypes.func.isRequired,
 };
 
 Checkbox.defaultProps = {

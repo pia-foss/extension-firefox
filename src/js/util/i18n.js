@@ -1,4 +1,4 @@
-import http from 'helpers/http';
+import http from '@helpers/http';
 
 export default function i18n(app) {
   let acceptedLocales;

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import PopularRule from 'component/bypasslist/PopularRule';
+
+import PopularRule from '@component/bypasslist/PopularRule';
 
 const PopularRules = ({ popularRules }) => {
   return (
@@ -10,13 +11,11 @@ const PopularRules = ({ popularRules }) => {
       </h3>
 
       <div className="popular">
-        <div>
-          {
-            popularRules.map((name) => {
-              return (<PopularRule defaultName={name} key={name} />);
-            })
-          }
-        </div>
+        {
+          popularRules.map((name) => {
+            return (<PopularRule defaultName={name} key={name} />);
+          })
+        }
       </div>
     </div>
   );

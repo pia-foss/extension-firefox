@@ -1,19 +1,21 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+
+import withAppContext from '@hoc/withAppContext';
 
 class ImportExportRules extends Component {
   constructor(props) {
     super(props);
 
-    const background = browser.extension.getBackgroundPage();
-    if (background) { this.app = background.app; }
-    else { this.app = window.app; }
-
     // properties
+    this.app = props.context.app;
+    this.state = { showCheckmark: false };
     this.bypasslist = this.app.util.bypasslist;
     this.region = this.app.util.regionlist.getSelectedRegion();
 
     // bindings
     this.onImportClick = this.onImportClick.bind(this);
+    this.onExportClick = this.onExportClick.bind(this);
   }
 
   async onImportClick() {
@@ -21,17 +23,27 @@ class ImportExportRules extends Component {
     window.close();
   }
 
+  async onExportClick() {
+    await this.bypasslist.saveRulesToFile();
+    this.setState({ showCheckmark: true });
+    setTimeout(() => {
+      this.setState({ showCheckmark: false });
+    }, 3000);
+  }
+
   render() {
+    const { showCheckmark } = this.state;
+    const showClass = showCheckmark ? 'show' : '';
     return (
       <div className="import-export-wrapper">
         <h3 className="bl_sectionheader">
           { t('ImportExportHeader') }
         </h3>
 
-        <div className="buttons row">
+        <div className="button-container">
           <button
             type="button"
-            className="col-xs-4 col-xs-offset-1 btn btn-success"
+            className="btn btn-success"
             disabled={!this.region}
             onClick={this.onImportClick}
           >
@@ -40,10 +52,11 @@ class ImportExportRules extends Component {
 
           <button
             type="button"
-            className="col-xs-4 col-xs-offset-2 btn btn-success"
-            onClick={this.bypasslist.saveRulesToFile}
+            className="btn btn-success"
+            onClick={this.onExportClick}
           >
             { t('ExportLabel') }
+            <img className={`${showClass}`} alt="Exported" src="/images/selected_2x.png" />
           </button>
         </div>
       </div>
@@ -51,4 +64,8 @@ class ImportExportRules extends Component {
   }
 }
 
-export default ImportExportRules;
+ImportExportRules.propTypes = {
+  context: PropTypes.object.isRequired,
+};
+
+export default withAppContext(ImportExportRules);

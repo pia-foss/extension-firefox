@@ -6,8 +6,11 @@
 
   Being unaware of this could introduce serious bugs that compromise the security of the
   extension.
+
 */
-export default function onErrorOccurred(app) {
+import createApplyListener from '@helpers/applyListener';
+
+function openErrorPage(app) {
   const networkErrors = [
     'NS_ERROR_UNKNOWN_PROXY_HOST',
     'NS_ERROR_PROXY_CONNECTION_REFUSED',
@@ -46,3 +49,7 @@ export default function onErrorOccurred(app) {
     return { cancel: true };
   };
 }
+
+export default createApplyListener((app, addListener) => {
+  addListener(openErrorPage(app), { urls: ['<all_urls>'] });
+});

@@ -1,18 +1,16 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 
-import listenOnline from 'hoc/listenOnline';
-import Checkbox from './checkbox';
+import Checkbox from '@component/checkbox';
+import listenOnline from '@hoc/listenOnline';
+import withAppContext from '@hoc/withAppContext';
 
 class SettingItem extends Component {
   constructor(props) {
     super(props);
 
-    const background = browser.extension.getBackgroundPage();
-    if (background) { this.app = background.app; }
-    else { this.app = window.app; }
-
     // properties
+    this.app = props.context.app;
     this.settings = this.app.util.settings;
 
     // bindings
@@ -21,30 +19,24 @@ class SettingItem extends Component {
     this.buildWarningSpan = this.buildWarningSpan.bind(this);
   }
 
-  /* ------------------------------------ */
-  /*               Events                 */
-  /* ------------------------------------ */
-
   async toggle() {
-    const { controllable, settingID } = this.props;
+    const { controllable, settingID, changeTheme } = this.props;
 
     if (!controllable) { return; }
 
     try {
       // change settings in background app
       const newValue = await this.settings.toggle(settingID);
+      this.app.util.settingsmanager.clearAndReapplySettings(settingID)
       // call parent function to update parent's state
-      const { sectionName, onSettingChange } = this.props;
+      const { onSettingChange } = this.props;
       if (onSettingChange) { onSettingChange(settingID, newValue); }
+      if (changeTheme && settingID === 'darkTheme') { changeTheme(); }
     }
     catch (err) {
       debug(err);
     }
   }
-
-  /* ------------------------------------ */
-  /*             Builders                 */
-  /* ------------------------------------ */
 
   buildWarningSpan() {
     const { controllable, settingID, warning } = this.props;
@@ -78,7 +70,7 @@ class SettingItem extends Component {
     if (!message) { throw new Error('Failed to generate warning message'); }
 
     return (
-      <span className="errorsubline">
+      <span className="error-line">
         { message }
       </span>
     );
@@ -87,12 +79,13 @@ class SettingItem extends Component {
   buildLabel() {
     const {
       label,
+      online,
       tooltip,
       settingID,
       learnMore,
       controllable,
       learnMoreHref,
-      online,
+      context: { theme },
     } = this.props;
     const WarningSpan = this.buildWarningSpan;
     const target = learnMoreHref === '#' ? undefined : '_blank';
@@ -100,25 +93,25 @@ class SettingItem extends Component {
 
     return (
       <div>
-        <a href={settingID} className="macetooltip">
+        <a href={settingID} className="noselect">
           <label
             htmlFor={settingID}
             className={classNames}
           >
             { label }
-            <div className="popover arrow-bottom">
+
+            <div className={`popover arrow-top ${theme} left-align`}>
               { tooltip }
             </div>
           </label>
         </a>
+
         <WarningSpan />
+
         { controllable && (
-          <div className={settingID}>
+          <div className={`learnmore-container ${settingID}`}>
             <a
-              className={[
-                'learnmore',
-                ...(online ? [] : ['disabled']),
-              ].join(' ')}
+              className={`learnmore ${online ? '' : 'disabled'}`}
               href={online ? learnMoreHref : undefined}
               target={target}
             >
@@ -130,27 +123,25 @@ class SettingItem extends Component {
     );
   }
 
-  /* ------------------------------------ */
-  /*               React                  */
-  /* ------------------------------------ */
-
   render() {
     const {
       checked,
       settingID,
-      controllable,
       available,
+      controllable,
+      context: { theme },
     } = this.props;
 
     return (available)
       ? (
-        <div className="field settingitem noselect">
-          <div className="col-xs-10 settingblock">
+        <div className={`setting-item ${settingID}-item ${theme} noselect`}>
+          <div className="setting-item-label">
             { this.buildLabel() }
           </div>
+
           <Checkbox
             id={settingID}
-            className="col-xs-2"
+            theme={theme}
             checked={checked}
             disabled={!controllable}
             onChange={this.toggle}
@@ -170,9 +161,11 @@ SettingItem.propTypes = {
   learnMore: PropTypes.string,
   controllable: PropTypes.bool,
   warning: PropTypes.string,
-  sectionName: PropTypes.string.isRequired,
+  online: PropTypes.bool.isRequired,
+  changeTheme: PropTypes.func.isRequired,
   checked: PropTypes.bool.isRequired,
   available: PropTypes.bool.isRequired,
+  context: PropTypes.object.isRequired,
 };
 
 SettingItem.defaultProps = {
@@ -183,4 +176,4 @@ SettingItem.defaultProps = {
   warning: '',
 };
 
-export default listenOnline(SettingItem);
+export default listenOnline(withAppContext(SettingItem));

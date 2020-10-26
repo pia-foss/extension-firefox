@@ -26,6 +26,7 @@ idescribe('the connection failed page', function () {
     await loginPage.navigate();
     await fingerprintPage.optIn();
     await loginPage.signIn();
+    await authPage.waitForLatencyTest();
     await authPage.switchOn();
     const id = await failConnection(this.script);
     await connFailPage.navigate((url) => {
@@ -34,7 +35,8 @@ idescribe('the connection failed page', function () {
   });
 
   iit('refreshing the page brings you to the URL where the connection failed', async function () {
-    await this.windows.refresh({ waitForVisible: robotsPage.container });
+    await this.windows.refresh();
+    await robotsPage.container.waitForVisible();
     await this.windows.expectCurrentUrlIs(robotsPage.getUrl());
   });
 

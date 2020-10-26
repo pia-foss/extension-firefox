@@ -10,7 +10,7 @@ class PrivacySection extends SectionBase {
     super(
       {
         selector: createSelector({
-          value: '.sectionwrapper.privacy',
+          value: '.section-wrapper.privacy',
         }),
         name: 'privacy settings',
       },

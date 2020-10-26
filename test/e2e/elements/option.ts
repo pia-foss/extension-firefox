@@ -1,9 +1,9 @@
-import { WebElementBase, createSelector } from '../core';
+import { Node, createSelector } from '../core';
 
-class Option extends WebElementBase {
+class Option extends Node {
   private readonly id: string;
 
-  constructor(id: string, parent: WebElementBase) {
+  constructor(id: string, parent: Node) {
     super(
       {
         selector: createSelector({
@@ -17,7 +17,7 @@ class Option extends WebElementBase {
   }
 
   async isActive(): Promise<boolean> {
-    const className = await this.element.getAttribute('class');
+    const className = await this.getAttribute('class');
     return className.includes('active');
   }
 
@@ -26,7 +26,8 @@ class Option extends WebElementBase {
   }
 
   async click() {
-    await this.visibleElement.click();
+    const el = await this.getElement();
+    await el.click();
   }
 }
 

@@ -1,6 +1,8 @@
-import 'babel-polyfill';
+import '@babel/polyfill';
 
-import { sendMessage, Target, Type } from 'helpers/messaging';
+import '@style/pia';
+import '@style/popups/importrules';
+import { sendMessage, Target, Type } from '@helpers/messaging';
 
 (async () => {
   function debug(debugMsg) {

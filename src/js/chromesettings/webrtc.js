@@ -1,4 +1,4 @@
-import ChromeSetting from 'chromesettings/chromesetting';
+import ChromeSetting from '@chromesettings/chromesetting';
 
 class WebRTC extends ChromeSetting {
   constructor() {
@@ -6,7 +6,7 @@ class WebRTC extends ChromeSetting {
 
     // functions
     this.applySetting = this.createApplySetting(
-      'disable_non_proxied_udp',
+      'proxy_only',
       'webrtc',
       'block',
     );
@@ -26,7 +26,7 @@ class WebRTC extends ChromeSetting {
 
   onChange(details) {
     this.setLevelOfControl(details.levelOfControl);
-    this.setBlocked(details.value === 'disable_non_proxied_udp');
+    this.setBlocked(details.value === 'proxy_only');
   }
 
   static getSetting() {

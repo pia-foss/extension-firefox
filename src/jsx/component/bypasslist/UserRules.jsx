@@ -1,15 +1,15 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import BypassItem from './BypassItem';
+
+import withAppContext from '@hoc/withAppContext';
+import BypassItem from '@component/bypasslist/BypassItem';
 
 class UserRules extends Component {
   constructor(props) {
     super(props);
 
-    const background = browser.extension.getBackgroundPage();
-    if (background) { this.app = background.app; }
-    else { this.app = window.app; }
-
     // properties
+    this.app = props.context.app;
     this.bypasslist = this.app.util.bypasslist;
     this.region = this.app.util.regionlist.getSelectedRegion();
     this.state = {
@@ -54,10 +54,19 @@ class UserRules extends Component {
   }
 
   createBypassItem(rule) {
-    return <BypassItem rule={rule} key={rule} onRemoveRule={this.createRemoveRule(rule)} />;
+    const { context: { theme } } = this.props;
+    return (
+      <BypassItem
+        key={rule}
+        rule={rule}
+        theme={theme}
+        onRemoveRule={this.createRemoveRule(rule)}
+      />
+    );
   }
 
   render() {
+    const { context: { theme } } = this.props;
     const { userInput, userRules } = this.state;
 
     return (
@@ -76,13 +85,14 @@ class UserRules extends Component {
           { t('BypassInstructions') }
         </div>
 
-        <div className="add-container">
+        <div className={`add-container ${theme}`}>
           <input
             type="text"
             name="rule"
+            maxLength="32779"
+            value={userInput}
             className="add-rule-input"
             placeholder="*.privateinternetaccess.com"
-            value={userInput}
             disabled={!this.region}
             onKeyPress={this.onKeyPress}
             onChange={this.onUserInputChange}
@@ -100,7 +110,7 @@ class UserRules extends Component {
           </button>
         </div>
 
-        <div className={`rule-list ${!this.region ? 'disabled' : ''}`}>
+        <div className={`rule-list ${!this.region ? 'disabled' : ''} ${theme}`}>
           { userRules.map(this.createBypassItem) }
         </div>
       </div>
@@ -108,4 +118,8 @@ class UserRules extends Component {
   }
 }
 
-export default UserRules;
+UserRules.propTypes = {
+  context: PropTypes.object.isRequired,
+};
+
+export default withAppContext(UserRules);
