@@ -42,6 +42,8 @@
 @import "component/tiles/Subscription";
 @import "component/tiles/BypassRules";
 @import "component/tiles/Ip";
+@import "component/JustInTime";
+
 
 
 // pages
@@ -54,12 +56,13 @@
 @import "pages/FingerprintOptInPage";
 @import "pages/LoginPage";
 @import "pages/SettingsPage";
+@import "pages/ExtraFeaturesPage";
 @import "pages/UncontrollablePage";
 @import "pages/RegionOverridePage";
 @import "pages/PrivateBrowsingPage";
 @import "pages/SmartLocationPage";
-
-
+@import "pages/OnboardingPage";
+@import "pages/OnboardingSettingsPage";
 
 html {
   margin: 0;

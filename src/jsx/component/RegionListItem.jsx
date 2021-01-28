@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-
+import BeatLoader from "react-spinners/BeatLoader";
 import withAppContext from '@hoc/withAppContext';
 import onFlagError from '@eventhandler/pages/changeregion/onFlagError';
 
@@ -94,12 +94,18 @@ class RegionListItem extends Component {
       debug(`invalid latency: ${latency}`);
       return 'latency-red';
     })();
+    const loading = <BeatLoader
+                          size={5}
+                          margin={2}
+                          color={"#66ab00"}
+                          loading={true}
+                        />;
     const latencyValue = (() => {
       if (latency === 'PENDING') { return 'waiting'; }
-      if (latency === 'ERROR') { return 'ERROR'; }
+      if (latency === 'ERROR') { return loading; }
       if (typeof latency === 'number' && latency >= 0) { return `${latency} ms`; }
       debug(`RegionListItem: invalid latency: ${latency}`);
-      return 'ERROR';
+      return loading;
     })();
 
     return (

@@ -98,12 +98,13 @@ exports.getProxyStateByURL = function(url, host, rules) {
 // e.g. {"GB":"HTTPS 8.8.8.8:443;HTTPS 8.8.8.9:443","US":"HTTPS 2.2.2.2:443"}
 // parameter noExtras removes the HTTPS and port appendix
 exports.getNodeDictFromLocations = function(
-  locations
+  locations,key
 ) {
     const nodeDict = {};    
     locations.map(node => {
-        const {host, port,id} = node;
-        nodeDict[id] = `${host}:80`;
+        const {host,id} = node;
+        const port = node[key]
+        nodeDict[id] = `${host}:${port}`;
     });
   return nodeDict;
 };

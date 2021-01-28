@@ -52,6 +52,7 @@ class DrawerOutlet extends Component {
               hideFlag={!drawerOpen}
               connection={connection}
               autoLoading={autoLoading}
+              region={region}
               toggleTileSaved={toggleTileSaved}
               onQuickConnect={onQuickConnect}
             />

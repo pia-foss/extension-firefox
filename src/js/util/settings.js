@@ -410,15 +410,15 @@ class Settings {
     return [
       {
         settingID: ApplicationIDs.BLOCK_UTM,
-        settingDefault: true,
+        settingDefault: false,
       },
       {
         settingID: ApplicationIDs.BLOCK_FBCLID,
-        settingDefault: true,
+        settingDefault: false,
       },
       {
         settingID: ApplicationIDs.MACE_PROTECTION,
-        settingDefault: true,
+        settingDefault: false,
       },
       {
         settingID: ApplicationIDs.DEBUG_MODE,
@@ -438,7 +438,7 @@ class Settings {
       },
       {
         settingID: ApplicationIDs.HTTPS_UPGRADE,
-        settingDefault: true,
+        settingDefault: false,
       },
       {
         settingID: ApplicationIDs.ALWAYS_ACTIVE,

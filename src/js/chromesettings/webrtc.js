@@ -19,7 +19,7 @@ class WebRTC extends ChromeSetting {
     this.onChange = this.onChange.bind(this);
 
     // init
-    this.settingDefault = true;
+    this.settingDefault = false;
     this.blockable = Boolean(this.setting);
     this.settingID = 'preventwebrtcleak';
   }

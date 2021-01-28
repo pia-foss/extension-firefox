@@ -19,7 +19,7 @@ class HttpReferrer extends ChromeSetting {
     this.onChange = this.onChange.bind(this);
 
     // init
-    this.settingDefault = true;
+    this.settingDefault = false;
     this.settingID = 'blockreferer';
     this.referable = Boolean(this.setting);
   }

@@ -1,4 +1,55 @@
 {
+  "JustInTimeDisclaimer":{
+    "message": "Rate your experience with PIA"
+  },
+  "encounterMessageFirefox_1":{
+    "message":"Thank you for your feedback! If you encounter any technical problems please "
+  },
+  "encounterMessageFirefox_2":{
+    "message":"contact the support department "
+  },
+  "feedbackMessageFirefox_1":{
+    "message":"Thank you for your feedback! We would appreciate it if rate us on "
+  },
+  "feedbackMessageFirefox_2":{
+    "message":"Firefox Browser Addons"
+  },
+  "OnBoardingStart":{
+    "message":"GET STARTED"
+  },
+  "FirstSlideInstallThanks":{
+    "message":"Thanks for installing the"
+  },
+  "PrivateInternetAccess":{
+    "message":"Private Internet Access"
+  },
+  "BrowserMessage":{
+    "message":"Browser Extension"
+  },
+  "StartSlide":{
+    "message":"Let's get you started"
+  },
+  "Step1":{
+    "message":"STEP 1 OF 2"
+  },
+  "Step2":{
+    "message":"STEP 2 OF 2"
+  },
+  "ChooseTheme":{
+    "message":"Choose yout theme"
+  },
+  "EnableSetings":{
+    "message":"Enable Extra Features"
+  },
+  "PrivateInternetComesWith":{
+    "message":"Private Internet Access comes with "
+  },
+  "LightAndDarkDisclaimer":{
+    "message":"light and dark themes to fit the look "
+  },
+  "LookOfBrowserDisclaimer":{
+    "message":"and feel of your browser"
+  },
   "UILanguage": {
     "message": "UI Language"
   },
@@ -84,7 +135,16 @@
     "message": "Write messages to the debug log. Press the 'ctrl' key followed by the 'd' key to show the debug log."
   },
   "DarkTheme": {
-    "message": "Dark theme"
+    "message": "Dark Theme"
+  },
+  "WhiteTheme": {
+    "message": "Light Theme"
+  },
+  "Next":{
+    "message":"NEXT"
+  },
+  "Skip":{
+    "message":"SKIP"
   },
   "DarkThemeTooltip": {
     "message": "Enable a darker theme for the extension to use in low light conditions"
@@ -99,7 +159,7 @@
     "message": "Cause settings to always remain active, regardless of whether proxy is connected or not"
   },
   "IpProxy": {
-    "message": "Proxy IP"
+    "message": "VPN IP"
   },
   "LogMeOutOnClose": {
     "message": "Log me out on browser close"
@@ -403,6 +463,9 @@
   },
   "ChangeExtensionSettings": {
     "message": "Extension Settings"
+  },
+  "ChangeExtraFeaturesSettings": {
+    "message": "Extra Features"
   },
   "CannotUsePIAMessage": {
     "message": "Private Internet Access cannot be used because another extension is controlling your browsers proxy settings."

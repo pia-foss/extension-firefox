@@ -16,7 +16,7 @@ class TrackingProtection extends ChromeSetting {
     this.onChange = this.onChange.bind(this);
 
     // init
-    this.settingDefault = true;
+    this.settingDefault = false;
     this.available = Boolean(this.setting);
     this.settingID = 'trackingprotection';
   }

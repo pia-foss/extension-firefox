@@ -15,6 +15,7 @@ class App extends Component {
     this.history = props.history;
     this.rebuildApp = this.rebuildApp.bind(this);
     this.updateTheme = this.updateTheme.bind(this);
+    this.getTheme = this.getTheme.bind(this);
     this.buildContext = this.buildContext.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.updateFirstRun = this.updateFirstRun.bind(this);
@@ -86,6 +87,11 @@ class App extends Component {
     this.rebuildApp();
   }
 
+  getTheme(){
+    const theme = this.app.util.settings.getItem('darkTheme');
+    return theme ? 'dark' : 'light';
+  }
+
   updateFirstRun() {
     const firstRun = this.app.util.settings.getItem('firstRun', true);
     this.setState({ firstRun });
@@ -96,6 +102,7 @@ class App extends Component {
     const {
       app,
       updateTheme,
+      getTheme,
       updateFirstRun,
       rebuildApp,
     } = this;
@@ -103,6 +110,7 @@ class App extends Component {
       app,
       theme: newTheme,
       updateTheme,
+      getTheme,
       updateFirstRun,
       rebuildApp,
     };
@@ -148,14 +156,6 @@ class App extends Component {
       return (
         <AppProvider value={context}>
           <PrivateBrowsingPage />
-        </AppProvider>
-      );
-    }
-
-    if (firstRun) {
-      return (
-        <AppProvider value={context}>
-          <FingerprintOptInPage />
         </AppProvider>
       );
     }

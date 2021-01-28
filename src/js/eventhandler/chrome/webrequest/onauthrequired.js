@@ -38,6 +38,8 @@ function authenticate(app) {
   };
 
   return function handle(details) {
+
+
     try {
       debug('onauthrequired.js: servicing request for authentication');
       if (!active(details)) { return debug('onAuthRequired/1: refused.'); }
@@ -54,12 +56,16 @@ function authenticate(app) {
         return { cancel: true };
       }
 
+     
+
+
       if (user.getLoggedIn()) {
         debug('onAuthRequired/1: allowed.');
 
         const username = user.getUsername();
         const password = user.getPassword();
         const token = user.getAuthToken();
+  
 
         let credentials = { cancel: true };
         if (username && password) {
@@ -70,6 +76,7 @@ function authenticate(app) {
           const tokenPass = token.substring(token.length / 2);
           credentials = { authCredentials: { username: tokenUser, password: tokenPass } };
         }
+  
         return credentials;
       }
 

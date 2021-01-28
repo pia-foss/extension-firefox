@@ -1,24 +1,53 @@
 __HEAD__
 
-__v2.2.7__
+__v.2.4.3__ (26.11.2020)
+
+* Added translations and layout changes for onboarding and just in time
+
+__v.2.4.1__ (17.11.2020)
+
+* Just in time added (rating system)
+* Latency rewrite
+
+__v.2.3.2__ (12.11.2020)
+
+* Hotfix for mace
+
+__v.2.3.1__ (5.11.2020)
+
+* Changed port for smart location
+
+__v.2.3.0__ (29.10.2020)
+
+* Added new background image for onboarding tab.
+* Added onboarding screen for new users.
+* New extra features tab was added.
+* Extra features are now all disabled when user connects.
+* Rearranged tiles.
+* Ip tile is default true.
+* Fingerprint protection onboarding screen is no more when users first connect.
+* No more warnings for new users.
+* Latency tab as default.
+
+__v2.2.7__ (15.09.2020)
 
 * Translations and css changes for some of them.
 
-__v2.2.6__
+__v2.2.6__ (11.09.2020)
 
 * Fixed proxyIp to update on smartlocation changes and if users connect or disconnect from proxy.
 
-__v2.2.5__
+__v2.2.5__ (10.09.2020)
 
 * Fixed smart location not grabbing correct proxy
 * Fixed quickconnect UI not working
 * Remember me now clears when false
 
-__v2.2.4__
+__v2.2.4__ (24.08.2020)
 
 * Fixed icon when installing extension
 
-__v2.2.3__
+__v2.2.3__ (14.08.2020)
 
 * Fixed incognito mode not working
 * Smartlocation on incognito working

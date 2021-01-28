@@ -57,7 +57,7 @@ class SettingSections extends Component {
 
   getSectionProps(sectionKey) {
     const { sectionsData, settingsData } = this.state;
-    const { name, label } = getSection(sectionKey, sectionsData);
+    const { name, label, defaultOpen } = getSection(sectionKey, sectionsData);
     const enabledCount = getEnabledCount(sectionKey, settingsData);
     const totalCount = getTotalCount(sectionKey, settingsData);
 
@@ -65,6 +65,7 @@ class SettingSections extends Component {
       name,
       label,
       enabledCount,
+      defaultOpen,
       totalCount,
     };
   }
@@ -135,28 +136,13 @@ class SettingSections extends Component {
       </div>
     );
   }
+  
 
   render() {
     const { settingsData } = this.state;
     const { onDebugClick, context: { theme } } = this.props;
     return (
       <Fragment>
-        <SettingSection {...this.getSectionProps('security')}>
-          <SettingItem {...this.getSettingProps('preventwebrtcleak')} />
-          <SettingItem {...this.getSettingProps('httpsUpgrade')} />
-        </SettingSection>
-        <SettingSection {...this.getSectionProps('privacy')}>
-          <SettingItem {...this.getSettingProps('blocknetworkprediction')} />
-        </SettingSection>
-        <SettingSection {...this.getSectionProps('tracking')}>
-          <SettingItem {...this.getSettingProps('trackingprotection')} />
-          <SettingItem {...this.getSettingProps('fingerprintprotection')} />
-          <SettingItem {...this.getSettingProps('blockreferer')} />
-          <SettingItem {...this.getSettingProps('blockhyperlinkaudit')} />
-          <SettingItem {...this.getSettingProps('blockutm')} />
-          <SettingItem {...this.getSettingProps('blockfbclid')} />
-          <SettingItem {...this.getSettingProps('maceprotection')} />
-        </SettingSection>
         <SettingSection {...this.getSectionProps('extension')}>
           <SettingItem 
           {...this.getSettingProps('alwaysActive')} />

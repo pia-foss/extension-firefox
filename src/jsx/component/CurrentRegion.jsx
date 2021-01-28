@@ -45,7 +45,7 @@ class CurrentRegion extends Component {
   render() {
     const { region, autoLoading, context: { theme } } = this.props;
 
-    if (autoLoading) { return <LoadingEllipsis theme={theme} />; }
+    if (!region) { return <LoadingEllipsis theme={theme} />; }
 
     return (
       <div

@@ -3,6 +3,7 @@ import { Type } from '@helpers/messaging';
 
 const OVERRIDE_KEY = 'regionlist::override';
 const FAVORITE_REGIONS_KEY = 'favoriteregions';
+const defaultRegions = require('../data/regions.json');
 
 class RegionList {
   constructor(app, foreground) {
@@ -11,6 +12,7 @@ class RegionList {
     this.testPort = this.testPort.bind(this);
     this.getPotentialHosts = this.getPotentialHosts.bind(this);
     this.getPotentialPorts = this.getPotentialPorts.bind(this);
+    this.getPort = this.getPort.bind(this);
     this.getPotentialRegions = this.getPotentialRegions.bind(this);
     this.initialOverrideRegions = this.initialOverrideRegions.bind(this);
     this.addOverrideRegion = this.addOverrideRegion.bind(this);
@@ -38,6 +40,7 @@ class RegionList {
     this.export = this.export.bind(this);
     this.importAutoRegion = this.importAutoRegion.bind(this);
     this.exportAutoRegion = this.exportAutoRegion.bind(this);
+    this.setDefaultRegions = this.setDefaultRegions.bind(this);
     this.getRegionById = this.getRegionById.bind(this);
     this.selectedRegionSmartLoc = null;
 
@@ -47,6 +50,8 @@ class RegionList {
     this.foreground = foreground;
     this.normalRegions = {};
     this.overrideRegions = this.initialOverrideRegions(this.storage);
+    this.defaultRegions = defaultRegions;
+
 
     // set isAuto property based on localStorage
     const isAutoString = this.app.util.storage.getItem('autoRegion');
@@ -56,6 +61,7 @@ class RegionList {
     else { this.isAuto = false; }
 
     // poll for new regions every 30 minutes
+    this.setDefaultRegions();
     chrome.alarms.create('PollRegionList', { delayInMinutes: 30, periodInMinutes: 60 });
   }
 
@@ -74,6 +80,25 @@ class RegionList {
     if(id){
       return Object.values(this.getRegions()).filter(v=>v.id === id)[0]
     }
+  }
+
+  setDefaultRegions() {
+    const { util: { storage } } = this.app;
+
+    // keep track of current favorite regions
+    let favoriteRegions = storage.getItem('favoriteregions');
+    if (favoriteRegions) { favoriteRegions = favoriteRegions.split(','); }
+    else { favoriteRegions = []; }
+
+    // clear current region data
+    this.normalRegions = {};
+
+    // replace with new data from server
+    Object.keys(defaultRegions).forEach((regionID) => {
+      const region = RegionList.createNormalRegion(regionID, defaultRegions[regionID]);
+      if (favoriteRegions.includes(region.id)) { region.isFavorite = true; }
+      this.normalRegions[region.id] = region;
+    });
   }
 
   /**
@@ -102,6 +127,12 @@ class RegionList {
 
     return this.getPotentialRegions()
       .map((r) => { return r[key]; });
+  }
+
+  getPort(){
+    const { util: { settings } } = app;
+    const key = settings.getItem('maceprotection') ? 'macePort' : 'port';
+    return key;
   }
 
   getPotentialRegions() {
@@ -255,6 +286,7 @@ class RegionList {
    * Returns the 'auto' region, the fastest region based on latency
    */
   getAutoRegion() {
+    this.setAutoRegion(this.getFastestRegion());
     return this.autoRegion;
   }
 

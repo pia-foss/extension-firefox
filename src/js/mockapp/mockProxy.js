@@ -10,6 +10,8 @@ class Proxy {
       
       const { origin } = new URL(requestInfo.url)
 
+      const key = app.util.regionlist.getPort();
+
       const region = app.util.regionlist.getSelectedRegion()
       
       if ( !region ) return
@@ -24,21 +26,8 @@ class Proxy {
         return proxyRule;
       }
       
-      return { host:region.host, port: 80, type: region.scheme };
+      return { host:region.host, port: port[key], type: region.scheme };
       
-      // const { util: { bypasslist, regionlist, icon, smartlocation } } = app
-      
-      // icon.online();
-
-      // if (bypasslist.toArray().includes(origin))
-      //   return { type: 'direct' };
-
-     
-      
-      
-      // const { host, scheme } = regionlist.getSelectedRegion();
-      
-      // return { host, port: 80, type: scheme };
     };
     
     browser.proxy.onError.addListener((error) => {
@@ -88,11 +77,14 @@ class Proxy {
   
  changeProxyRule (tab){
     const { util: { smartlocation,regionlist } } = app;
+    const key = app.util.regionlist.getPort();
     const locations =  Object.values(regionlist.getRegions());
     if(smartlocation.getSmartLocationRules('smartLocationRules').length > 0 && smartlocation.getSmartLocationRules('checkSmartLocation')){
       // nodeDict is used for PAC script
+
       const nodeDict = pacengine.getNodeDictFromLocations(
         locations,
+        key,
         [],
         true
       );
@@ -103,7 +95,7 @@ class Proxy {
         return {
           type:'https',
           host,
-          port: Number(port) || 80
+          port: Number(port) || 443
         }    
        
       }else{

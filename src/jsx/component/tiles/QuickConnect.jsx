@@ -195,11 +195,12 @@ class QuickConnect extends Component {
       saved,
       hideFlag,
       autoLoading,
+      region,
       toggleTileSaved,
       context: { theme },
     } = this.props;
 
-    if (autoLoading) {
+    if (!region) {
       return (
         <Tile
           name="QuickConnect"

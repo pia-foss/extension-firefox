@@ -38,7 +38,7 @@ class RegionAuto extends Component {
     const { isAuto } = this.state;
     const { region, autoLoading, context: { theme } } = this.props;
 
-    if (autoLoading) { return <LoadingEllipsis theme={theme} />; }
+    if (!region) { return <LoadingEllipsis theme={theme} />; }
 
     return (
       <div

@@ -7,6 +7,10 @@ import CompanyLogo from '@component/CompanyLogo';
 import withAppContext from '@hoc/withAppContext';
 import DrawerOutlet from '@component/drawer/DrawerOutlet';
 import DrawerHandle from '../component/drawer/DrawerHandle';
+import { AppProvider } from '@contexts/AppContext';
+import OnboardingPage from '@pages/OnboardingPage';
+import JustInTime from '@component/JustInTime';
+const SETTINGS_DISCLAIMER_KEY = 'app::justInTimeDismissed';
 
 
 class AuthenticatedPage extends Component {
@@ -22,6 +26,21 @@ class AuthenticatedPage extends Component {
     this.storage = this.app.util.storage;
     this.settings = this.app.util.settings;
     this.regionlist = this.app.util.regionlist;
+    const theme = this.app.util.settings.getItem('darkTheme') ? 'dark' : 'light';
+
+    // binding
+    this.pollRegions = this.pollRegions.bind(this);
+    this.onToggleDrawer = this.onToggleDrawer.bind(this);
+    this.onQuickConnect = this.onQuickConnect.bind(this);
+    this.toggleTileSaved = this.toggleTileSaved.bind(this);
+    this.onToggleConnection = this.onToggleConnection.bind(this);
+    this.handleProxyConnection = this.handleProxyConnection.bind(this);
+    this.updateFirstRun = this.updateFirstRun.bind(this);
+    this.updateTheme = props.context.updateTheme;
+    this.getTheme = props.context.getTheme;
+    this.getjustInTimeDismissedDismissed = this.getjustInTimeDismissedDismissed.bind(this);
+    this.dismissjustInTime = this.dismissjustInTime.bind(this);
+
     this.state = {
       mode: '',
       error: '',
@@ -32,24 +51,19 @@ class AuthenticatedPage extends Component {
       tiles: this.storage.getItem('tiles'),
       region: this.regionlist.getSelectedRegion(),
       drawerOpen: this.storage.getItem('drawerState') === 'open',
+      firstRun: null,
+      context: this.buildContext(theme),
+      justInTimeDismissed: JSON.parse(this.getjustInTimeDismissedDismissed()),
     };
-
-    // binding
-    this.pollRegions = this.pollRegions.bind(this);
-    this.onToggleDrawer = this.onToggleDrawer.bind(this);
-    this.onQuickConnect = this.onQuickConnect.bind(this);
-    this.toggleTileSaved = this.toggleTileSaved.bind(this);
-    this.onToggleConnection = this.onToggleConnection.bind(this);
-    this.handleProxyConnection = this.handleProxyConnection.bind(this);
 
     // default tiles
     const defaultTiles = [
       { name: 'RegionTile', saved: true },
+      { name: 'Ip', saved: true },
       { name: 'QuickConnect', saved: false },
-      { name: 'Subscription', saved: false },
       { name: 'QuickSettings', saved: false },
       { name: 'BypassRules', saved: false },
-      { name: 'Ip', saved: false },
+      { name: 'Subscription', saved: false },
     ];
 
     // parse tiles from JSON
@@ -80,8 +94,12 @@ class AuthenticatedPage extends Component {
     // default tile data if no tile data found
     else { tiles = defaultTiles; }
 
+    // check if this is the first time being run
+    this.firstRun = this.app.util.settings.getItem('firstRun', true);
+
     // reset state.tiles
     this.state.tiles = tiles;
+    this.state.firstRun = this.firstRun;
   }
 
   componentDidMount() {
@@ -91,7 +109,7 @@ class AuthenticatedPage extends Component {
 
     if (isAuto && !autoRegion) {
       this.setState({ autoLoading: true });
-      this.pollRegions();
+      // this.pollRegions();
     }
   }
 
@@ -117,6 +135,11 @@ class AuthenticatedPage extends Component {
     // debounce the calls to the proxy handler by 175ms
     clearTimeout(this.debounce);
     this.debounce = setTimeout(() => { this.handleProxyConnection(); }, 175);
+  }
+
+  updateFirstRun() {
+    const firstRun = this.settings.getItem("firstRun");
+    this.setState({ firstRun });
   }
 
   onQuickConnect(regionId) {
@@ -155,23 +178,19 @@ class AuthenticatedPage extends Component {
 
     // artificial delay to allow animation to shine
     setTimeout(() => {
+      if(!this.proxy.enabled()){
+        this.incrementIndexConnection()
+      }
       this.setState({ enabled: this.proxy.enabled(), mode: '' });
     }, 500);
   }
 
   pollRegions() {
     if (!this.mounted) { return; }
-
     // check if there are still server latency checks ongoing
-    const { pollIteration } = this.state;
     const regions = this.regionlist.toArray();
-    const repoll = regions.some((currentRegion) => {
-      return currentRegion.latency === 'PENDING';
-    });
 
-    this.setState({ pollIteration: pollIteration + 1 });
-
-    if (repoll || (!regions.length && pollIteration < 8)) {
+    if (!regions.length) {
       this.setState({ autoLoading: true });
       setTimeout(this.pollRegions, 500);
     }
@@ -196,27 +215,107 @@ class AuthenticatedPage extends Component {
     this.setState({ tiles: filteredTiles });
   }
 
-  render() {
+  getjustInTimeDismissedDismissed() {
+    const { app: { util: { storage } } } = this;
+    const value = storage.getItem(SETTINGS_DISCLAIMER_KEY);
+
+    // if(value == null){
+    //   storage.setItem(SETTINGS_DISCLAIMER_KEY,false);
+    //   this.setState({justInTimeDismissed:false})
+    // }
+    return value;
+  }
+
+
+  dismissjustInTime(what) {
+    const objValues ={
+      settings:{
+        value:SETTINGS_DISCLAIMER_KEY,
+        objState:{justInTimeDismissed: false}
+      }
+    }
+    const { app: { util: { storage } } } = this;
+    storage.setItem(objValues[what].value, false);
+    this.setState(() => {
+      return objValues[what].objState;
+    });
+  }
+
+  incrementIndexConnection(){
+    let connectionIndex = this.storage.getItem('connectionIndex') ? this.storage.getItem('connectionIndex') : 0;
+    connectionIndex = Number(connectionIndex);
+    if(connectionIndex == 10){
+      this.storage.setItem(SETTINGS_DISCLAIMER_KEY, true);
+      this.setState({justInTimeDismissed:true});
+    }
+    this.storage.setItem('connectionIndex' , connectionIndex += 1);
+  }
+
+  buildContext(newTheme) {
     const {
+      app,
+      updateTheme,
+      getTheme,
+      updateFirstRun,
+      rebuildApp,
+    } = this;
+ 
+    return {
+      app,
+      theme: newTheme,
+      updateTheme,
+      getTheme,
+      updateFirstRun,
+      rebuildApp,
+    };
+  }
+
+  render() {
+    let {
       mode,
       tiles,
-      region,
+      // region,
       enabled,
       drawerOpen,
-      autoLoading
+      firstRun,
+      autoLoading,
+      context,
+      justInTimeDismissed
     } = this.state;
+
+    const region = this.regionlist.getSelectedRegion();
+
     const { context: { theme } } = this.props;
     let { error } = this.state;
     let connection = enabled ? 'connected' : 'disconnected';
-
+    const hasRegions = this.regionlist.hasRegions();
+    
     // handle proxy errors
-    if (!region) { error = t('NoRegionSelected'); } // put 'no region' error above all others
+    if (!hasRegions) { error = t('NoRegionSelected'); } // put 'no region' error above all others
     if (error) { connection = 'error'; }
-
+    
     // filter tiles
     const savedTiles = tiles.filter((tile) => { return tile.saved; });
     const unsavedTiles = tiles.filter((tile) => { return !tile.saved; });
+    
+    //if user los for first time we show him the onboarding page
+    if (firstRun) {
+      return (
+        <AppProvider value={context} >
+          <OnboardingPage updateFirstRun= {this.updateFirstRun} />
+        </AppProvider>
+      );
+    }
 
+    let ratingTile = null;
+    if(justInTimeDismissed){
+      ratingTile = 
+        <JustInTime
+        whichDisclaimer={'settingDisclaimer'}
+        onDismiss={this.dismissjustInTime}
+        theme={theme}
+      />
+    }
     return (
       <div id="authenticated-page" className="row">
         <CompanyLogo mode={mode} error={error} connection={connection} />
@@ -230,6 +329,8 @@ class AuthenticatedPage extends Component {
               onToggleConnection={this.onToggleConnection}
             />
           </div>
+
+          { ratingTile }
 
           <div className="authenticated-tiles">
             <DrawerOutlet

@@ -4,6 +4,7 @@ import { Route, Switch } from 'react-router-dom';
 import LoginPage from '@pages/LoginPage';
 import UpgradePage from '@pages/UpgradePage';
 import SettingsPage from '@pages/SettingsPage';
+import ExtraFeaturesPage from '@pages/ExtraFeaturesPage';
 import DebugLogPage from '@pages/DebugLogPage';
 import ChangelogPage from '@pages/ChangeLogPage';
 import BypassListPage from '@pages/BypassListPage';
@@ -24,6 +25,7 @@ export const Path = {
   regionOverride: '/override',
   changeRegion: '/region',
   settings: '/settings',
+  extraFeatures: '/extrafeatures',
   changelog: '/changelog',
   bypassList: '/bypasslist',
   privateBrowsing: '/private-browsing',
@@ -47,6 +49,7 @@ const Routes = () => {
       <Route path={Path.regionOverride} component={RegionOverridePage} />
       <PrivateRoute path={Path.changeRegion} component={ChangeRegionPage} />
       <PrivateRoute path={Path.settings} component={SettingsPage} />
+      <PrivateRoute path={Path.extraFeatures} component={ExtraFeaturesPage} />
       <PrivateRoute path={Path.changelog} component={ChangelogPage} />
       <PrivateRoute path={Path.bypassList} component={BypassListPage} />
       <PrivateRoute path={Path.privateBrowsing} component={PrivateBrowsingPage} />

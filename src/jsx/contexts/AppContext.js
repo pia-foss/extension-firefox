@@ -4,6 +4,7 @@ const context = {
   app: {},
   theme: 'dark',
   updateTheme: () => {},
+  getTheme: () => {}
 };
 
 const AppContext = createContext(context);
