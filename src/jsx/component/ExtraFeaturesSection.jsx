@@ -1,36 +1,29 @@
-import PropTypes from 'prop-types';
-import React, { Component, Fragment } from 'react';
-
+import PropTypes from "prop-types";
+import React, { Component, Fragment } from "react";
 import {
   createSettingsData,
   getSetting,
-  getEnabledCount,
   getTotalCount,
-} from '@data/settings';
-import { createSectionsData, getSection } from '@data/sections';
-import withAppContext from '@hoc/withAppContext';
-import SettingItem from '@component/SettingItem';
-import SettingSection from '@component/SettingSection';
-import DebugSettingItem from '@component/DebugSettingItem';
-import LanguageDropdown from '@component/LanguageDropdown';
+  getEnabledCount,
+} from "@data/settings";
+import withAppContext from "@hoc/withAppContext";
+import { createSectionsData, getSection } from "@data/sections";
+import SettingItem from "@component/SettingItem";
+import SettingSection from "@component/SettingSection";
+import DebugSettingItem from "@component/DebugSettingItem";
+import LanguageDropdown from "@component/LanguageDropdown";
 
-class ExtraFeaturesSection extends Component {
+class ExtraFeaturesSettings extends Component {
   constructor(props) {
     super(props);
 
     // properties
     this.app = props.context.app;
     this.languageDropdown = LanguageDropdown;
-    const { settings, user } = this.app.util;
-    const { browser: browserType } = this.app.buildinfo;
+    const { settings } = this.app.util;
     this.state = {
       sectionsData: createSectionsData({ t }),
-      settingsData: createSettingsData({
-        t,
-        user,
-        settings,
-        browser: browserType,
-      }),
+      settingsData: createSettingsData({ t, settings }, this.app),
     };
 
     // bindings
@@ -64,8 +57,8 @@ class ExtraFeaturesSection extends Component {
     return {
       name,
       label,
-      enabledCount,
       defaultOpen,
+      enabledCount,
       totalCount,
     };
   }
@@ -96,37 +89,36 @@ class ExtraFeaturesSection extends Component {
       sectionName: section,
       key: settingID,
       checked: value,
-      available,
       changeTheme,
       onSettingChange: this.onSettingChange,
+      available,
     };
   }
 
   updateLanguage() {
-    const { settings, user } = this.app.util;
-    const { browser: browserType } = this.app.buildinfo;
+    const { settings } = this.app.util;
     this.setState({
       sectionsData: createSectionsData({ t }),
-      settingsData: createSettingsData({
-        t,
-        user,
-        settings,
-        browser: browserType,
-      }),
+      settingsData: createSettingsData({ t, settings }, this.app),
     });
   }
 
   languageDropdownBuilder() {
-    const { context: { theme } } = this.props;
+    const {
+      context: { theme },
+    } = this.props;
     const LanguageDropDown = this.languageDropdown;
 
     return (
       <div className={`setting-item ${theme} noselect`}>
         <div className="setting-item-label">
-          <label htmlFor="languages" className="controllable-setting languages noselect">
-            { t('UILanguage') }
+          <label
+            htmlFor="languages"
+            className="controllable-setting languages noselect"
+          >
+            {t("UILanguage")}
             <div className={`popover arrow-bottom ${theme} left-align`}>
-              { t('UILanguageTooltip') }
+              {t("UILanguageTooltip")}
             </div>
           </label>
         </div>
@@ -137,34 +129,68 @@ class ExtraFeaturesSection extends Component {
     );
   }
 
+  settingsBrowser() {
+    //TODOF: make an object with [{name:security,childern:[preventwebrtcleak,httpsUpgrade]}]
+    if (typeof browser == "undefined") {
+      return (
+        <div>
+          <SettingSection {...this.getSectionProps("security")}>
+            <SettingItem {...this.getSettingProps("preventwebrtcleak")} />
+            <SettingItem {...this.getSettingProps("httpsUpgrade")} />
+          </SettingSection>
+          <SettingSection {...this.getSectionProps("privacy")}>
+            <SettingItem {...this.getSettingProps("blockcamera")} />
+            <SettingItem {...this.getSettingProps("blockmicrophone")} />
+            <SettingItem {...this.getSettingProps("blocklocation")} />
+            <SettingItem {...this.getSettingProps("blocknetworkprediction")} />
+            <SettingItem {...this.getSettingProps("blocksafebrowsing")} />
+            <SettingItem {...this.getSettingProps("blockautofillcreditcard")} />
+            <SettingItem {...this.getSettingProps("blockautofilladdress")} />
+            <SettingItem {...this.getSettingProps("blockautofill")} />
+          </SettingSection>
+          <SettingSection {...this.getSectionProps("tracking")}>
+            <SettingItem {...this.getSettingProps("blockthirdpartycookies")} />
+            <SettingItem {...this.getSettingProps("blockreferer")} />
+            <SettingItem {...this.getSettingProps("blockhyperlinkaudit")} />
+            <SettingItem {...this.getSettingProps("blockutm")} />
+            <SettingItem {...this.getSettingProps("blockfbclid")} />
+            <SettingItem {...this.getSettingProps("maceprotection")} />
+          </SettingSection>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <SettingSection {...this.getSectionProps("security")}>
+            <SettingItem {...this.getSettingProps("preventwebrtcleak")} />
+            <SettingItem {...this.getSettingProps("httpsUpgrade")} />
+          </SettingSection>
+          <SettingSection {...this.getSectionProps("privacy")}>
+            <SettingItem {...this.getSettingProps("blocknetworkprediction")} />
+          </SettingSection>
+          <SettingSection {...this.getSectionProps("tracking")}>
+            <SettingItem {...this.getSettingProps("trackingprotection")} />
+            <SettingItem {...this.getSettingProps("fingerprintprotection")} />
+            <SettingItem {...this.getSettingProps("blockreferer")} />
+            <SettingItem {...this.getSettingProps("blockhyperlinkaudit")} />
+            <SettingItem {...this.getSettingProps("blockutm")} />
+            <SettingItem {...this.getSettingProps("blockfbclid")} />
+            <SettingItem {...this.getSettingProps("maceprotection")} />
+          </SettingSection>
+        </div>
+      );
+    }
+  }
+
   render() {
-    return (
-      <Fragment>
-        <SettingSection {...this.getSectionProps('security')}>
-          <SettingItem {...this.getSettingProps('preventwebrtcleak')} />
-          <SettingItem {...this.getSettingProps('httpsUpgrade')} />
-        </SettingSection>
-        <SettingSection {...this.getSectionProps('privacy')}>
-          <SettingItem {...this.getSettingProps('blocknetworkprediction')} />
-        </SettingSection>
-        <SettingSection {...this.getSectionProps('tracking')}>
-          <SettingItem {...this.getSettingProps('trackingprotection')} />
-          <SettingItem {...this.getSettingProps('fingerprintprotection')} />
-          <SettingItem {...this.getSettingProps('blockreferer')} />
-          <SettingItem {...this.getSettingProps('blockhyperlinkaudit')} />
-          <SettingItem {...this.getSettingProps('blockutm')} />
-          <SettingItem {...this.getSettingProps('blockfbclid')} />
-          <SettingItem {...this.getSettingProps('maceprotection')} />
-        </SettingSection>
-      </Fragment>
-    );
+    return <Fragment>{this.settingsBrowser()}</Fragment>;
   }
 }
 
-ExtraFeaturesSection.propTypes = {
+ExtraFeaturesSettings.propTypes = {
   context: PropTypes.object.isRequired,
   changeTheme: PropTypes.func.isRequired,
   onDebugClick: PropTypes.func.isRequired,
 };
 
-export default withAppContext(ExtraFeaturesSection);
+export default withAppContext(ExtraFeaturesSettings);

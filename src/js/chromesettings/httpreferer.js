@@ -1,8 +1,11 @@
 import ChromeSetting from '@chromesettings/chromesetting';
 
-class HttpReferrer extends ChromeSetting {
+class HttpReferer extends ChromeSetting {
   constructor() {
-    super(HttpReferrer.getSetting());
+    super(chrome.privacy.websites.referrersEnabled);
+
+    // bindings
+    this.onChange = this.onChange.bind(this);
 
     // functions
     this.applySetting = this.createApplySetting(
@@ -15,27 +18,15 @@ class HttpReferrer extends ChromeSetting {
       'unblock',
     );
 
-    // bindings
-    this.onChange = this.onChange.bind(this);
-
     // init
-    this.settingDefault = false;
     this.settingID = 'blockreferer';
-    this.referable = Boolean(this.setting);
+    this.settingDefault = false;
   }
 
   onChange(details) {
     this.setLevelOfControl(details.levelOfControl);
     this.setBlocked(details.value === false);
   }
-
-  static getSetting() {
-    if (chrome.privacy && chrome.privacy.websites) {
-      return chrome.privacy.websites.referrersEnabled;
-    }
-
-    return undefined;
-  }
 }
 
-export default HttpReferrer;
+export default HttpReferer;

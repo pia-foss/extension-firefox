@@ -34,7 +34,7 @@ class RegionOverridePage extends Component {
     const { util: { regionlist } } = this.app;
 
     try {
-      await regionlist.addOverrideRegion({ name, host, port });
+      regionlist.addOverrideRegion({ name, host, port });
       this.setState(() => {
         return {
           name: '',
@@ -47,6 +47,7 @@ class RegionOverridePage extends Component {
       const msg = err.message || err;
       this.setError(msg);
     }
+
     this.refreshRegions();
 
     // to update latency & ping gateways
@@ -63,7 +64,7 @@ class RegionOverridePage extends Component {
   async onRemove(ev) {
     const { name } = ev.target;
     const { util: { regionlist } } = this.app;
-    const wasSelected = await regionlist.removeOverrideRegion(name);
+    const wasSelected = regionlist.removeOverrideRegion(name);
     this.refreshRegions();
     // if proxy was connected to this region, refresh proxy
     if (wasSelected && this.proxy.enabled()) {
@@ -110,7 +111,7 @@ class RegionOverridePage extends Component {
       },
     } = this;
     return (
-      <div id="region-override-page">
+      <div id="region-override-template">
         <div className="override-heading">
           <h1 className="override-title">Region Override</h1>
           <span className="disclaimer">

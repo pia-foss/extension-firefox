@@ -2,17 +2,26 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const Switch = (props) => {
+
+  let { mode, connection } = props;
   const {
-    mode,
     theme,
+    region,
+    regions,
     classes,
-    connection,
     onToggleConnection,
   } = props;
 
   // noop if connection is 'error'
   let handler = onToggleConnection;
-  if (connection === 'error') { handler = () => {}; }
+  const pending = regions.some((current) => { return current.latency === 'PENDING'; });
+  if (connection === 'error' || !region) { handler = () => {}; }
+
+  // Show switch in loading mode if pending on region latency
+  if (!region) {
+    mode = 'connecting';
+    connection = 'connected';
+  }
 
   return (
     <div
@@ -34,6 +43,8 @@ const Switch = (props) => {
 };
 
 Switch.propTypes = {
+  region: PropTypes.object,
+  regions: PropTypes.array,
   classes: PropTypes.string,
   mode: PropTypes.string.isRequired,
   theme: PropTypes.string.isRequired,
@@ -43,6 +54,8 @@ Switch.propTypes = {
 
 Switch.defaultProps = {
   classes: '',
+  regions: [],
+  region: undefined,
 };
 
 export default Switch;

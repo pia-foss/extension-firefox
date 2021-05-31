@@ -2,6 +2,7 @@ body {
   height: 100vh;
   width: 100vw;
   display: flex;
+  justify-content: center;
 
   #import-rules-popup {
     flex: 1 0 auto;
@@ -25,7 +26,7 @@ body {
     #import-error {
       color: red;
       font-size: 1.35rem;
-      margin-top: 5px;
+      margin-top: 3px;
     }
   }
 }

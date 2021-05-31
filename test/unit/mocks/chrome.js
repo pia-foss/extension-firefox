@@ -29,6 +29,13 @@ function createMock() {
     runtime: {
       getURL: named('runtime#getURL'),
     },
+    storage: {
+      local: {
+        get: named('storage#local#get'),
+        set: named('storage#local#set'),
+        remove: named('storage#local#remove'),
+      },
+    },
   };
 }
 

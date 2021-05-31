@@ -7,7 +7,7 @@ interface ReturnType {}
 function getEnabledPopularRules(script: Script) {
   return script.executeAsync<Payload, ReturnType>(
     ({}, done) => {
-      browser.runtime.getBackgroundPage().then((window: any) => {
+      chrome.runtime.getBackgroundPage((window: any) => {
         const { app } = window;
         const popularRules = app.util.bypasslist.enabledPopularRules();
 

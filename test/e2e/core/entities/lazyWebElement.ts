@@ -11,6 +11,7 @@ import { DriverFactory } from '../driver';
 import { bySelector } from '../util/bySelector';
 import { Selector } from './selector';
 import { getConfig } from '../util/config';
+// TODO: Enforce no unused
 
 interface ElementDescriptor {
   name: string;
@@ -29,7 +30,7 @@ type LazyChain = LazyWebElement[];
  * when a {@link LazyWebElement} is instantiated
  */
 class LazyWebElement {
-  private static WAIT_TIME = getConfig().WAIT_TIME;
+  private static WAIT_TIME = getConfig().waitTime;
   private selector: Selector;
   private name: string;
   private by: By;

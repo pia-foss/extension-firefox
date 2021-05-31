@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
-
 import Switch from '@component/Switch';
+import React, { Component } from 'react';
 import RegionIso from '@component/RegionIso';
 import RegionAuto from '@component/RegionAuto';
 import withAppContext from '@hoc/withAppContext';
@@ -51,7 +50,7 @@ class RegionList extends Component {
   }
 
   componentizeRegions() {
-    const { regions, updateRegionsLocally } = this.props;
+    const { regions } = this.props;
     const filteredRegions = this.filterRegions(regions);
 
     const componentRegions = [];
@@ -61,22 +60,13 @@ class RegionList extends Component {
 
         if (isoRegions.length === 1) {
           componentRegions.push((
-            <RegionListItem
-              key={region.id}
-              region={region}
-              onRegionUpdate={updateRegionsLocally}
-            />
+            <RegionListItem key={region.id} region={region} />
           ));
         }
         else {
           const { iso } = region;
           componentRegions.push((
-            <RegionIso
-              key={iso}
-              iso={iso}
-              regions={isoRegions}
-              updateRegionsLocally={updateRegionsLocally}
-            />
+            <RegionIso key={iso} iso={iso} regions={isoRegions} />
           ));
         }
       });
@@ -85,12 +75,14 @@ class RegionList extends Component {
   }
 
   renderAutoRegion() {
-    const { regions, autoLoading } = this.props;
+    const { regions } = this.props;
+    const hasRegions = this.regionlist.hasRegions();
+    const pending = regions.some((current) => { return current.latency === 'PENDING'; });
+
+    if (!hasRegions || pending) { return ''; }
+
     const region = this.regionsorter.latencySort(regions)[0];
-
-    if (!region) { return ''; }
-
-    return (<RegionAuto region={region} autoLoading={autoLoading} />);
+    return (<RegionAuto region={region} />);
   }
 
   render() {
@@ -98,9 +90,10 @@ class RegionList extends Component {
     const {
       mode,
       regions,
+      syncRegions,
       context: { theme },
-      updateRegionsRemotely,
     } = this.props;
+
 
     // Loading screen when between actions
     if (mode === 'loading') {
@@ -125,11 +118,7 @@ class RegionList extends Component {
             { t('NoRegionsFound') }
           </div>
 
-          <button
-            type="button"
-            className="btn btn-success"
-            onClick={updateRegionsRemotely}
-          >
+          <button type="button" className="btn btn-success" onClick={syncRegions}>
             { t('RefreshRegions') }
           </button>
         </div>
@@ -156,10 +145,8 @@ RegionList.propTypes = {
   regions: PropTypes.array.isRequired,
   sortBy: PropTypes.string.isRequired,
   context: PropTypes.object.isRequired,
-  autoLoading: PropTypes.bool.isRequired,
+  syncRegions: PropTypes.func.isRequired,
   showFavorites: PropTypes.bool.isRequired,
-  updateRegionsLocally: PropTypes.func.isRequired,
-  updateRegionsRemotely: PropTypes.func.isRequired,
 };
 
 export default withAppContext(RegionList);

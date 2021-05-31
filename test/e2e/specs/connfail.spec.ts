@@ -7,24 +7,19 @@ import { AuthenticatedPage } from '../pages/authenticated';
 import { failConnection } from '../scripts/failConnection';
 import { translate } from '../scripts/translate';
 import { RobotsPage } from '../pages/robots';
-import { FingerprintPage } from '../pages/fingerprint';
 
 idescribe('the connection failed page', function () {
   let robotsPage: RobotsPage;
   let loginPage: LoginPage;
   let connFailPage: ConnFailPage;
   let authPage: AuthenticatedPage;
-  let fingerprintPage: FingerprintPage;
 
   ibeforeEach(async function () {
     authPage = new AuthenticatedPage();
     loginPage = new LoginPage();
     connFailPage = new ConnFailPage();
     robotsPage = new RobotsPage();
-    fingerprintPage = new FingerprintPage();
-
     await loginPage.navigate();
-    await fingerprintPage.optIn();
     await loginPage.signIn();
     await authPage.waitForLatencyTest();
     await authPage.switchOn();
@@ -35,8 +30,7 @@ idescribe('the connection failed page', function () {
   });
 
   iit('refreshing the page brings you to the URL where the connection failed', async function () {
-    await this.windows.refresh();
-    await robotsPage.container.waitForVisible();
+    await this.windows.refresh({ waitForVisible: robotsPage.container });
     await this.windows.expectCurrentUrlIs(robotsPage.getUrl());
   });
 

@@ -28,6 +28,7 @@ class ManageLocations extends Component {
       indexEdit:null,
       edit:false
     };
+
     // bindings
     this.save = this.save.bind(this);
     this.createRemoveRule = this.createRemoveRule.bind(this);
@@ -42,7 +43,7 @@ class ManageLocations extends Component {
 
   async reinitializedProxy(){
     this.selectedRegionSmartLoc = null;
-    if (this.app.proxy.enabled()) {
+    if (this.app.proxy.getEnabled()) {
       await this.app.proxy.enable();
     }
   }
@@ -62,7 +63,6 @@ class ManageLocations extends Component {
   }
 
   verifyDomains(){ 
-    //validate domains and if they exist state them on edit
     const { userInput,userRules } = this.state;
     userRules.map(smartLoc=>{
       if(smartLoc.userRules == userInput){
@@ -83,9 +83,7 @@ class ManageLocations extends Component {
   }
 
   save() {
-    //save domains 
     const { userInput,userSelect } = this.state;
-    //check field and put border error
     this.verifyAndChangeState('add-rule-input');
     if(userInput && userSelect && this.verifyDomainPattern(userInput) && this.verifyIfDomainExists(userInput)){
       this.smartlocation.addSmartLocation(userInput,userSelect);
@@ -93,10 +91,9 @@ class ManageLocations extends Component {
     }else{
       this.verifyAndChangeState('add-rule-input-error');
     }
+   
   }
-
   edit(){
-    //edit smart location rules
     const { userInput,userSelect,indexEdit } = this.state;
     this.verifyAndChangeState('add-rule-input');
     if(userInput.length > 0 && userSelect && this.verifyDomainPattern(userInput)){
@@ -168,7 +165,7 @@ class ManageLocations extends Component {
 
   createBypassItem(rule) {
     if(rule.proxy){
-    const { context: { theme } } = this.props;
+      const { context: { theme } } = this.props;
       return (
         <SmartLocationItem
           key={rule.userRules}
@@ -178,7 +175,7 @@ class ManageLocations extends Component {
           onEditItem={this.createEditRule(rule)}
         />
       );
-    }
+      }
   }
 
   countryList(){
@@ -189,7 +186,9 @@ class ManageLocations extends Component {
   }
 
   countyLabel(label){
-    return this.countryList().filter(v=>v.value == label);
+    if(label){
+      return this.countryList().filter(v=>v.value == label);
+    }
   }
 
   componentDidMount(){

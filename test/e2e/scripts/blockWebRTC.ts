@@ -5,7 +5,7 @@ interface Payload {}
 function blockWebRTC(script: Script) {
   return script.executeAsync<Payload, void>(
     ({}, done) => {
-      browser.runtime.getBackgroundPage().then((window: any) => {
+      chrome.runtime.getBackgroundPage((window: any) => {
         const { app } = window;
         app.chromesettings.webrtc.blockable = false;
 

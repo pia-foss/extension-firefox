@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
+import Switch from '@component/Switch';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-
-import Switch from '@component/Switch';
 import LoginField from '@component/LoginField';
 import withAppContext from '@hoc/withAppContext';
 import RememberMeCheckbox from '@component/checkbox/RememberMeCheckbox';
@@ -15,7 +14,6 @@ class LoginForm extends Component {
     this.app = props.context.app;
     this.history = props.history;
     this.user = this.app.util.user;
-    this.settings = this.app.util.settings;
     this.state = {
       username: this.user.getUsername(),
       password: '',
@@ -54,10 +52,7 @@ class LoginForm extends Component {
 
     // try to authenticate user
     this.user.auth(username, password)
-      .then(() => { 
-        this.settings.toggle('debugmode') 
-        return this.history.push('/');
-       })
+      .then(() => { this.history.push('/'); })
       .catch((res) => {
         let errorText = '';
         this.setState({ loading: false });

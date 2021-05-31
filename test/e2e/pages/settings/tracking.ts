@@ -4,13 +4,13 @@ import { Checkbox, Text } from '../../elements';
 import { createSelector } from '../../core/entities/selector';
 
 class TrackingSection extends SectionBase {
+  public disableThirdPartyCookies: Checkbox;
   public disableWebsiteReferrer: Checkbox;
   public disableHyperLinkAuditing: Checkbox;
+  public hyperLinkAuditMessage: Text;
   public removeUtmParameters: Checkbox;
   public removeFbclidParameters: Checkbox;
   public piaMace: Checkbox;
-  public fingerprintProtection: Checkbox;
-  public hyperLinkAuditMessage: Text;
 
   constructor(parent: PageObject) {
     super(
@@ -21,6 +21,15 @@ class TrackingSection extends SectionBase {
         name: 'tracking settings',
       },
       parent,
+    );
+    this.disableThirdPartyCookies = new Checkbox(
+      {
+        selector: createSelector({
+          value: '#blockthirdpartycookies',
+        }),
+        name: 'disableThirdPartyCookies',
+      },
+      this,
     );
     this.disableWebsiteReferrer = new Checkbox(
       {
@@ -49,30 +58,21 @@ class TrackingSection extends SectionBase {
       },
       this,
     );
-    this.piaMace = new Checkbox(
-      {
-        selector: createSelector({
-          value: '#maceprotection',
-        }),
-        name: 'piaMace',
-      },
-      this,
-    );
-    this.fingerprintProtection = new Checkbox(
-      {
-        selector: createSelector({
-          value: '#fingerprintprotection',
-        }),
-        name: 'fingerprintProtection',
-      },
-      this,
-    );
     this.removeFbclidParameters = new Checkbox(
       {
         selector: createSelector({
           value: '#blockfbclid',
         }),
         name: 'removeFbclidParameters',
+      },
+      this,
+    );
+    this.piaMace = new Checkbox(
+      {
+        selector: createSelector({
+          value: '#maceprotection',
+        }),
+        name: 'piaMace',
       },
       this,
     );

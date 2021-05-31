@@ -1,14 +1,13 @@
 import PropTypes from 'prop-types';
 import React, { Component, Fragment } from 'react';
-
 import {
   createSettingsData,
   getSetting,
-  getEnabledCount,
   getTotalCount,
+  getEnabledCount,
 } from '@data/settings';
-import { createSectionsData, getSection } from '@data/sections';
 import withAppContext from '@hoc/withAppContext';
+import { createSectionsData, getSection } from '@data/sections';
 import SettingItem from '@component/SettingItem';
 import SettingSection from '@component/SettingSection';
 import DebugSettingItem from '@component/DebugSettingItem';
@@ -21,16 +20,10 @@ class SettingSections extends Component {
     // properties
     this.app = props.context.app;
     this.languageDropdown = LanguageDropdown;
-    const { settings, user } = this.app.util;
-    const { browser: browserType } = this.app.buildinfo;
+    const { settings } = this.app.util;
     this.state = {
       sectionsData: createSectionsData({ t }),
-      settingsData: createSettingsData({
-        t,
-        user,
-        settings,
-        browser: browserType,
-      }),
+      settingsData: createSettingsData({ t, settings },this.app),
     };
 
     // bindings
@@ -64,8 +57,8 @@ class SettingSections extends Component {
     return {
       name,
       label,
-      enabledCount,
       defaultOpen,
+      enabledCount,
       totalCount,
     };
   }
@@ -96,23 +89,17 @@ class SettingSections extends Component {
       sectionName: section,
       key: settingID,
       checked: value,
-      available,
       changeTheme,
       onSettingChange: this.onSettingChange,
+      available,
     };
   }
 
   updateLanguage() {
-    const { settings, user } = this.app.util;
-    const { browser: browserType } = this.app.buildinfo;
+    const { settings } = this.app.util;
     this.setState({
       sectionsData: createSectionsData({ t }),
-      settingsData: createSettingsData({
-        t,
-        user,
-        settings,
-        browser: browserType,
-      }),
+      settingsData: createSettingsData({ t, settings },this.app),
     });
   }
 
@@ -136,13 +123,26 @@ class SettingSections extends Component {
       </div>
     );
   }
-  
 
-  render() {
+  browserSettings(){
     const { settingsData } = this.state;
     const { onDebugClick, context: { theme } } = this.props;
-    return (
-      <Fragment>
+    
+    if(typeof browser == 'undefined'){
+      return (
+        <SettingSection {...this.getSectionProps('extension')}>
+          <SettingItem {...this.getSettingProps('allowExtensionNotifications')} />
+          <SettingItem {...this.getSettingProps('alwaysActive')} />
+          <SettingItem {...this.getSettingProps('darkTheme')} />
+          <SettingItem {...this.getSettingProps('debugmode')} />
+          { getSetting('debugmode', settingsData).value
+            && <DebugSettingItem onClick={onDebugClick} theme={theme} />
+          }
+          { this.languageDropdownBuilder() }
+        </SettingSection>
+      );
+    }else{
+      return (
         <SettingSection {...this.getSectionProps('extension')}>
           <SettingItem 
           {...this.getSettingProps('alwaysActive')} />
@@ -153,6 +153,15 @@ class SettingSections extends Component {
           }
           { this.languageDropdownBuilder() }
         </SettingSection>
+      );
+    }
+  }
+
+  render() {
+
+    return (
+      <Fragment>
+        { this.browserSettings() }
       </Fragment>
     );
   }

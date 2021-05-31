@@ -53,14 +53,16 @@
       .rightalign .expandicon { background-position: 0px 0px; }
     }
 
-    .section-body { display: block; }
+    .section-body { 
+      display: block;
+     }
   }
 
   .section-header {
     height: 40px;
     padding: 10px 15px;
     background: $grey92;
-    cursor: pointer;
+    cursor:pointer;
     outline: none;
 
     .section-label {
@@ -75,7 +77,7 @@
       .counts {
         color: #A9A9A9;
         font-weight: normal;
-        font-size: 8pt;
+        font-size: 9pt;
         margin-right: 10px;
       }
 

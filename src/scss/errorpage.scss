@@ -1,7 +1,7 @@
 @import "colors";
 @import "roboto_font";
 
-body { font-family: "Roboto", Helvetica, Arial, sans-serif; }
+body { font-family: "Roboto", Helvetica, Arial, sans-serif; font-size: 12px; }
 h1  { margin: 10px 0; }
 
 .container {
@@ -49,6 +49,11 @@ h1  { margin: 10px 0; }
       font-weight: normal;
       font-size: 15px;
       line-height: 1.7;
+      margin-top: 20px;
+
+      .error-message {
+        margin-bottom: 20px;
+      }
     }
 
     .btn {

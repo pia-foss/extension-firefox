@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-
 import withAppContext from '@hoc/withAppContext';
 import LoadingEllipsis from '@component/LoadingEllipsis';
 import onFlagError from '@eventhandler/pages/changeregion/onFlagError';
@@ -13,6 +12,7 @@ class CurrentRegion extends Component {
     // properties
     this.app = props.context.app;
     this.history = props.history;
+    this.regionlist = this.app.util.regionlist;
     this.isAuto = this.app.util.regionlist.getIsAuto();
 
     // bindings
@@ -43,7 +43,8 @@ class CurrentRegion extends Component {
   }
 
   render() {
-    const { region, autoLoading, context: { theme } } = this.props;
+    const { region, regions, context: { theme } } = this.props;
+    // const pending = regions.some((current) => { return current.latency === 'PENDING'; });
 
     if (!region) { return <LoadingEllipsis theme={theme} />; }
 
@@ -58,7 +59,7 @@ class CurrentRegion extends Component {
         <div className="region-content">
           <div className="flag">
             {
-              (region && !region.override)
+              region && !region.override
                 ? <img alt={region.iso} onError={this.onFlagLoadError} src={region.flag} />
                 : <div className="empty-flag" />
             }
@@ -83,12 +84,13 @@ class CurrentRegion extends Component {
 
 CurrentRegion.propTypes = {
   region: PropTypes.object,
+  regions: PropTypes.array,
   context: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
-  autoLoading: PropTypes.bool.isRequired,
 };
 
 CurrentRegion.defaultProps = {
+  regions: [],
   region: undefined,
 };
 

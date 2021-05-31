@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-
 import Checkbox from '@component/checkbox';
 import ErrorBoundary from '@hoc/errorboundary';
 import withAppContext from '@hoc/withAppContext';
@@ -16,7 +15,7 @@ class PopularRule extends Component {
     this.region = this.app.util.regionlist.getSelectedRegion();
     this.state = { checked: this.bypasslist.isRuleEnabled(this.defaultName) };
 
-    // bindings
+    // Bindings
     this.onChange = this.onChange.bind(this);
   }
 

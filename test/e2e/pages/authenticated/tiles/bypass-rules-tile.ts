@@ -12,7 +12,7 @@ class BypassRulesTile extends Tile {
     this.addButton = new Button(
       {
         selector: createSelector({
-          value: '.add-rule-btn'
+          value: '.add-rule-btn',
         }),
         name: 'Add Button',
       },
@@ -21,7 +21,7 @@ class BypassRulesTile extends Tile {
     this.domainInput = new Input(
       {
         selector: createSelector({
-          value: '.add-rule-input'
+          value: '.add-rule-input',
         }),
         name: 'Domain Input',
       },
@@ -30,7 +30,7 @@ class BypassRulesTile extends Tile {
     this.removeButton = new Button(
       {
         selector: createSelector({
-          value: '.remove-rule'
+          value: '.remove-rule',
         }),
         name: 'Remove Rule Button',
       },

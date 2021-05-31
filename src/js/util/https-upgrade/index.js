@@ -17,9 +17,10 @@ import {
 } from './rulesets';
 
 /**
- * HttpsUpgrade Class
+ * HttpsUpgrade Utility
  *
- * Will handle fetching & updating rulesets
+ * Will handle fetching & updating rulesets used to upgrade requests to
+ * https protocol for improved security
  */
 class HttpsUpgrade {
   constructor(app) {
@@ -115,10 +116,7 @@ class HttpsUpgrade {
    */
   enabled() {
     const { app: { util: { settings } } } = this;
-    const enabled = (
-      settings.getItem('httpsUpgrade')
-      && settings.enabled()
-    );
+    const enabled = settings.isActive('httpsUpgrade');
     if (!enabled && this.enabledTracker) {
       this.counter.clear();
       this.cookieCache.clear();
@@ -127,55 +125,16 @@ class HttpsUpgrade {
     return enabled;
   }
 
+  /**
+   * Triggered when an alarm event occurs
+   *
+   * Attempt to update the rulesets
+   */
   async onAlarm(alarm) {
     if (alarm.name === ALARM_NAME) {
       await this.attemptUpdate();
     }
     return undefined;
-  }
-
-  shouldSecureCookie(cookie) {
-    let shouldSecure = false;
-    let { domain } = cookie;
-    if (this.cookieCache.size > 300) {
-      this.cookieCache.delete(this.cookieCache.keys().next().value);
-    }
-    while (domain.charAt(0) === '.') {
-      domain = domain.slice(1);
-    }
-    const potentialRules = this.getPotentialRulesets(domain);
-
-    // check cache
-    const cacheItem = this.cookieCache.get(domain);
-    if (cacheItem) {
-      shouldSecure = true;
-    }
-    // update cache
-    else {
-      const fakeUrl = `http://${domain}/${Math.random()}/${Math.random()}`;
-      shouldSecure = !!potentialRules.find((ruleset) => {
-        if (applyRuleset(ruleset, fakeUrl)) {
-          this.cookieCache.set(domain, true);
-          return true;
-        }
-        return false;
-      });
-      if (!shouldSecure) {
-        this.cookieCache.set(domain, false);
-      }
-    }
-
-    if (!shouldSecure) { return false; }
-    return potentialRules
-      .filter((ruleset) => { return ruleset.securecookie; })
-      .find((ruleset) => {
-        return ruleset.securecookie.find((cr) => {
-          return !!(
-            new RegExp(cr.host).test(cookie.domain)
-            && new RegExp(cr.name).test(cookie.name)
-          );
-        });
-      });
   }
 
   /**
@@ -188,6 +147,10 @@ class HttpsUpgrade {
       debug('https-upgrade: cancelling update, update already in progress');
       return false;
     }
+    /**
+     * performUpdate will actually update the rulesets, regardless
+     * of the currently stored timestamp
+     */
     const performUpdate = async (channel, timestamp) => {
       this.updating = true;
       try {
@@ -201,7 +164,7 @@ class HttpsUpgrade {
         // in the event that the browser is closed BEFORE the timestamp is
         // updated, we still want to successfully cleanup any potential space
         const { length: count } = parts;
-        this.storage.setItem(STORAGE_COUNT_KEY, String(count));
+        this.storage.setItem(STORAGE_COUNT_KEY, count);
 
         // NOTE: if EU closes browser during this operation, we want
         // to always fetch the rulesets again
@@ -209,6 +172,7 @@ class HttpsUpgrade {
 
         // update timestamp only AFTER the operation completes successfully
         this.storage.setItem(LAST_TIMESTAMP_KEY, timestamp);
+        this.storage.setItem(STORAGE_COUNT_KEY, count);
         this.storage.setItem(LAST_UPDATED_KEY, Date.now());
         this.updating = false;
         return parts;
@@ -222,15 +186,21 @@ class HttpsUpgrade {
     };
     debug('https-upgrade: checking if update required');
     try {
+      // get update channel
       const channel = getDefaultChannel();
+      // get remote timestamp
       const timestamp = await getTimestamp(channel);
+      // get local timestamp
       const lastTimestamp = this.storage.getItem(LAST_TIMESTAMP_KEY);
+      // if no local timestamp (update has never occurred successfully), perform update
       if (!lastTimestamp) {
         return performUpdate(channel, timestamp);
       }
+      // if timestamp has changed, perform update
       if (Number(timestamp) !== Number(lastTimestamp)) {
         return performUpdate(channel, timestamp);
       }
+      // timestamp is up to date, do not update
       debug('https-upgrade: postponing https update');
       return false;
     }
@@ -296,6 +266,50 @@ class HttpsUpgrade {
     }
     results.delete(undefined);
     return Array.from(results.values());
+  }
+
+  shouldSecureCookie(cookie) {
+    let shouldSecure = false;
+    let { domain } = cookie;
+    if (this.cookieCache.size > 300) {
+      this.cookieCache.delete(this.cookieCache.keys().next().value);
+    }
+    while (domain.charAt(0) === '.') {
+      domain = domain.slice(1);
+    }
+    const potentialRules = this.getPotentialRulesets(domain);
+
+    // check cache
+    const cacheItem = this.cookieCache.get(domain);
+    if (cacheItem) {
+      shouldSecure = true;
+    }
+    // update cache
+    else {
+      const fakeUrl = `http://${domain}/${Math.random()}/${Math.random()}`;
+      shouldSecure = !!potentialRules.find((ruleset) => {
+        if (applyRuleset(ruleset, fakeUrl)) {
+          this.cookieCache.set(domain, true);
+          return true;
+        }
+        return false;
+      });
+      if (!shouldSecure) {
+        this.cookieCache.set(domain, false);
+      }
+    }
+
+    if (!shouldSecure) { return false; }
+    return potentialRules
+      .filter((ruleset) => { return ruleset.securecookie; })
+      .find((ruleset) => {
+        return ruleset.securecookie.find((cr) => {
+          return !!(
+            new RegExp(cr.host).test(cookie.domain)
+            && new RegExp(cr.name).test(cookie.name)
+          );
+        });
+      });
   }
 
   // ======================================== //
@@ -376,8 +390,8 @@ class HttpsUpgrade {
             ? { url: `https://www${cookie.domain}${cookie.path}` }
             : { url: `https://${cookie.domain}${cookie.path}` },
         );
-        browser.cookies.set(secureCookie);
-        debug(`https-upgrade.js: secured cookie "${cookie.name}" for "${cookie.domain}"`);
+        chrome.cookies.set(secureCookie);
+        debug(`https-upgrade: secured cookie "${cookie.name}" for "${cookie.domain}"`);
       }
     }
   }

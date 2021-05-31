@@ -47,20 +47,20 @@
   "ChangeExtraFeaturesSettings": {
     "message": "Extra functies"
   },
+  "encounterMessage_2": {
+    "message": "contact op met onze supportafdeling "
+  },
   "JustInTimeDisclaimer": {
     "message": "Beoordeel uw ervaring met PIA"
   },
-  "encounterMessageFirefox_1": {
-    "message": "Bedankt voor uw feedback. Neem bij technische problemen "
-  },
-  "encounterMessageFirefox_2": {
-    "message": "contact op met onze supportafdeling "
-  },
-  "feedbackMessageFirefox_1": {
+  "feedbackMessage_1": {
     "message": "Bedankt voor uw feedback. We zouden het op prijs stellen als u ons een beoordeling kon geven op de "
   },
-  "feedbackMessageFirefox_2": {
-    "message": "Add-ons Firefox-browser"
+  "feedbackMessage_2": {
+    "message": "Chrome Web Store"
+  },
+  "encountermessage_1": {
+    "message": "Bedankt voor uw feedback. Neem bij technische problemen "
   },
   "UILanguage": {
     "message": "Taal UI"

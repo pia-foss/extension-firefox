@@ -1,6 +1,6 @@
 import http from '../helpers/http';
 import ChromeSetting from '@chromesettings/chromesetting';
-import { Target, Type, sendMessage } from '@helpers/messaging';
+import { Target, Type, sendMessage } from '@helpers/messagingFirefox';
 const pacengine = require('../pacengine');
 
 class Proxy {
@@ -25,8 +25,9 @@ class Proxy {
       if(proxyRule){
         return proxyRule;
       }
+
       
-      return { host:region.host, port: port[key], type: region.scheme };
+      return { host:region.host, port: region[key], type: region.scheme };
       
     };
     
@@ -37,18 +38,25 @@ class Proxy {
     this.enabled = () => {
       return browser.proxy.onRequest.hasListener(handleProxyRequest);
     };
+
+    this.getEnabled = () =>{
+      return browser.proxy.onRequest.hasListener(handleProxyRequest);
+  }
+  
     
     this.enable = () => {
       if(this.enabled()) return
+
       app.util.icon.online();
       app.util.storage.setItem('online', String(true));
       browser.proxy.onRequest.removeListener(handleProxyRequest);
       browser.proxy.onRequest.addListener(handleProxyRequest, { urls: ['<all_urls>'] });
       http.head('https://privateinternetaccess.com');
       sendMessage(Target.ALL, Type.PROXY_ENABLE);
-      const { util: { ipManager,settingsmanager } } = app;
+      const { util: { settingsmanager } } = app;
       app.util.ipManager.update({ retry: true });
       settingsmanager.clearAndReapplySettings('alwaysActive');
+      return this
     };
     
     this.disable = async () => {

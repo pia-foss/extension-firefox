@@ -1,4 +1,4 @@
-import { Node } from '../core';
+import { Node } from '../core/entities/node';
 import { Key } from 'selenium-webdriver';
 import { expect } from 'chai';
 
@@ -17,8 +17,8 @@ class Input extends Node {
   }
 
   async hasPlaceholder(expected: string) {
-    const el = await this.getElement();
-    const placeholder = await el.getAttribute('placeholder');
+    const element = await this.getElement();
+    const placeholder = await element.getAttribute('placeholder');
     expect(placeholder).to.eq(expected);
   }
 }

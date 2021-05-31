@@ -1,13 +1,11 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-
 import PageTitle from '@component/PageTitle';
 import withAppContext from '@hoc/withAppContext';
 import SettingSections from '@component/SettingSections';
 import BypassSettingSection from '@component/bypasslist/BypassSettingSection';
 import SmartLocation from '../component/smart-location/SmartLocation';
-
 
 class SettingsPage extends Component {
   constructor(props) {
@@ -21,14 +19,14 @@ class SettingsPage extends Component {
     this.updateTheme = props.context.updateTheme;
 
     // bindings
-    this.renderBuildInfo = this.renderBuildInfo.bind(this);
+    this.buildInfo = this.buildInfo.bind(this);
     this.changeTheme = this.changeTheme.bind(this);
     this.onDebugClick = this.onDebugClick.bind(this);
     this.viewChangeLog = this.viewChangeLog.bind(this);
   }
 
   onDebugClick() {
-    return this.history.push('debuglog');
+    return this.history.push('/debuglog');
   }
 
   changeTheme() {
@@ -42,12 +40,11 @@ class SettingsPage extends Component {
     return this.history.push('/changelog');
   }
 
-  renderBuildInfo() {
+  buildInfo() {
     const { gitcommit, gitbranch, name } = this.buildinfo;
     const numValidHashes = [gitcommit, gitbranch]
       .filter((e) => { return e && (/^[a-zA-Z0-9\-.]+$/).test(e); })
       .length;
-
     const valid = (numValidHashes === 2);
     const buildName = (() => {
       switch (name) {
@@ -89,7 +86,7 @@ class SettingsPage extends Component {
 
   render() {
     const { context: { theme } } = this.props;
-    const BuildInfo = this.renderBuildInfo;
+    const BuildInfo = this.buildInfo;
 
     return (
       <div id="settings-page" className="row">
@@ -97,7 +94,6 @@ class SettingsPage extends Component {
           <PageTitle text={t('ChangeExtensionSettings')} />
 
           <SettingSections
-            theme={theme}
             changeTheme={this.changeTheme}
             onDebugClick={this.onDebugClick}
           />
@@ -105,6 +101,7 @@ class SettingsPage extends Component {
           <BypassSettingSection />
 
           <SmartLocation />
+
 
           <div className={`panelfooter ${theme}`}>
             <div>

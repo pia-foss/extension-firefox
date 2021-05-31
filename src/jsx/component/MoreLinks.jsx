@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-
-import listenOnline from '@hoc/listenOnline';
 import withAppContext from '@hoc/withAppContext';
+import listenOnline from '@hoc/listenOnline';
 
 class MoreLinks extends Component {
   constructor(props) {
@@ -59,16 +58,16 @@ class MoreLinks extends Component {
 
   openAccount() {
     const { online } = this.props;
-    if (online) { browser.tabs.create({ url: this.loginUrl }); }
+    if (online) { chrome.tabs.create({ url: this.loginUrl }); }
   }
 
   openSupport() {
     const { online } = this.props;
-    if (online) { browser.tabs.create({ url: this.supportUrl }); }
+    if (online) { chrome.tabs.create({ url: this.supportUrl }); }
   }
 
   logout() {
-    if (this.user.loggedIn) {
+    if (this.user.getLoggedIn()) {
       this.user.logout()
         .then(() => { return this.history.push('/login'); });
     }
@@ -101,7 +100,7 @@ class MoreLinks extends Component {
               <div
                 role="button"
                 tabIndex="-1"
-                className={`${this.user.loggedIn ? '' : 'disabled'}`}
+                className={`${this.user.getLoggedIn() ? '' : 'disabled'}`}
                 onClick={this.openExtraFeatures}
                 onKeyPress={this.openExtraFeatures}
               >
@@ -113,7 +112,7 @@ class MoreLinks extends Component {
               <div
                 role="button"
                 tabIndex="-1"
-                className={`${this.user.loggedIn ? '' : 'disabled'}`}
+                className={`${this.user.getLoggedIn() ? '' : 'disabled'}`}
                 onClick={this.openSettings}
                 onKeyPress={this.openSettings}
               >
@@ -149,7 +148,7 @@ class MoreLinks extends Component {
               <div
                 role="button"
                 tabIndex="-1"
-                className={`${this.user.loggedIn ? '' : 'disabled'}`}
+                className={`${this.user.getLoggedIn() ? '' : 'disabled'}`}
                 onClick={this.logout}
                 onKeyPress={this.logout}
               >
@@ -169,4 +168,4 @@ MoreLinks.propTypes = {
   history: PropTypes.object.isRequired,
 };
 
-export default withRouter(listenOnline(withAppContext(MoreLinks)));
+export default listenOnline(withRouter(withAppContext(MoreLinks)));

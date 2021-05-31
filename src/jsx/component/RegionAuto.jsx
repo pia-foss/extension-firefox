@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-
 import withAppContext from '@hoc/withAppContext';
 import LoadingEllipsis from '@component/LoadingEllipsis';
 import onFlagError from '@eventhandler/pages/changeregion/onFlagError';
@@ -36,7 +35,7 @@ class RegionAuto extends Component {
 
   render() {
     const { isAuto } = this.state;
-    const { region, autoLoading, context: { theme } } = this.props;
+    const { region, context: { theme } } = this.props;
 
     if (!region) { return <LoadingEllipsis theme={theme} />; }
 
@@ -86,7 +85,6 @@ RegionAuto.propTypes = {
   region: PropTypes.object.isRequired,
   context: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
-  autoLoading: PropTypes.bool.isRequired,
 };
 
 export default withRouter(withAppContext(RegionAuto));

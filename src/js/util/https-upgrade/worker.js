@@ -1,3 +1,14 @@
+/*
+ * HttpsUpgrade Worker
+ *
+ * The extraction of the rulesets is a blocking action that takes
+ * a significant amount of time (considering the number of rulesets).
+ * Using a worker to complete this operation prevents the background
+ * "app" from locking up, which could potentially lead to the foreground
+ * being locked up as well due to the use of
+ * chrome#runtime#getBackgroundPage
+ */
+
 import pako from 'pako';
 
 import { MessageType } from '@data/https-upgrade';

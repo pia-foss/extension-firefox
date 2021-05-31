@@ -3,35 +3,47 @@
    Similar to but not the same as a ContentSetting.
 */
 class ChromeSetting {
-  static get controllable() { return 'controllable_by_this_extension'; }
-
-  static get controlled() { return 'controlled_by_this_extension'; }
-
-  static get notControllable() { return 'not_controllable'; }
-
   static get defaultSetOptions() { return { scope: 'regular' }; }
 
   static get defaultGetOptions() { return {}; }
 
   static get defaultClearOptions() { return { scope: 'regular' }; }
 
+  static get controlled() { return 'controlled_by_this_extension'; }
+
+  static get controllable() { return 'controllable_by_this_extension'; }
+
+  static get notControllable() { return 'not_controllable'; }
+
   constructor(setting) {
+    // bindings
+    this.init = this.init.bind(this);
+    this.getLevelOfControl = this.getLevelOfControl.bind(this);
+    this.isControllable = this.isControllable.bind(this);
+    this.isBlocked = this.isBlocked.bind(this);
+    this.isApplied = this.isApplied.bind(this);
+    this.onChange = this.onChange.bind(this);
+    this.set = this.set.bind(this);
+    this.get = this.get.bind(this);
+    this.clear = this.clear.bind(this);
+    this.createApplySetting = this.createApplySetting.bind(this);
+    this.createClearSetting = this.createClearSetting.bind(this);
+
     // init
     this.setting = setting;
+    this.levelOfControl = undefined;
+    this.blocked = undefined;
+    this.applied = undefined;
   }
 
   async init() {
     if (this.isAvailable()) {
-      // This API is currently missing on Firefox but documented as existing:
-      // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/types/BrowserSetting/onChange
-      if (this.setting.onChange) {
-        this.setting.onChange.addListener(this.onChange);
-      }
-      await this.get();
+      this.setting.onChange.addListener(this.onChange);
+      await this.setting.get({}, this.onChange);
     }
     else {
       this.setLevelOfControl(ChromeSetting.notControllable);
-      this.setBlocked(true);
+      this.blocked = true;
     }
   }
 
@@ -41,9 +53,14 @@ class ChromeSetting {
 
   // eslint-disable-next-line class-methods-use-this
   onChange() {
-    throw new Error('Each chromesetting must implement onChange');
+    throw new Error('each chromesetting must implement it\'s own onChange listener');
   }
 
+  /**
+   * Get the current level of control
+   *
+   * @returns {string} current level of control
+   */
   getLevelOfControl() {
     return this.levelOfControl;
   }
@@ -52,13 +69,24 @@ class ChromeSetting {
     this.levelOfControl = levelOfControl;
   }
 
+  /**
+   * Determine whether the setting is controllable
+   *
+   * @returns {boolean} whether setting is controllable
+   */
   isControllable() {
     return (
-      this.levelOfControl === ChromeSetting.controllable
+      this.levelOfControl === undefined
       || this.levelOfControl === ChromeSetting.controlled
+      || this.levelOfControl === ChromeSetting.controllable
     );
   }
 
+  /**
+   * Determine whether or not the setting is blocked
+   *
+   * @returns {boolean} whether setting is blocked
+   */
   isBlocked() {
     return this.blocked;
   }
@@ -67,19 +95,26 @@ class ChromeSetting {
     this.blocked = blocked;
   }
 
+  /**
+   * Determine whether or not setting is applied
+   *
+   * @returns {boolean} whether setting is applied
+   */
   isApplied() {
     return this.applied;
   }
 
-  set(options, override) {
+  /**
+   * Set the info for the setting
+   */
+  set(options) {
     return new Promise((resolve, reject) => {
       if (this.isControllable()) {
         this.setting.set(
           Object.assign({}, ChromeSetting.defaultSetOptions, options),
           () => {
-            if (chrome.runtime.lastError === null) {
-              if (override && override.applyValue) { this.applied = options.value; }
-              else { this.applied = true; }
+            if (chrome.runtime.lastError === undefined) {
+              this.applied = true;
               resolve();
             }
             else {
@@ -89,37 +124,45 @@ class ChromeSetting {
         );
       }
       else {
-        reject(new Error(`${this.settingID}: extension cannot control this setting`));
+        reject(new Error('extension cannot control this setting'));
       }
     });
   }
 
+  /**
+   * Get the current info for setting
+   */
   get() {
     return new Promise((resolve, reject) => {
-      if (this.isAvailable()) {
-        this.setting.get(ChromeSetting.defaultGetOptions, async (details) => {
-          await Promise.resolve(this.onChange(details));
-          if (chrome.runtime.lastError === null) {
+      if (!this.isAvailable()) {
+        reject();
+        return;
+      }
+      this.setting.get(
+        ChromeSetting.defaultGetOptions,
+        async (details) => {
+          await this.onChange(details);
+          if (chrome.runtime.lastError === undefined) {
             resolve(details);
           }
           else {
             reject(chrome.runtime.lastError);
           }
-        });
-      }
-      else {
-        reject(new Error(`${this.settingID} setting is not available`));
-      }
+        },
+      );
     });
   }
 
+  /**
+   * Clear the info for the setting
+   */
   clear(options) {
     return new Promise((resolve, reject) => {
       if (this.isControllable()) {
         this.setting.clear(
-          Object.assign({}, ChromeSetting.defaultClearOptions, options),
+          Object.assign({}, ChromeSetting.defaultClearOptions, options || {}),
           () => {
-            if (chrome.runtime.lastError === null) {
+            if (chrome.runtime.lastError === undefined) {
               this.applied = false;
               resolve();
             }
@@ -130,7 +173,7 @@ class ChromeSetting {
         );
       }
       else {
-        reject(new Error(`${this.settingID}: extension cannot control this setting`));
+        reject(new Error('extension cannot control this setting'));
       }
     });
   }

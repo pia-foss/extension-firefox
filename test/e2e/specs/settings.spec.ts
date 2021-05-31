@@ -6,26 +6,22 @@ import { AuthenticatedPage } from '../pages/authenticated';
 import { Checkbox } from '../elements';
 import { SectionBase } from '../pages/settings/sectionBase';
 import { getStorage } from '../scripts/getStorage';
-import { expect } from 'chai';
-import { FingerprintPage } from '../pages/fingerprint';
 import { setLevelOfControl } from '../scripts/setLevelOfControl';
+import { expect } from 'chai';
 
 idescribe('the settings page', function () {
   let settingsPage: SettingsPage;
   let loginPage: LoginPage;
   let authPage: AuthenticatedPage;
-  let fingerprintPage: FingerprintPage;
 
   beforeEach(async function () {
     // Init
     settingsPage = new SettingsPage();
     loginPage = new LoginPage();
     authPage = new AuthenticatedPage();
-    fingerprintPage = new FingerprintPage();
 
     // Nav
     await loginPage.navigate();
-    await fingerprintPage.optIn();
     await loginPage.signIn();
     await authPage.menu.toggleDropdown();
     await authPage.menu.settings.click();
@@ -78,7 +74,7 @@ idescribe('the settings page', function () {
           await checkbox.check();
 
           const storageValue = await getStorage(this.script, `settings:${settingData.settingID}`);
-          expect(storageValue).to.eq('true');
+          expect(storageValue).to.eq(true);
           await checkbox.expectChecked();
         });
 
@@ -88,7 +84,7 @@ idescribe('the settings page', function () {
           await checkbox.uncheck();
 
           const storageValue = await getStorage(this.script, `settings:${settingData.settingID}`);
-          expect(storageValue).to.eq('false');
+          expect(storageValue).to.eq(false);
           await checkbox.expectNotChecked();
         });
       });

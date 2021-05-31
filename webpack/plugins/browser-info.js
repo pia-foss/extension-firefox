@@ -15,6 +15,8 @@ class BrowserInfoPlugin {
   constructor(opts = {}) {
     this.version = opts.version || getVersion();
     if (!process.env.RELEASE_DATE) { throw new Error('must set RELEASE_DATE environment variable'); }
+    if (!opts.zipHook) { throw new Error('BrowserInfoPlugin requires "hook" opt'); }
+    this.zipHook = opts.zipHook;
     this.date = opts.releaseDate;
     this.getCommitHash = opts.getCommitHash || getGitHash;
     this.dest = opts.dest || dist('..');
@@ -30,12 +32,15 @@ class BrowserInfoPlugin {
   getInfoPromise() {
     if (!this.infoPromise) {
       this.infoPromise = Promise.all([
-        // pack promise
+        // zip promise
         new Promise((resolve) => {
-          this.resolvePacked = resolve;
+          this.resolveZipped = resolve;
         }),
-      ]).then(async ([{ packedFilename, packedDir }]) => {
-        await this.writeInfoFile({ packedDir, packedFilename });
+      ]).then(async ([{ zippedFilename, zippedDir }]) => {
+        await this.writeInfoFile({
+          zippedDir,
+          zippedFilename,
+        });
       });
     }
     return this.infoPromise;
@@ -56,11 +61,14 @@ class BrowserInfoPlugin {
     return changelog;
   }
 
-  async writeInfoFile({ packedDir, packedFilename }) {
+  async writeInfoFile({
+    zippedDir,
+    zippedFilename,
+  }) {
     try {
       const downloadUrl = 'https://installers.privateinternetaccess.com/download';
-      const packedPath = join(packedDir, packedFilename);
-      const packedHash = await BrowserInfoPlugin.hash(packedPath);
+      const zippedPath = join(zippedDir, zippedFilename);
+      const zipHash = await BrowserInfoPlugin.hash(zippedPath);
       const info = {
         version: this.version,
         available: true,
@@ -69,10 +77,16 @@ class BrowserInfoPlugin {
         changes: [...this.getChanges()],
         installers: [
           {
+            platform: 'win',
+            platform_title: 'Windows',
+            url: `${downloadUrl}/${zippedFilename}`,
+            sha: zipHash,
+          },
+          {
             platform: '',
-            platform_title: 'Windows / Mac / Linux / Other',
-            url: `${downloadUrl}/${packedFilename}`,
-            sha: packedHash,
+            platform_title: 'Mac / Linux / Other',
+            url: `${downloadUrl}/${zippedFilename}`,
+            sha: zipHash,
           },
         ],
       };
@@ -83,14 +97,14 @@ class BrowserInfoPlugin {
     catch (err) {
       print('BrowserInfoPlugin: failed with error', Color.red);
       print(err.message || err, Color.red);
-      process.exit(1);
     }
   }
 
   apply(compiler) {
-    compiler.hooks.packed.tapPromise('BrowserInfoPlugin', async (packedDir, packedFilename) => {
+    const { zipHook } = this;
+    compiler.hooks[zipHook].tapPromise('BrowserInfoPlugin', async (zippedDir, zippedFilename) => {
       const infoPromise = this.getInfoPromise();
-      this.resolvePacked({ packedDir, packedFilename });
+      this.resolveZipped({ zippedDir, zippedFilename });
       await infoPromise;
     });
   }

@@ -1,10 +1,8 @@
 import { Script } from '../core';
-import { StorageType } from '../types';
 
 interface Payload {
   key: string;
   value: string;
-  storage?: StorageType;
 }
 
 /**
@@ -16,16 +14,16 @@ interface Payload {
  * @param {string} payload.location storage location
  * @param {Script} payload.script Script engine used to run
  */
-function setStorage(script: Script, { value, key, storage }: Payload) {
+function setStorage(script: Script, { value, key }: Payload) {
   return script.executeAsync<Payload, void>(
-    ({ value, key, storage }, done) => {
-      browser.runtime.getBackgroundPage().then((window: any) => {
+    ({ value, key }, done) => {
+      chrome.runtime.getBackgroundPage((window: any) => {
         const { app } = window;
-        app.util.storage.setItem(key, value, storage);
+        app.util.storage.setItem(key, value);
         done(void 0);
       });
     },
-    { value, key, storage },
+    { value, key },
   );
 }
 

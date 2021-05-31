@@ -113,7 +113,7 @@ module.exports = {
   // reporters: undefined,
 
   // Automatically reset mock state between every test
-  // resetMocks: false,
+  // resetMocks: true,
 
   // Reset the module registry before running each individual test
   // resetModules: false,
@@ -146,6 +146,7 @@ module.exports = {
   setupFilesAfterEnv: [
     setup('chrome'),
     setup('debug'),
+    setup('localStorage'),
   ],
 
   // A list of paths to snapshot serializer modules Jest should use for snapshot testing

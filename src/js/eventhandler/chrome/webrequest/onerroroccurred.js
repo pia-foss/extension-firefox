@@ -12,12 +12,13 @@ import createApplyListener from '@helpers/applyListener';
 
 function openErrorPage(app) {
   const networkErrors = [
-    'NS_ERROR_UNKNOWN_PROXY_HOST',
-    'NS_ERROR_PROXY_CONNECTION_REFUSED',
-    'NS_ERROR_CONNECTION_REFUSED',
-    'NS_ERROR_NET_TIMEOUT',
-    'NS_ERROR_OFFLINE',
-    'NS_ERROR_ABORT',
+    'net::ERR_CONNECTION_RESET',
+    'net::ERR_PROXY_CONNECTION_FAILED',
+    'net::ERR_CONNECTION_TIMED_OUT',
+  ];
+  const tabQueries = [
+    { active: true, status: 'loading', url: ['http://*/*', 'https://*/*'] },
+    { active: true, status: 'complete', url: ['http://*/*', 'https://*/*'] },
   ];
 
   return (details) => {
@@ -28,23 +29,17 @@ function openErrorPage(app) {
     if (!connectedToPIA || !errorOnMainFrame || !catchableError) {
       return { cancel: false };
     }
-
-    const { error, tabId } = details;
-    const { url } = details;
-
-    (async () => {
-      try {
-        await browser.tabs.get(tabId);
-        const errorID = app.util.errorinfo.set(error, url);
-        const connfailUrl = chrome.extension.getURL(`html/errorpages/connfail.html?id=${errorID}`);
-        chrome.tabs.update(details.tabId, { url: connfailUrl });
-        debug(`connection error: successfully navigated to ${connfailUrl}`);
-      }
-      catch (err) {
-        debug(`connection error: failed to create error for ${url}`);
-      }
-    })();
-
+    tabQueries.forEach((query) => {
+      chrome.tabs.query(query, (tabs) => {
+        tabs.forEach((tab) => {
+          if (tab.id === details.tabId) {
+            const errorID = app.util.errorinfo.set(details.error, details.url);
+            const errorPageURL = chrome.extension.getURL(`html/errorpages/connfail.html?id=${errorID}`);
+            chrome.tabs.update(tab.id, { url: errorPageURL });
+          }
+        });
+      });
+    });
     debug(`connection error: ${details.error}`);
     return { cancel: true };
   };

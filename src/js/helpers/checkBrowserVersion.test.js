@@ -3,7 +3,10 @@ import checkBrowserVersion from '@helpers/checkBrowserVersion';
 const { userAgent: DEFAULT_USER_AGENT } = window.navigator;
 
 const Browser = {
-  firefox: 'firefox',
+  chrome: 'chrome',
+  brave: 'brave',
+  opera: 'opera',
+  firefox: 'firefox'
 };
 
 const OS = {
@@ -13,6 +16,51 @@ const OS = {
 };
 
 const UserAgentList = [
+  {
+    value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$version.0.3578.98 Safari/537.36',
+    browser: Browser.chrome,
+    os: OS.windows,
+  },
+  {
+    value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$version.0.3626.109 Safari/537.36',
+    browser: Browser.brave,
+    os: OS.windows,
+  },
+  {
+    value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$version.0.3578.98 Safari/537.36 OPR/58.0.3135.68',
+    browser: Browser.opera,
+    os: OS.windows,
+  },
+  {
+    value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$version.0.3578.98 Safari/537.36',
+    browser: Browser.chrome,
+    os: OS.mac,
+  },
+  {
+    value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$version.0.3626.109 Safari/537.36',
+    browser: Browser.brave,
+    os: OS.mac,
+  },
+  {
+    value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$version.0.3578.98 Safari/537.36 OPR/58.0.3135.68',
+    browser: Browser.opera,
+    os: OS.mac,
+  },
+  {
+    value: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/71.0.3578.98 Chrome/$version.0.3578.98 Safari/537.36',
+    browser: Browser.chrome,
+    os: OS.ubuntu,
+  },
+  {
+    value: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$version.0.3626.109 Safari/537.36',
+    browser: Browser.brave,
+    os: OS.ubuntu,
+  },
+  {
+    value: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$version.0.3578.98 Safari/537.36 OPR/58.0.3135.68',
+    browser: Browser.opera,
+    os: OS.ubuntu,
+  },
   {
     value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6; rv:65.0) Gecko/20100101 Firefox/$version.0',
     browser: Browser.firefox,

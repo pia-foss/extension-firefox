@@ -1,4 +1,14 @@
 /* eslint indent: 0 */
+
+/*
+ * Configuration for webpack build process
+ *
+ * The configuration uses the builder pattern
+ * in order to configure the build using typical
+ * control flow, due to the many variations in
+ * the build process
+ */
+
 const dotenv = require('dotenv');
 const ExtractCssPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
@@ -9,9 +19,11 @@ const Config = require('webpack-chain');
 dotenv.config();
 
 const {
+  ZipPlugin,
   PackPlugin,
   MovePlugin,
   GitInfoPlugin,
+  PublishPlugin,
   ReporterPlugin,
   ChangelogPlugin,
   BrowserInfoPlugin,
@@ -28,48 +40,49 @@ const {
   getBrowser,
   getAliases,
   getVersion,
+  shouldRelease,
   getExtensions,
 } = require('./webpack/util');
 const Environment = require('./webpack/environment');
 
+// initialize builders
 const config = new Config();
 const environments = new Environment();
 
 // ----------------- Common Config ----------------- //
 
 config
+  /* target web */
   .target('web')
-  // Main entry points
+  /* main entry points */
   .entry('foreground')
     .add(src('jsx', 'app', 'index.jsx'))
     .end()
   .entry('background')
     .add(src('js', 'background.js'))
     .end()
-  // Popups
+  /* popups */
   .entry('importrules')
     .add(src('js', 'popups', 'importrules.js'))
     .end()
-  // Error Pages
+  /* error pages */
   .entry('connfail')
     .add(src('js', 'errorpages', 'connfail.js'))
     .end()
   .entry('authfail')
     .add(src('js', 'errorpages', 'authfail.js'))
     .end()
-  // Workers
+  /* workers */
   .entry('https-upgrade-worker')
     .add(src('js', 'util', 'https-upgrade', 'worker.js'))
     .end()
-  // PAC File
-  .entry('pac')
-    .add(src('js', 'pac.js'))
-    .end()
+  /* output files to dist */
   .output
     .path(dist())
     .filename('[name].js')
     .publicPath('/')
     .end()
+  /* disable some performance (unnecessary for extension, no network) */
   .performance
     .hints(false)
     .end()
@@ -80,12 +93,15 @@ config
       timings: true,
       warnings: true,
     })
+  /* setup extensions */
   .resolve
     .extensions
       .merge(getExtensions())
       .end()
     .end()
+  /* loaders */
   .module
+    /* javascript (babel) */
     .rule('javascript')
       .test(/\.m?jsx?$/)
       .exclude
@@ -95,6 +111,7 @@ config
         .loader('babel-loader')
         .end()
       .end()
+    /* sass */
     .rule('scss')
       .test(/\.scss$/)
       .use('extract css loader')
@@ -110,6 +127,7 @@ config
         .loader('sass-loader')
         .end()
       .end()
+    /* css (for locales, libraries */
     .rule('css')
       .test(/\.css$/)
       .use('css loader')
@@ -122,6 +140,7 @@ config
         .loader('sass-loader')
         .end()
       .end()
+    /* images */
     .rule('images')
       .test(/\.(png|jpg|gif|svg)$/)
       .use('file loader')
@@ -133,15 +152,18 @@ config
         .end()
       .end()
     .end()
+  /* report when build completes */
   .plugin('reporter')
     .use(ReporterPlugin, [])
     .end()
+  /* cleanup before build */
   .plugin('clean')
     .use(CleanWebpackPlugin, [
       [dist()],
       { root: root() },
     ])
     .end()
+  /* copy necessary files to dist after build */
   .plugin('copy')
     .use(CopyPlugin, [[
       {
@@ -166,23 +188,27 @@ config
       },
     ]])
     .end()
+  /* generate browser manifest from template */
   .plugin('manifest')
     .use(ExtensionManifestPlugin, [{
       template: src(`manifest.${getBrowser()}.json`),
       version: getVersion(),
     }])
     .end()
+  /* extract css from js files */
   .plugin('extract css')
     .use(ExtractCssPlugin, [{
       filename: '[name].css',
       chunkFilename: '[id].css',
     }])
     .end()
+  /* generate changelog.md file */
   .plugin('changelog')
     .use(ChangelogPlugin, [{
       source: root('CHANGELOG.md'),
     }])
     .end()
+  /* move files after build */
   .plugin('move')
     .use(MovePlugin, [
       {
@@ -241,6 +267,17 @@ if (build === Build.DEVELOPMENT) {
     .end();
 }
 
+// ------------------- Bugfixes -------------------- //
+
+if (build === Build.DEVELOPMENT || build === Build.QA) {
+  environments
+    .set('OVERRIDE_CLOSE_FOREGROUND', true);
+}
+else {
+  environments
+    .set('OVERRIDE_CLOSE_FOREGROUND', false);
+}
+
 // ---------------- Non-Development ----------------- //
 
 if (build !== Build.DEVELOPMENT) {
@@ -253,18 +290,36 @@ if (build !== Build.DEVELOPMENT) {
     .end();
 }
 
+// ---------------------- E2E ---------------------- //
+
+if (build === Build.E2E) {
+  if (!process.env.MANIFEST_KEY) {
+    throw new Error('e2e build requires MANIFEST_KEY to be set');
+  }
+  config
+    .plugin('manifest')
+      .tap(([opts]) => {
+        return [Object.assign({}, opts, {
+          properties: {
+            key: process.env.MANIFEST_KEY,
+          },
+        })];
+      })
+      .end()
+    .end();
+}
+
 // ------------------ Freeze App ------------------- //
 
 if (build === Build.DEVELOPMENT || build === Build.E2E) {
   environments
     .set('FREEZE_APP', false);
-}
-else {
+} else {
   environments
     .set('FREEZE_APP', true);
 }
 
-// ------------------- Gitinfo --------------------- //
+// ------------------- GITINFO --------------------- //
 
 if (build === Build.DEVELOPMENT || build === Build.QA) {
   config
@@ -275,51 +330,104 @@ if (build === Build.DEVELOPMENT || build === Build.QA) {
 }
 
 // -------------------- Pack ---------------------- //
-
-if (build === Build.BETA || build === Build.QA || build === Build.E2E) {
-  config
-    .plugin('pack')
-      .use(PackPlugin, [{
-        apiKey: env('FIREFOX_KEY'),
-        apiSecret: env('FIREFOX_SECRET'),
-      }])
-      .end()
-    .end();
+// -------------------- Pack ---------------------- //
+if(getBrowser() == 'firefox'){
+  if (build === Build.BETA || build === Build.QA || build === Build.E2E) {
+    config
+      .plugin('pack')
+        .use(PackPlugin, [{
+          apiKey: env('FIREFOX_KEY'),
+          apiSecret: env('FIREFOX_SECRET'),
+        }])
+        .end()
+      .end();
+  }
+  else if (build === Build.PUBLIC) {
+    config
+      .plugin('pack')
+        .use(PackPlugin, [{
+          apiKey: env('FIREFOX_KEY'),
+          apiSecret: env('FIREFOX_SECRET'),
+          // Don't want to include [build] (default behaviour)
+          filename: 'private_internet_access-[browser]-v[version].[ext]',
+        }])
+        .end()
+      .end();
+  }
+}else{
+  if (build === Build.QA) {
+    config
+      .plugin('pack')
+        .use(PackPlugin, [{
+          useWebstoreKey: shouldRelease(),
+          webstoreKey: root('webstore.pem'),
+        }])
+        .end()
+      .end();
+    }
+  
+  else if (build === Build.PUBLIC) {
+    config
+      .plugin('pack')
+        .use(PackPlugin, [{
+          useWebstoreKey: shouldRelease(),
+          webstoreKey: root('webstore.pem'),
+          // Don't want to include [build] (default behaviour)
+          filename: 'private_internet_access-[browser]-v[version].[ext]',
+        }])
+        .end()
+      .end();
+  }
 }
-else if (build === Build.PUBLIC) {
-  config
-    .plugin('pack')
-      .use(PackPlugin, [{
-        apiKey: env('FIREFOX_KEY'),
-        apiSecret: env('FIREFOX_SECRET'),
-        // Don't want to include [build] (default behaviour)
-        filename: 'private_internet_access-[browser]-v[version].[ext]',
-      }])
-      .end()
-    .end();
-}
 
-// ---------------------- E2E ---------------------- //
-
-if (build === Build.E2E) {
-  config
-    .plugin('pack')
-      .tap(([opts]) => {
-        return [Object.assign({}, opts, {
-          replaceDist: true,
-          dest: root('test', 'e2e'),
-        })];
-      })
-      .end()
-    .end();
-}
 
 // -------------------- Beta ---------------------- //
 
 if (build === Build.BETA) {
   config
+    .plugin('zip')
+      .use(ZipPlugin, [
+        {
+          source: dist(),
+          dir: dist('..'),
+          filename: 'private_internet_access-[browser]-v[version]-[build].zip',
+          hook: 'betaZip',
+        },
+      ])
+      .end()
     .plugin('info')
-      .use(BrowserInfoPlugin, [{}])
+      .use(BrowserInfoPlugin, [{
+        zipHook: 'betaZip',
+      }])
+      .end()
+    .end();
+}
+
+// ------------------- Release --------------------- //
+
+if (shouldRelease()) {
+  config
+    .plugin('zip')
+      .use(ZipPlugin, [
+        {
+          source: dist(),
+          dist: dist('..'),
+          filename: 'private_internet_access-[browser]-v[version].zip',
+          hook: 'releaseZip',
+        },
+      ])
+      .end()
+    .plugin('publish')
+      .use(PublishPlugin, [{
+        keys: {
+          clientId: env('WEBSTORE_CLIENT_ID'),
+          clientSecret: env('WEBSTORE_CLIENT_SECRET'),
+          refreshToken: env('WEBSTORE_REFRESH_TOKEN'),
+        },
+        id: env('WEBSTORE_PUBLIC_ID'),
+        target: 'default',
+        hook: 'releaseZip',
+      }])
       .end()
     .end();
 }

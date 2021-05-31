@@ -1,5 +1,7 @@
 /* eslint no-restricted-syntax: 0 */
 import http from '@helpers/http';
+import timer from '@helpers/timer';
+import reportError from '@helpers/reportError';
 import {
   PART_SIZE,
   STORAGE_TEMPLATE,
@@ -30,6 +32,7 @@ export function applyRuleset(ruleset, url) {
     rule: rules,
     exclusions,
   } = ruleset;
+
   if (!rules) {
     return undefined;
   }
@@ -46,6 +49,7 @@ export function applyRuleset(ruleset, url) {
       debug(`exclusions value: ${exclusions}`);
     }
   }
+
   let applied;
   return rules.find((rule) => {
     if (rule.to === null || rule.from === null) { return false; }
@@ -99,7 +103,7 @@ export async function getStoredRulesets(storageCount) {
         );
       });
       // yield to event loop
-      await new Promise((resolve) => { setTimeout(resolve, 5); });
+      await timer(5);
 
       return part;
     };
@@ -108,7 +112,6 @@ export async function getStoredRulesets(storageCount) {
     // perform ops consecutively
     const parts = [];
     for (const op of ops) {
-      // eslint-disable-next-line no-await-in-loop
       parts.push(await op());
     }
 
@@ -119,9 +122,10 @@ export async function getStoredRulesets(storageCount) {
 /**
  * Store the rulesets in storage.local
  *
- * Break up the operations to avoid locking up the background thread
+ * Break up the operations by parts to avoid locking up the background thread
  *
- * @returns {number} storageCount
+ * @param {Array} parts Storage payload
+ * @param {number} oldCount Previous parts length
  */
 export async function setStoredRulesets(parts, oldCount) {
   // create ops to push each part into storage
@@ -141,33 +145,51 @@ export async function setStoredRulesets(parts, oldCount) {
         );
       });
       // yield to event loop
-      await new Promise((resolve) => { setTimeout(resolve, 5); });
+      await timer(5);
     };
   });
 
-  await debugTime('stage d', async () => {
-    // delete excess parts in storage
-    if (oldCount && Number(oldCount) > parts.length) {
-      const keys = [...Array(Number(oldCount) - parts.length).keys()]
-        .map((i) => { return i + parts.length; })
-        .map((i) => { return STORAGE_TEMPLATE.replace('%s', i); });
-      await new Promise((resolve) => {
-        chrome.storage.local.remove(keys, () => {
-          if (chrome.runtime.lastError) {
-            const err = chrome.runtime.lastError;
-            debug(`https-upgrade/rulesets#setStoredRulesets: failed to remove with "${err}"`);
-          }
-          else { resolve(); }
-        });
-      });
-    }
+  const act = async () => {
+    await debugTime('stage d (delete)', async () => {
+      const oldCountNum = Number(oldCount);
+      // delete excess parts in storage
+      if (!Number.isNaN(oldCountNum) && oldCountNum > parts.length) {
+        const keys = [...Array(oldCountNum - parts.length).keys()]
+          .map((i) => { return i + parts.length; })
+          .map((i) => { return STORAGE_TEMPLATE.replace('%s', i); });
+        await new Promise((resolve) => {
+          chrome.storage.local.remove(keys, () => {
+            if (chrome.runtime.lastError) {
+              const err = chrome.runtime.lastError;
+              debug(`https-upgrade/rulesets#setStoredRulesets: failed to remove with "${err}"`);
+            }
 
-    // perform each add op consecutively
-    for (const op of addOps) {
-      // eslint-disable-next-line no-await-in-loop
-      await op();
-    }
-  });
+            else { resolve(); }
+          });
+        });
+      }
+    });
+
+    await debugTime('stage d (add)', async () => {
+      // perform each add op consecutively
+      for (const op of addOps) {
+        // eslint-disable-next-line no-await-in-loop
+        await op();
+      }
+    });
+  };
+
+  try {
+    await act();
+  }
+  catch (err) {
+    debug('https-upgrade/rulesets: stage d (store rulesets) failed');
+    reportError('https-upgrade/rulesets', err);
+    debug('https-upgrade/rulesets: retry storing rulesets...');
+    await timer(5000);
+    await act();
+    debug('https-upgrade/rulesets: successfully stored rulesets');
+  }
 }
 
 // ======================================== //
@@ -204,6 +226,7 @@ async function getBuffer(channel) {
  * Uses WebWorker because pako#inflate does not offer async API
  */
 async function extract(rulesBuffer) {
+  // Get url (same as ./worker.js file)
   const url = chrome.runtime.getURL('js/https-upgrade-worker.js');
   const worker = new Worker(url);
   const reqID = 0;
@@ -225,6 +248,7 @@ async function extract(rulesBuffer) {
     });
   });
 }
+
 /**
  * Fetch the rulesets from specified channel
  *
@@ -301,12 +325,11 @@ export async function partsToTargetMap(parts) {
       });
       // yield to event loop (to prevent locking up background)
       // eslint-disable-next-line no-await-in-loop
-      await new Promise((resolve) => { setTimeout(resolve, 5); });
+      await timer(5);
     };
   });
   await debugTime('stage f', async () => {
     for (const op of ops) {
-      // eslint-disable-next-line no-await-in-loop
       await op();
     }
   });

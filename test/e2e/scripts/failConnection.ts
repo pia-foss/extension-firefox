@@ -5,7 +5,7 @@ interface Payload {}
 function failConnection(script: Script): Promise<string> {
   return script.executeAsync<Payload, string>(
     function (_, done) {
-      browser.runtime.getBackgroundPage().then(({ app }: any) => {
+      chrome.runtime.getBackgroundPage(({ app }: any) => {
         const id = app
           .util
           .errorinfo

@@ -7,7 +7,6 @@
   Being unaware of this could introduce serious bugs that compromise the security of the
   extension.
 
-  https://developer.chrome.com/extensions/runtime#event-onUpdateAvailable
 */
 import createApplyListener from '@helpers/applyListener';
 

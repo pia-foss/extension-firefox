@@ -47,20 +47,20 @@
   "ChangeExtraFeaturesSettings": {
     "message": "額外功能"
   },
+  "encounterMessage_2": {
+    "message": "聯絡支援部門"
+  },
   "JustInTimeDisclaimer": {
     "message": "使用 PIA 為您的體驗評分"
   },
-  "encounterMessageFirefox_1": {
-    "message": "感謝您提供意見回饋！如果您遇到任何技術性問題，請"
-  },
-  "encounterMessageFirefox_2": {
-    "message": "聯絡支援部門"
-  },
-  "feedbackMessageFirefox_1": {
+  "feedbackMessage_1": {
     "message": "感謝您提供意見回饋！如果您能到這裡為我們評分，我們會非常感激："
   },
-  "feedbackMessageFirefox_2": {
-    "message": "Firefox 附加元件站"
+  "feedbackMessage_2": {
+    "message": "Chrome 線上應用程式商店"
+  },
+  "encountermessage_1": {
+    "message": "感謝您提供意見回饋！如果您遇到任何技術性問題，請"
   },
   "UILanguage": {
     "message": "UI 語言"

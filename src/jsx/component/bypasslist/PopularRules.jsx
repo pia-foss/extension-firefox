@@ -13,7 +13,7 @@ const PopularRules = ({ popularRules }) => {
       <div className="popular">
         {
           popularRules.map((name) => {
-            return (<PopularRule defaultName={name} key={name} />);
+            return <PopularRule defaultName={name} key={name} />;
           })
         }
       </div>

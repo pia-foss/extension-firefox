@@ -8,6 +8,7 @@ import { Driver } from '../driver';
   actions.
  */
 
+ /** Cannot be used in Chrome (not supported), here for consistency w/ firefox */
 type Origin = { _indicator: 'do not use me' };
 
 interface HasOrigin {

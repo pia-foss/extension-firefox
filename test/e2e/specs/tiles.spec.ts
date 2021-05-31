@@ -2,7 +2,6 @@ import { expect } from 'chai';
 
 import { idescribe, ibeforeEach, iit } from '../core';
 import { AuthenticatedPage } from '../pages/authenticated';
-import { FingerprintPage } from '../pages/fingerprint';
 import { SubscriptionTile } from '../pages/authenticated/tiles/subscription-tile';
 import { SettingName } from '../pages/authenticated/tiles/quick-settings-tile';
 import { Tile } from '../pages/authenticated/tiles/tile';
@@ -15,20 +14,17 @@ import { getStorage } from '../scripts/getStorage';
 
 idescribe('interface tiles', function () {
   let authPage: AuthenticatedPage;
-  let fingerprintPage: FingerprintPage;
   let loginPage: LoginPage;
   let settingsPage: SettingsPage;
   let regionPage: RegionPage;
 
   ibeforeEach(async function () {
     authPage = new AuthenticatedPage();
-    fingerprintPage = new FingerprintPage();
     loginPage = new LoginPage();
     settingsPage = new SettingsPage();
     regionPage = new RegionPage();
 
     await loginPage.navigate();
-    await fingerprintPage.optIn();
     await loginPage.signIn();
     await authPage.waitForLatencyTest();
   });
@@ -40,6 +36,7 @@ idescribe('interface tiles', function () {
       'current-region',
       'quick-settings',
       'bypass-rules',
+      'ip',
     ];
     tileNames.forEach((tileName) => {
       let bothTile: Tile;
@@ -100,14 +97,6 @@ idescribe('interface tiles', function () {
       await currentRegionTile.expectCount(1);
     });
 
-    iit('should persist drawer', async function () {
-      await authPage.tiles.openDrawer();
-      await this.windows.refresh();
-      await authPage.navigate();
-      const opened = await authPage.tiles.isDrawerOpen();
-      expect(opened).be.true;
-    });
-
     iit('should sort bookmarks in order of enabling them', async function () {
       await authPage.tiles.openDrawer();
       // disable all favorites
@@ -150,7 +139,8 @@ idescribe('interface tiles', function () {
       'mace',
       'http-referrer',
       'debug-log',
-      'fingerprint',
+      'microphone',
+      'camera',
       'theme',
     ];
     settingNames.forEach((name) => {
@@ -159,7 +149,7 @@ idescribe('interface tiles', function () {
         const tile = authPage.tiles.getQuickSettingsTile();
         const setting = tile.getSettingButton(name);
         const storageKey = tile.getStorageKey(name);
-        const expectedValue = name === 'theme' ? String(false) : String(true);
+        const expectedValue = name === 'theme' ? false : true;
 
         // Start w/ off
         await setting.deactivate();
@@ -179,7 +169,7 @@ idescribe('interface tiles', function () {
         const tile = authPage.tiles.getQuickSettingsTile();
         const setting = tile.getSettingButton(name);
         const storageKey = tile.getStorageKey(name);
-        const expectedValue = name === 'theme' ? String(true) : String(false);
+        const expectedValue = name === 'theme' ? true : false;
 
         // Start w/ off
         await setting.activate();

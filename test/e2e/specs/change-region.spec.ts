@@ -6,32 +6,28 @@ import { RegionPage } from '../pages/region';
 import { Button } from '../elements';
 import { getConnected } from '../scripts/getConnected';
 import { expect } from 'chai';
-import { FingerprintPage } from '../pages/fingerprint';
 
 idescribe('the change region page', function () {
   let loginPage: LoginPage;
   let authPage: AuthenticatedPage;
   let regionPage: RegionPage;
-  let regionTile: CurrentRegionTile;
   let nameButton: Button;
   let latencyButton: Button;
   let favoritesButton: Button;
-  let fingerprintPage: FingerprintPage;
+  let regionTile: CurrentRegionTile;
 
   ibeforeEach(async function () {
     // Init
     loginPage = new LoginPage();
     authPage = new AuthenticatedPage();
     regionPage = new RegionPage();
-    regionTile = authPage.tiles.getCurrentRegionTile();
-    fingerprintPage = new FingerprintPage();
     nameButton = regionPage.tabs.nameSort;
     latencyButton = regionPage.tabs.latencySort;
     favoritesButton = regionPage.tabs.favoritesSort;
+    regionTile = authPage.tiles.getCurrentRegionTile();
 
     // Navigate
     await loginPage.navigate();
-    await fingerprintPage.optIn();
     await loginPage.signIn();
     await authPage.waitForLatencyTest();
     await regionTile.changeRegion.click();

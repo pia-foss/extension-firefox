@@ -35,6 +35,7 @@
 
     .copy, .clear {
       margin-bottom: 15px;
+      outline: none;
     }
   }
 
@@ -48,7 +49,7 @@
 
     li { margin-bottom: 10px; }
     li:last-child { margin-bottom: 0px; }
-    li div { overflow-wrap: break-word; }
+    li span { overflow-wrap: break-word; }
 
     time {
       color: $grey55;

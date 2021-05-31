@@ -10,8 +10,6 @@ import ThirdSlide from "@component/onboarding/ThirdSlide";
 class OnboardingPage extends Component {
   constructor(props) {
     super(props);
-    
-
     // Properties
     this.app = props.context.app;
     this.proxy = this.app.proxy;
@@ -21,6 +19,7 @@ class OnboardingPage extends Component {
     this.fingerprintProtectionSetting = "";
     this.fingerprintProtectionSettingId = "";
     this.i18n = this.app.util.i18n;
+    this.sameApp = this.app.sameApp;
 
     // Bindings
     this.enable = this.enable.bind(this);
@@ -66,7 +65,6 @@ class OnboardingPage extends Component {
   }
 
   skip(){
-
     const {
        updateFirstRun 
     } = this.props;
@@ -75,7 +73,7 @@ class OnboardingPage extends Component {
   }
 
   checkSlides() {
-    //check what index is on and return the tight slide
+    //Checks what index is checked and returs the right slide
     const { indexSlide, checkedArray } = this.state;
 
     if (indexSlide == 0) {
@@ -97,19 +95,19 @@ class OnboardingPage extends Component {
 
   render() {
     let { indexSlide, checkedArray } = this.state;
-
     checkedArray= [false,false,false];
-    //true for checked values in input and buttons
+    const lang = this.i18n.locale ? this.i18n.locale : 'en';
+    const browser = this.sameApp.returnBrowser();
+    //store value true for where the index is
     checkedArray[indexSlide] = true;
 
     const theme = this.props.context.getTheme();
-    const lang = this.i18n.locale ? this.i18n.locale : 'en';
-    
+
     return (
-      <div className={`onboarding-page ${theme} ${lang}`}>
-        {/* We show the slides here */}
+      <div className={`onboarding-page ${theme} ${lang} ${browser}`}>
+        {/* Slides */}
         {this.checkSlides()}
-        {/* this are the bullet points and buttons (skip,next) */}
+        {/* Bullets and buttons (skip, next) */}
         <div className="bullets-skip">
           {checkedArray[1] || checkedArray[2] ? 
           <button type="button" className="btn-skip" onClick={this.skip}>

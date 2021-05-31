@@ -1,8 +1,11 @@
 import ChromeSetting from '@chromesettings/chromesetting';
 
-class NetworkPredication extends ChromeSetting {
+class NetworkPrediction extends ChromeSetting {
   constructor() {
-    super(NetworkPredication.getSetting());
+    super(chrome.privacy.network.networkPredictionEnabled);
+
+    // bindings
+    this.onChange = this.onChange.bind(this);
 
     // functions
     this.applySetting = this.createApplySetting(
@@ -15,26 +18,15 @@ class NetworkPredication extends ChromeSetting {
       'unblock',
     );
 
-    // bindings
-    this.onChange = this.onChange.bind(this);
-
     // init
-    this.settingDefault = false;
-    this.available = Boolean(this.setting);
     this.settingID = 'blocknetworkprediction';
+    this.settingDefault = false;
   }
 
   onChange(details) {
     this.setLevelOfControl(details.levelOfControl);
     this.setBlocked(details.value === false);
   }
-
-  static getSetting() {
-    if (chrome.privacy && chrome.privacy.network) {
-      return chrome.privacy.network.networkPredictionEnabled;
-    }
-    return undefined;
-  }
 }
 
-export default NetworkPredication;
+export default NetworkPrediction;

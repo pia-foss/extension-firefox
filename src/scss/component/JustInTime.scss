@@ -4,8 +4,8 @@
   font-size: 15px;
   background-color: $grey85;
   color:$grey20;
-  padding-right: 30px;
 
+ 
   .response-message {
     padding: 3px;
     font-size: 14px;
@@ -29,17 +29,12 @@
         }
       }
     }
-
-    &.pt_BR, &.nl, &.tr, &.pl {
+    
+    &.pt_BR {
       font-size: 12px;
       padding-right: 30px;
     }
     
-    &.ru{
-      font-size: 12px;
-      padding-right: 30px;
-    }
-
     &.ja{
       font-size: 12px;
       padding-right: 30px;
@@ -79,7 +74,9 @@
       font-size: 13px;
       padding-right: 25px;
     }
+    
   }
+
 
   .just-in-time-contents {
     margin-top: 7px;
@@ -107,11 +104,8 @@
     background-color: #22252e;
   }
 
-  .ru {
-    font-size: 13px;
-  }
-
   .tr {
     font-size: 13px;
   }
+  
 }

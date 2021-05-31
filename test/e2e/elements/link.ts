@@ -6,6 +6,10 @@ class Link extends Node {
 
     return el.click();
   }
+
+  public async getHref() {
+    return (await this.element).getAttribute('href');
+  }
 }
 
 export { Link };

@@ -2,9 +2,12 @@ import ChromeSetting from '@chromesettings/chromesetting';
 
 class HyperLinkAudit extends ChromeSetting {
   constructor() {
-    super(HyperLinkAudit.getSetting());
+    super(chrome.privacy.websites.hyperlinkAuditingEnabled);
 
-    // function
+    // bindings
+    this.onChange = this.onChange.bind(this);
+
+    // functions
     this.applySetting = this.createApplySetting(
       false,
       'hyperlinkaudit',
@@ -15,25 +18,14 @@ class HyperLinkAudit extends ChromeSetting {
       'unblock',
     );
 
-    // bindings
-    this.onChange = this.onChange.bind(this);
-
     // init
-    this.settingDefault = false;
-    this.available = Boolean(this.setting);
     this.settingID = 'blockhyperlinkaudit';
+    this.settingDefault = false;
   }
 
   onChange(details) {
     this.setLevelOfControl(details.levelOfControl);
     this.setBlocked(details.value === false);
-  }
-
-  static getSetting() {
-    if (chrome.privacy && chrome.privacy.websites) {
-      return chrome.privacy.websites.hyperlinkAuditingEnabled;
-    }
-    return undefined;
   }
 }
 

@@ -7,6 +7,7 @@ const presets = [
         chrome: '60',
       },
       useBuiltIns: 'entry',
+      corejs: 2,
     },
   ],
   '@babel/react',

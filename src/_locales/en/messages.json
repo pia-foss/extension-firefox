@@ -14,8 +14,17 @@
   "feedbackMessageFirefox_2":{
     "message":"Firefox Browser Addons"
   },
-  "OnBoardingStart":{
-    "message":"GET STARTED"
+  "encounterMessage_1":{
+    "message":"Thank you for your feedback! If you encounter any technical problems please "
+  },
+  "encounterMessage_2":{
+    "message":"contact the support department "
+  },
+  "feedbackMessage_1":{
+    "message":"Thank you for your feedback! We would appreciate it if rate us on "
+  },
+  "feedbackMessage_2":{
+    "message":"Chrome Web Store"
   },
   "FirstSlideInstallThanks":{
     "message":"Thanks for installing the"
@@ -110,6 +119,9 @@
   "FingerprintProtectionDisable": {
     "message": "Disable"
   },
+  "OnBoardingStart":{
+    "message":"GET STARTED"
+  },
   "FingerprintProtectionAfterword": {
     "message": "This setting can also be changed from the \"Extension Settings\" panel after logging into the extension."
   },
@@ -152,29 +164,17 @@
   "IpReal": {
     "message": "IP"
   },
-  "AlwaysActive": {
-    "message": "Always active settings"
-  },
-  "AlwaysActiveTooltip": {
-    "message": "Cause settings to always remain active, regardless of whether proxy is connected or not"
-  },
   "IpProxy": {
     "message": "VPN IP"
-  },
-  "LogMeOutOnClose": {
-    "message": "Log me out on browser close"
-  },
-  "LogMeOutOnCloseTooltip": {
-    "message": "After reopening the browser you will not be logged back in automatically"
-  },
-  "LogMeOutOnCloseDisabled": {
-    "message": "This setting cannot be controlled while credentials are not being remembered (login screen)"
   },
   "DebugLogIsEmpty": {
     "message": "The debug log is empty."
   },
   "PersistentSettingsDisclaimer": {
     "message": "Enabled settings are now always active whether you are connected to a region or not, with the exception of PIA MACE™ which is only active when you are connected to a region."
+  },
+  "PersistentIncognitoDisclaimer": {
+    "message": "Enable extension in incognito mode by selecting this option from extension settings in chrome://extensions ."
   },
   "UsernamePlaceholder": {
     "message": "Username"
@@ -193,9 +193,6 @@
   },
   "WrongUsernameAndPassword": {
     "message": "Username and/or password are incorrect."
-  },
-  "NetworkError": {
-    "message": "Login request failed due to a network error. Please try again."
   },
   "OfflineError": {
     "message": "Login request failed because you appear to be offline. Please check if you are connected to the internet."
@@ -239,26 +236,14 @@
   "ExportLabel": {
     "message": "Export"
   },
-  "SettingsWarning": {
-    "message": "These settings are not in effect. They come into effect while you are connected to a region."
+  "BypassWarningLead": {
+    "message": "Requests made to websites listed in the Bypass List use"
   },
-  "SettingsWarningConnected": {
-    "message": "These settings are in effect. They will be restored to %{browser}'s default settings when you disconnect from %{region}."
-  },
-  "BypassWarning": {
-    "message": "Requests made to websites found on the Bypass List use a <span class=\"bold-underline\">direct connection</span> that is <span class=\"bold-underline\">not</span> protected by Private Internet Access™."
-  },
-  "trial":{
-    "message":"Trial"
-  },
-  "days_left": {
-    "message":"days left"
+  "BypassWarningBold": {
+    "message": "direct connections and are not protected by Private Internet Access™."
   },
   "AccountSettingsText": {
     "message": "Account Settings"
-  },
-  "AddUrlToBypassList": {
-    "message": "Add URL to bypass list"
   },
   "SupportText": {
     "message": "Help & Support"
@@ -266,14 +251,8 @@
   "OfflineText": {
     "message": "OFFLINE"
   },
-  "PleaseWait": {
-    "message": "Loading. Please wait."
-  },
   "Security": {
     "message": "Security"
-  },
-  "AdsTrackersProtection": {
-    "message": "Ads, Trackers & Malware Protection"
   },
   "MaceProtection": {
     "message": "PIA MACE™"
@@ -302,6 +281,12 @@
   "HttpsUpgradeTooltip": {
     "message": "Automatically converts supported websites or links using an unencrypted connection (HTTP) to a more secure HTTPS connection before leaving your browser. Made possible because of HTTPS Everywhere and the EFF."
   },
+  "AlwaysActive": {
+    "message": "Always active settings"
+  },
+  "AlwaysActiveTooltip": {
+    "message": "Cause settings to always remain active, regardless of whether proxy is connected or not"
+  },
   "BlockUTM": {
     "message": "Remove UTM parameters"
   },
@@ -313,9 +298,6 @@
   },
   "BlockFBCLIDTooltip": {
     "message": "Remove Facebook FBCLID parameters from outgoing links in Facebook. FBCLID parameters are used to track information about your visit to a website"
-  },
-  "BypassListPlaceholder": {
-    "message": "hello1.com, *.hello2.com, *.hello3.com/page.html"
   },
   "BypassInstructionsBold": {
     "message": "* prefix required"
@@ -335,21 +317,6 @@
   "AddSmartLocation":{
     "message":"Add smart location"
   },
-  "NoLocation":{
-    "message":"No location added"
-  },
-  "MultipleLocations":{
-    "message":"locations"
-  },
-  "OneLocation":{
-    "message":"location added"
-  },
-  "SaveProxyBypassList": {
-    "message": "Save"
-  },
-  "OKSaved": {
-    "message": "OK. Saved"
-  },
   "WelcomeToNewVersion": {
     "message": "Welcome to %{appVersion}"
   },
@@ -361,6 +328,15 @@
   },
   "NoRulesAdded": {
     "message": "No rules added"
+  },
+  "NoLocation":{
+    "message":"No location added"
+  },
+  "OneLocation":{
+    "message":"location added"
+  },
+  "MultipleLocations":{
+    "message":"locations"
   },
   "MultipleRulesAdded": {
     "message": "%{count} rules added"
@@ -431,20 +407,8 @@
   "BlockMicrophoneAccessTooltip": {
     "message": "Block websites from accessing your computer's microphone."
   },
-  "UseRegionLocale": {
-    "message": "Private locale and language settings"
-  },
-  "UseRegionLocaleTooltip": {
-    "message": "The default locale and language settings of your browser are kept private by replacing them with the locale and language settings of the current region."
-  },
   "Privacy": {
     "message": "Privacy"
-  },
-  "OnText": {
-    "message": "On"
-  },
-  "OffText": {
-    "message": "Off"
   },
   "ImportFileMessage": {
     "message": "Please select an exported Bypass Rules file (ex. bypass-rules.json)"
@@ -488,9 +452,6 @@
   "UpgradeBrowserMessage": {
     "message": "Private Internet Access cannot be used because your version of %{browser} is outdated. Please upgrade %{browser} to its latest version."
   },
-  "LoadingText": {
-    "message": "Loading"
-  },
   "LogoutText": {
     "message": "Logout"
   },
@@ -501,7 +462,13 @@
     "message": "Authentication error"
   },
   "AuthFailMessage": {
-    "message": "If you recently changed your password on the Private Internet Access website then re-authenticating with the extension might fix this error.<br /><br />For help and support, contact our <a href=\"https://privateinternetaccess.com/helpdesk\">support team</a>."
+    "message": "If you recently changed your password on the Private Internet Access website then re-authenticating with the extension might fix this error."
+  },
+  "AuthFailMessageSupportLead": {
+    "message": "For help and support, contact our"
+  },
+  "AuthFailMessageSupportEnd": {
+    "message": "support team"
   },
   "ConnectionFailPageTitle": {
     "message": "Connection error | Private Internet Access"
@@ -593,6 +560,12 @@
   "VIEWALL": {
     "message": "VIEW ALL SETTINGS..."
   },
+  "trial":{
+    "message":"Trial"
+  },
+  "days_left": {
+    "message":"days left"
+  },
   "Subscription": {
     "message": "SUBSCRIPTION"
   },
@@ -608,11 +581,14 @@
   "RemoveRule": {
     "message": "remove"
   },
+  "GatheringRegions": {
+    "message": "Gathering Regions"
+  },
   "PrivateBrowsingChangeLead": {
-    "message": "Firefox has recently changed the way addons handle proxy connections. Allowing the addon to run in Private Windows is now required for proxy settings to be updated."
+    "message": "Firefox has recently changed the way addons handle proxy connection. Allowing the addon to run in Private Windows is now required for proxy settings to be updated."
   },
   "PrivateBrowsingChangeDirections": {
-    "message": "Please visit the URL below to view your addons page. Then click on the \"Private Internet Access\" addon to modify its settings. From here, change the \"Run in Private Windows\" setting to \"Allow\"."
+    "message": "Please visit the URL below to view you addons page. Then click on the \"Private Internet Access\" addon to modify its settings. From here, change the \"Run in Private Windows\" setting to \"Allow\"."
   },
   "us": {
     "message": "United States"

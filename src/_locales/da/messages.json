@@ -47,20 +47,20 @@
   "ChangeExtraFeaturesSettings": {
     "message": "Ekstra funktioner"
   },
+  "encounterMessage_2": {
+    "message": "kontakte supportafdelingen "
+  },
   "JustInTimeDisclaimer": {
     "message": "Bedøm din oplevelse med PIA"
   },
-  "encounterMessageFirefox_1": {
-    "message": "Tak for din feedback! Hvis du støder på tekniske problemer, bedes du "
-  },
-  "encounterMessageFirefox_2": {
-    "message": "kontakte supportafdelingen "
-  },
-  "feedbackMessageFirefox_1": {
+  "feedbackMessage_1": {
     "message": "Tak for din feedback! Vi ville sætte pris på det, hvis du bedømte os på "
   },
-  "feedbackMessageFirefox_2": {
-    "message": "Firefox Browser Addons"
+  "feedbackMessage_2": {
+    "message": "Chrome Web Store"
+  },
+  "encountermessage_1": {
+    "message": "Tak for din feedback! Hvis du støder på tekniske problemer, bedes du "
   },
   "UILanguage": {
     "message": "Grænsefladesprog"

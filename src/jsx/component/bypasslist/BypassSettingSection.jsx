@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-
 import withAppContext from '@hoc/withAppContext';
 
 class BypassSettingSection extends Component {
@@ -31,7 +30,7 @@ class BypassSettingSection extends Component {
     else { listDetails = t('MultipleRulesAdded', { count }); }
 
     return (
-      <div className={`section-wrapper bypass ${theme}`}>
+      <div className={`section-wrapper bypass ${theme} ${lang}`}>
         <div
           role="button"
           tabIndex="-1"

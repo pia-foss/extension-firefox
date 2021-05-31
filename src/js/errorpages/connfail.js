@@ -1,12 +1,12 @@
 import '@babel/polyfill';
+import '@style/errorpage';
 import URLParser from 'url';
 import escapeHTML from 'escape-html';
 
 import { t } from '@errorpages/utils';
-import '@style/errorpage.scss';
 
-/*
- * This IIFE is necessary for top-level async functions
+/**
+ * This IIFE is necessary for top level async functions
  *
  * Removing this results in async functions being hoisted above the '@babel/polyfill'
  * import, and a ReferenceError occurring
@@ -21,19 +21,15 @@ import '@style/errorpage.scss';
   const HASH = 'reload';
 
   async function debug(msg) {
-    const { app } = await browser.runtime.getBackgroundPage();
-    app.logger.debug(msg);
-  }
-
-  /**
-   * Check if the url hash matches the provided value
-   *
-   * @param {string} hash Provided hash to test against
-   *
-   * @returns {boolean} whether the provided hash matches the current location
-   */
-  function isHash(hash) {
-    return document.location.hash === `#${hash}`;
+    return new Promise((resolve) => {
+      return chrome.runtime.getBackgroundPage(resolve);
+    })
+      .then(({ app }) => {
+        return app.logger.debug;
+      })
+      .then((backgroundDebug) => {
+        backgroundDebug(msg);
+      });
   }
 
   /**
@@ -77,6 +73,17 @@ import '@style/errorpage.scss';
   }
 
   /**
+   * Async wrapper around chrome.runtime.sendMessage
+   */
+  async function sendMessage(msg) {
+    return new Promise((resolve) => {
+      chrome.runtime.sendMessage(msg, (response) => {
+        resolve(response);
+      });
+    });
+  }
+
+  /**
    * Fetch the error information for the current url
    *
    * @returns {Promise<*>} errorInfo object
@@ -87,24 +94,9 @@ import '@style/errorpage.scss';
       id,
       request: 'RequestErrorInfo',
     };
-    const [errorName, errorUri] = await browser.runtime.sendMessage(message);
+    const [errorName, errorUri] = await sendMessage(message);
 
     return { errorName, errorUri, id };
-  }
-
-  /**
-   * Create listener for unload event for cleanup
-   *
-   * @param {string} id Id for error
-   */
-  function createUnloadListener(id) {
-    return async () => {
-      const message = {
-        id,
-        request: 'RequestErrorDelete',
-      };
-      await browser.runtime.sendMessage(message);
-    };
   }
 
   /**
@@ -112,41 +104,31 @@ import '@style/errorpage.scss';
    */
   async function onContentLoaded() {
     try {
+      // Get error info
       const errorInfo = await getErrorInfo();
-      const { errorName, id } = errorInfo;
+      const { errorName } = errorInfo;
       let { errorUri } = errorInfo;
       errorUri = safeUri(errorUri);
-      // If the page already contains hash, redirect
-      // NOTE: We deal with the redirect here, because firefox only receives
-      // requests from http:// and https:// urls via the webRequest API.
-      // Since we are redirecting from a moz-extension:// url, we cannot
-      // use the same method as the chrome extension (ie webRequest)
-      if (isHash(HASH)) {
-        window.addEventListener('unload', createUnloadListener(id));
-        window.location = errorUri;
-      }
-      // Else, update contents on page
-      else {
-        // Setup page
-        window.addEventListener('online', onlineListener);
-        document.location.hash = HASH;
 
-        // Setup page contents
-        const errorNameSpan = document.querySelector(ERROR_NAME_SPAN_SELECTOR);
-        const tryAgainBtn = document.querySelector(TRY_AGAIN_BTN_SELECTOR);
-        tryAgainBtn.setAttribute('href', errorUri);
-        errorNameSpan.innerHTML = errorName;
-        tryAgainBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          window.location = errorUri;
-        });
-        await Promise.all([
-          setTranslatedContents(PAGE_TITLE_SELECTOR, 'ConnectionFailPageTitle'),
-          setTranslatedContents(ERROR_TITLE_SELECTOR, 'ConnectionFailTitle'),
-          setTranslatedContents(ERROR_MESSAGE_SELECTOR, 'ConnectionFailMessage'),
-          setTranslatedContents(TRY_AGAIN_BTN_SELECTOR, 'TryAgain'),
-        ]);
-      }
+      // Setup page
+      window.addEventListener('online', onlineListener);
+      document.location.hash = HASH;
+
+      // Setup page contents
+      const errorNameSpan = document.querySelector(ERROR_NAME_SPAN_SELECTOR);
+      const tryAgainBtn = document.querySelector(TRY_AGAIN_BTN_SELECTOR);
+      tryAgainBtn.setAttribute('href', errorUri);
+      errorNameSpan.innerHTML = errorName;
+      tryAgainBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location = errorUri;
+      });
+      await Promise.all([
+        setTranslatedContents(PAGE_TITLE_SELECTOR, 'ConnectionFailPageTitle'),
+        setTranslatedContents(ERROR_TITLE_SELECTOR, 'ConnectionFailTitle'),
+        setTranslatedContents(ERROR_MESSAGE_SELECTOR, 'ConnectionFailMessage'),
+        setTranslatedContents(TRY_AGAIN_BTN_SELECTOR, 'TryAgain'),
+      ]);
     }
     catch (err) {
       await debug(`connfail.js::error - ${JSON.stringify(err, Object.getOwnPropertyNames(err))}`);

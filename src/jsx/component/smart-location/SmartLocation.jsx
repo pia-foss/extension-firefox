@@ -28,7 +28,7 @@ class SmartLocation extends Component {
     const lang = this.i18n.locale ? this.i18n.locale : 'en';
     if (count === 0) { listDetails = t('NoLocation'); }
     else if(count === 1){listDetails = count + " " +t('OneLocation'); }
-    else { listDetails  = count + " " +t('MultipleLocations'); }
+    else { listDetails = listDetails = count + " " +t('MultipleLocations'); }
 
     return (
       <div className={`section-wrapper bypass ${theme} ${lang}`}>

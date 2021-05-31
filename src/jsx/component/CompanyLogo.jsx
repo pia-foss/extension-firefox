@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-
 import MoreLinks from '@component/MoreLinks';
 import withAppContext from '@hoc/withAppContext';
 
@@ -40,11 +39,11 @@ class CompanyLogo extends Component {
       connection,
       context: { theme },
     } = this.props;
-
     // Normal Case: turn on and off proxy connection
     let content = '';
     if (mode === 'connecting' && connection === 'connected') { content = t('Disconnecting'); }
-    else if (mode === 'connecting' && connection === 'disconnected') { content = t('Connecting'); }
+    else if (mode === 'connecting' && connection === 'disconnected') {content = t('Connecting'); }
+    else if (connection === 'initial') { content = t('GatheringRegions'); }
     else if (connection === 'disconnected' || !connection) {
       const logoUrl = theme === 'dark' ? '/images/pia-logo-white.png' : '/images/pia-logo-black.png';
       content = (

@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-
 import Tile from '@component/tiles/Tile';
 import withAppContext from '@hoc/withAppContext';
 import LoadingEllipsis from '@component/LoadingEllipsis';
@@ -111,7 +110,6 @@ class QuickConnect extends Component {
   createComponent(newRegion, isFav) {
     // update mode, connection, and region here?
     const { mode, connection, region } = this.props;
-
     const classList = [];
     classList.push('connect-region');
     if (region && region.id === newRegion.id) { classList.push(mode, connection); }
@@ -193,12 +191,13 @@ class QuickConnect extends Component {
     const hasRegions = this.regionlist.hasRegions();
     const {
       saved,
-      hideFlag,
-      autoLoading,
       region,
+      regions,
+      hideFlag,
       toggleTileSaved,
       context: { theme },
     } = this.props;
+    const pending = regions.some((current) => { return current.latency === 'PENDING'; });
 
     if (!region) {
       return (
@@ -265,17 +264,18 @@ class QuickConnect extends Component {
 
 QuickConnect.propTypes = {
   region: PropTypes.object,
+  regions: PropTypes.array,
   saved: PropTypes.bool.isRequired,
   mode: PropTypes.string.isRequired,
   hideFlag: PropTypes.bool.isRequired,
   context: PropTypes.object.isRequired,
-  autoLoading: PropTypes.bool.isRequired,
   connection: PropTypes.string.isRequired,
   onQuickConnect: PropTypes.func.isRequired,
   toggleTileSaved: PropTypes.func.isRequired,
 };
 
 QuickConnect.defaultProps = {
+  regions: [],
   region: undefined,
 };
 

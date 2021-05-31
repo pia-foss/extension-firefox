@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-
 import withAppContext from '@hoc/withAppContext';
 import RegionListItem from '@component/RegionListItem';
 import onFlagError from '@eventhandler/pages/changeregion/onFlagError';
@@ -34,10 +33,8 @@ class RegionIso extends Component {
   }
 
   getRegionVisibility() {
-    let visibleISOs = this.storage.getItem('visibleISOs') || '{}';
-    try { visibleISOs = JSON.parse(visibleISOs); }
-    catch (err) { visibleISOs = {}; }
-    return visibleISOs;
+    const visibleISOs = this.storage.getItem('visibleISOs') || '{}';
+    return JSON.parse(visibleISOs);
   }
 
   toggleRegionVisibility() {
@@ -74,19 +71,12 @@ class RegionIso extends Component {
   }
 
   render() {
-    const { regions, updateRegionsLocally, context: { theme } } = this.props;
+    const { regions, context: { theme } } = this.props;
     const { flag } = regions[0];
     const { showRegions } = this.state;
     const regionHeight = this.calculateRegionHeight();
     const componentRegions = regions.map((region) => {
-      return (
-        <RegionListItem
-          key={region.id}
-          nested={true}
-          region={region}
-          onRegionUpdate={updateRegionsLocally}
-        />
-      );
+      return (<RegionListItem key={region.id} nested={true} region={region} />);
     });
 
     return (
@@ -128,7 +118,6 @@ RegionIso.propTypes = {
   iso: PropTypes.string.isRequired,
   regions: PropTypes.array.isRequired,
   context: PropTypes.object.isRequired,
-  updateRegionsLocally: PropTypes.func.isRequired,
 };
 
 export default withAppContext(RegionIso);

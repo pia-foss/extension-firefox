@@ -47,20 +47,20 @@
   "ChangeExtraFeaturesSettings": {
     "message": "Zusätzliche Funktionen"
   },
+  "encounterMessage_2": {
+    "message": "kontaktieren Sie den Support "
+  },
   "JustInTimeDisclaimer": {
     "message": "Bewerten Sie Ihre Erfahrung mit PIA"
   },
-  "encounterMessageFirefox_1": {
-    "message": "Danke für Ihr Feedback! Falls Sie auf technische Probleme stoßen "
-  },
-  "encounterMessageFirefox_2": {
-    "message": "kontaktieren Sie bitte den Support "
-  },
-  "feedbackMessageFirefox_1": {
+  "feedbackMessage_1": {
     "message": "Danke für Ihr Feedback! Wir begrüßen Ihre Bewertung im "
   },
-  "feedbackMessageFirefox_2": {
-    "message": "Firefox Browser-Add-ons"
+  "feedbackMessage_2": {
+    "message": "Chrome Web Store"
+  },
+  "encountermessage_1": {
+    "message": "Danke für Ihr Feedback! Falls Sie auf technische Probleme stoßen "
   },
   "UILanguage": {
     "message": "Sprache (Benutzeroberfläche)"

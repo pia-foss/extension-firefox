@@ -39,7 +39,5 @@
     "48": "images/icons/icon48.png",
     "128": "images/icons/icon128.png"
   },
-  "web_accessible_resources": [
-    "_locales/*/messages.json"
-  ]
+  "web_accessible_resources": ["_locales/*/messages.json"]
 }

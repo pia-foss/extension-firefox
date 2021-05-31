@@ -5,6 +5,7 @@ import { QuickConnectTile } from './quick-connect-tile';
 import { SubscriptionTile } from './subscription-tile';
 import { CurrentRegionTile } from './current-region-tile';
 import { BypassRulesTile } from './bypass-rules-tile';
+import { IpTile } from './ip-tile';
 import { Tile } from './tile';
 
 type TileName
@@ -12,6 +13,7 @@ type TileName
   | 'quick-connect'
   | 'subscription'
   | 'current-region'
+  | 'ip'
   | 'bypass-rules';
 
 type TileSource
@@ -91,6 +93,7 @@ class AuthenticatedTiles extends PageObject {
       case 'subscription': return this.getSubscriptionTile(source);
       case 'current-region': return this.getCurrentRegionTile(source);
       case 'bypass-rules': return this.getBypassRulesTile(source);
+      case 'ip': return this.getIpTile(source);
       default: throw new Error(`no such tile name: ${name}`);
     }
   }
@@ -105,6 +108,18 @@ class AuthenticatedTiles extends PageObject {
         name: 'tiles',
       },
       parent,
+    );
+  }
+
+  public getIpTile(source: TileSource = 'both') {
+    return new IpTile(
+      {
+        selector: createSelector({
+          value: '.ip-tile',
+        }),
+        name: 'ip tile',
+      },
+      this.getTileParent(source),
     );
   }
 
@@ -200,6 +215,7 @@ class AuthenticatedTiles extends PageObject {
       if (className.includes('quicksettings-tile')) { return 'quick-settings'; }
       if (className.includes('quickconnect-tile')) { return 'quick-connect'; }
       if (className.includes('bypassrules-tile')) { return 'bypass-rules'; }
+      if (className.includes('ip-tile')) { return 'ip'; }
       throw new Error(`unknown className: ${className}`);
     });
   }

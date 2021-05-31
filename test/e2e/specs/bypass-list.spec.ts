@@ -6,24 +6,20 @@ import { BypassPage } from '../pages/bypass';
 import { getEnabledPopularRules } from '../scripts/getEnabledPopularRules';
 import { expect } from 'chai';
 import { getConnected } from '../scripts/getConnected';
-import { FingerprintPage } from '../pages/fingerprint';
 
 idescribe('the bypass list page', function () {
   let loginPage: LoginPage;
   let settingsPage: SettingsPage;
   let authPage: AuthenticatedPage;
   let bypassPage: BypassPage;
-  let fingerprintPage: FingerprintPage;
 
   ibeforeEach(async function () {
     loginPage = new LoginPage();
     settingsPage = new SettingsPage();
     authPage = new AuthenticatedPage();
     bypassPage = new BypassPage();
-    fingerprintPage = new FingerprintPage();
 
     await loginPage.navigate();
-    await fingerprintPage.optIn();
     await loginPage.signIn();
     await authPage.waitForLatencyTest();
     await authPage.switchOn();

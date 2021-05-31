@@ -26,7 +26,7 @@ abstract class SectionBase extends PageObject {
   public getSetting(settingName: string): Checkbox {
     const setting = (this as any)[settingName];
     if (!setting) {
-      throw new Error(`no such setting '${settingName}'`);
+      throw new Error(`no such setting: ${settingName}`);
     }
     if (!(setting instanceof Checkbox)) {
       throw new Error(`${settingName} is not a setting`);

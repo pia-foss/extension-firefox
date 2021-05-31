@@ -125,7 +125,6 @@ module.exports = {
   _getProxyState(url, host, rules) {
     // No need to lowercase host, see http://findproxyforurl.com/misconceptions/
     url = url.toLowerCase();
-  
 
     // Reset the lastIndex regex property which is cached for subsequent calls
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/lastIndex

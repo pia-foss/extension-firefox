@@ -9,10 +9,52 @@ function createData(): SettingData[] {
   return [
     {
       sectionName: 'privacy',
+      settingName: 'blockCamera',
+      settingID: 'blockcamera',
+      expectedDefault: true,
+    },
+    {
+      sectionName: 'privacy',
+      settingName: 'blockMicrophone',
+      settingID: 'blockmicrophone',
+      expectedDefault: true,
+    },
+    {
+      sectionName: 'privacy',
+      settingName: 'blockLocation',
+      settingID: 'blocklocation',
+      expectedDefault: true,
+    },
+    {
+      sectionName: 'privacy',
       settingName: 'disableNetworkPrediction',
       settingID: 'blocknetworkprediction',
       expectedDefault: true,
     },
+    {
+      sectionName: 'privacy',
+      settingName: 'disableSafeBrowsing',
+      settingID: 'blocksafebrowsing',
+      expectedDefault: true,
+    },
+    {
+      sectionName: 'privacy',
+      settingName: 'disableAutofillCreditCard',
+      settingID: 'blockautofillcreditcard',
+      expectedDefault: true,
+    },
+    {
+      sectionName: 'privacy',
+      settingName: 'disableAutofillAddress',
+      settingID: 'blockautofilladdress',
+      expectedDefault: true,
+    },
+    // {
+    //   sectionName: 'security',
+    //   settingName: 'blockAdobeFlashCheckbox',
+    //   settingID: 'blockadobeflash',
+    //   expectedDefault: false,
+    // },
     {
       sectionName: 'security',
       settingName: 'preventWebRtcLeak',
@@ -20,15 +62,21 @@ function createData(): SettingData[] {
       expectedDefault: true,
     },
     {
-      sectionName: 'tracking',
-      settingName: 'disableWebsiteReferrer',
-      settingID: 'blockreferer',
+      sectionName: 'security',
+      settingName: 'httpsUpgrade',
+      settingID: 'httpsUpgrade',
       expectedDefault: true,
     },
     {
       sectionName: 'tracking',
-      settingName: 'fingerprintProtection',
-      settingID: 'fingerprintprotection',
+      settingName: 'disableThirdPartyCookies',
+      settingID: 'blockthirdpartycookies',
+      expectedDefault: true,
+    },
+    {
+      sectionName: 'tracking',
+      settingName: 'disableWebsiteReferrer',
+      settingID: 'blockreferer',
       expectedDefault: true,
     },
     {
@@ -53,6 +101,12 @@ function createData(): SettingData[] {
       sectionName: 'tracking',
       settingName: 'piaMace',
       settingID: 'maceprotection',
+      expectedDefault: true,
+    },
+    {
+      sectionName: 'extension',
+      settingName: 'allowDesktopNotifications',
+      settingID: 'allowExtensionNotifications',
       expectedDefault: true,
     },
     {

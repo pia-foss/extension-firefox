@@ -1,8 +1,10 @@
+import SameApp from '../sameApp';
+
 import User from '@util/user';
 import Icon from '@util/icon';
 import I18n from '@util/i18n';
 import Logger from '@util/logger';
-import Storage from '@util/storage';
+import Storage from '@firefoxsettings/storage';
 import Counter from '@util/counter';
 import Settings from '@util/settings';
 import ErrorInfo from '@util/errorinfo';
@@ -16,12 +18,12 @@ import SettingsManager from '@util/settingsmanager';
 import SmartLocation from '@util/smart-location';
 import IpManager from '@util/ipmanager';
 
-import WebRTC from '@chromesettings/webrtc';
-import HttpReferer from '@chromesettings/httpreferer';
-import HyperlinkAudit from '@chromesettings/hyperlinkaudit';
-import NetworkPrediction from '@chromesettings/networkprediction';
-import TrackingProtection from '@chromesettings/trackingprotection';
-import FingerprintProtection from '@chromesettings/fingerprintprotection';
+import WebRTC from '@firefoxsettings/webrtc';
+import HttpReferer from '@firefoxsettings/httpreferer';
+import HyperlinkAudit from '@firefoxsettings/hyperlinkaudit';
+import NetworkPrediction from '@firefoxsettings/networkprediction';
+import TrackingProtection from '@firefoxsettings/trackingprotection';
+import FingerprintProtection from '@firefoxsettings/fingerprintprotection';
 // import BrowserProxy from '@chromesettings/proxy';
 import UrlParser from '@helpers/url-parser';
 import BrowserProxy from './mockProxy';
@@ -31,7 +33,7 @@ import {
   isTarget,
   sendMessage,
   Type,
-} from '@helpers/messaging';
+} from '@helpers/messagingFirefox';
 
 export default class MockApp {
   constructor() {
@@ -40,7 +42,9 @@ export default class MockApp {
     this.logger = new Logger(this);
     this.buildinfo = new BuildInfo(this);
     window.debug = this.logger.debug;
-
+    
+    this.contentsettings = Object.create(null);
+    
     this.chromesettings = Object.create(null);
     this.chromesettings.webrtc = new WebRTC(this);
     this.chromesettings.httpreferer = new HttpReferer(this);
@@ -49,11 +53,11 @@ export default class MockApp {
     this.chromesettings.trackingprotection = new TrackingProtection(this);
     this.chromesettings.fingerprintprotection = new FingerprintProtection(this);
     this.chromesettings = Object.freeze(this.chromesettings);
-
+    
     this.proxy = new BrowserProxy(this, true);
-
+    
     this.adapter = this;
-
+    
     this.util = Object.create(null);
     this.util.storage = new Storage(this);
     this.util.platforminfo = new PlatformInfo(this);
@@ -68,13 +72,13 @@ export default class MockApp {
     this.util.user = new User(this, true);
     this.util.i18n = new I18n(this);
     this.util.errorinfo = new ErrorInfo(this);
-    this.util.smartlocation = new SmartLocation(this);
+    this.util.smartlocation = new SmartLocation(this,true);
     this.util.ipManager = new IpManager(this);
     this.util = Object.freeze(this.util);
-
     this.helpers = Object.create(null);
     this.helpers.UrlParser = new UrlParser(); 
     this.helpers = Object.freeze(this.helpers);
+    this.sameApp = new SameApp(this);
 
     // NOTE: Do not initialize the bypass list here,
     // it will be taken care of in the initialize function below
@@ -86,7 +90,6 @@ export default class MockApp {
     this.initialize = this.initialize.bind(this);
     this.sendMessage = this.sendMessage.bind(this);
     this.handleMessage = this.handleMessage.bind(this);
-
 
 
     // message handling
@@ -116,12 +119,13 @@ export default class MockApp {
         .map((setting) => { return setting.init(); })
         .map(reflect);
       await Promise.all(pendingInit);
-
+      
       if (app) {
         // set user, proxy, and region values
         this.util.smartlocation.saveToStorage('smartLocationRules',app.util.smartlocation.smartLocationRules,true);
         this.util.smartlocation.saveToStorage('checkSmartLocation',app.util.smartlocation.checkSmartLocation,true);
         this.proxy.setLevelOfControl(app.proxy.levelOfControl);
+
         if(app.proxy.enabled) this.proxy.enable();
         else this.proxy.disable();
         this.util.user.setLoggedIn(app.util.user.loggedIn);
@@ -134,11 +138,11 @@ export default class MockApp {
         this.util.regionlist.importAutoRegion(app.util.regionlist.autoRegion);
         await this.util.regionlist.setSelectedRegion(app.util.regionlist.region.id, true);
         this.util.regionlist.resetFavoriteRegions(app.util.regionlist.favorites);
-
+        
         // save tile and drawerOpen state to storage
         if (app.tiles) { this.util.storage.setItem('tiles', app.tiles); }
         if (app.drawerState) { this.util.storage.setItem('drawerState', app.drawerState); }
-
+        
         // set bypasslist rules
         const userRuleKey = this.util.bypasslist.storageKeys.userrk;
         const popRuleKey = this.util.bypasslist.storageKeys.poprk;
@@ -146,8 +150,10 @@ export default class MockApp {
         this.util.storage.setItem(popRuleKey, app.util.bypasslist.popular);
         this.util.bypasslist.resetPopularRules();
       }
+      
 
       await this.proxy.init();
+      await this.sameApp.init();
     }
     catch (err) {
       debug('mockApp.js: error occurred');
@@ -167,7 +173,7 @@ export default class MockApp {
     return message;
   }
 
-  handleMessage(message, sender, response) {
+  handleMessage(message, response) {
     if (!isTarget(message, Target.FOREGROUND)) { return false; }
 
     // can't return a promise because it's the polyfill version

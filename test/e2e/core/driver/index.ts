@@ -1,10 +1,10 @@
-import { Driver as FirefoxDriver } from 'selenium-webdriver/firefox';
+import { Driver as ChromeDriver } from 'selenium-webdriver/chrome';
 import { By, WebElementPromise, Builder } from 'selenium-webdriver';
 
 import { augmentDriver } from './augmentDriver';
-import { createOptions } from './options'
+import { createOptions } from './options';
 
-interface Driver extends FirefoxDriver {
+interface Driver extends ChromeDriver {
   waitAndFindElement(by: By): WebElementPromise;
   baseURL: string;
 }
@@ -12,13 +12,13 @@ interface Driver extends FirefoxDriver {
 class DriverFactory {
   private static driver = null as Driver | null;
 
-  private static async createFirefoxDriver(): Promise<FirefoxDriver> {
+  private static async createChromeDriver(): Promise<ChromeDriver> {
     const options = await createOptions();
-    const thenableDriver = await new Builder()
-      .forBrowser('firefox')
-      .setFirefoxOptions(options)
+    const thenableDriver = new Builder()
+      .forBrowser('chrome')
+      .setChromeOptions(options)
       .build();
-    const driver = await thenableDriver as FirefoxDriver;
+    const driver = (await thenableDriver) as ChromeDriver;
 
     return driver;
   }
@@ -38,8 +38,8 @@ class DriverFactory {
     if (DriverFactory.driver) {
       throw new Error('a driver is already active');
     }
-    const firefoxDriver = await DriverFactory.createFirefoxDriver();
-    DriverFactory.driver = await augmentDriver(firefoxDriver);
+    const chromeDriver = await DriverFactory.createChromeDriver();
+    DriverFactory.driver = augmentDriver(chromeDriver);
 
     return DriverFactory.driver;
   }
@@ -59,4 +59,4 @@ class DriverFactory {
   }
 }
 
-export { DriverFactory, Driver, FirefoxDriver };
+export { DriverFactory, Driver, ChromeDriver };

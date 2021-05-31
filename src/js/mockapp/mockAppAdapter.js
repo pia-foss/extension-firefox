@@ -4,7 +4,7 @@ import {
   isTarget,
   sendMessage,
   Namespace,
-} from '@helpers/messaging';
+} from '@helpers/messagingFirefox';
 
 export default class MockAppAdapter {
   constructor(app) {
@@ -17,7 +17,7 @@ export default class MockAppAdapter {
     this.sendMessage = this.sendMessage.bind(this);
     this.handleMessage = this.handleMessage.bind(this);
     this.handleRegionList = this.handleRegionList.bind(this);
-
+    console.log('SENT MESSAGE -------------',this.handleMessage);
     // handle listener
     browser.runtime.onMessage.addListener(this.handleMessage);
   }
@@ -59,7 +59,10 @@ export default class MockAppAdapter {
       else if (message.type === 'smartLocation') {
         const { settingID, value } = message.data;
         this.app.util.smartlocation.saveToStorage(settingID, value, true);
-      }  else if (message.type === 'util.settings.toggle') {
+      }  else if (message.type === 'sameApp') {
+        const { settingID } = message.data;
+        this.app.sameApp.saveToStorage(settingID,value, true);
+      } else if (message.type === 'util.settings.toggle') {
         const { settingID } = message.data;
         this.app.util.settings.toggle(settingID, true);
       }
@@ -104,6 +107,7 @@ export default class MockAppAdapter {
       else if (message.type.startsWith(Namespace.I18N)) {
         res = this.handleI18nMessage(message);
       }
+
       return resolve(res);
     })
       .then(response)
@@ -240,6 +244,9 @@ export default class MockAppAdapter {
         },
         settings: this.app.util.settings.getAll(),
       },
+      sameApp:{
+        sameAppBrowser : this.app.sameApp.returnBrowser()
+      }
     };
 
     const tiles = this.app.util.storage.getItem('tiles');

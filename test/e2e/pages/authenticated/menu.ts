@@ -1,8 +1,8 @@
-import { PageObject } from '../../core';
+import { Node } from '../../core';
 import { createSelector } from '../../core/entities/selector';
 import { Button, Container } from '../../elements';
 
-class AuthenticatedMenu extends PageObject {
+class AuthenticatedMenu extends Node {
   public settings: Button;
   public account: Button;
   public help: Button;
@@ -10,7 +10,7 @@ class AuthenticatedMenu extends PageObject {
   public switch: Button;
   public dropdown: Container;
 
-  constructor(parent: PageObject) {
+  constructor(parent: Node) {
     super(
       {
         selector: createSelector({

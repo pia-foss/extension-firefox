@@ -47,20 +47,20 @@
   "ChangeExtraFeaturesSettings": {
     "message": "Características adicionales"
   },
+  "encounterMessage_2": {
+    "message": "ponte en contacto con el departamento de atención al cliente. "
+  },
   "JustInTimeDisclaimer": {
     "message": "Valora tu experiencia con PIA"
   },
-  "encounterMessageFirefox_1": {
-    "message": "Gracias por tus comentarios. Si encuentras algún problema técnico, "
-  },
-  "encounterMessageFirefox_2": {
-    "message": "ponte en contacto con el departamento de atención al cliente. "
-  },
-  "feedbackMessageFirefox_1": {
+  "feedbackMessage_1": {
     "message": "Gracias por tus comentarios. Te agradeceríamos que pudieras valorarnos en "
   },
-  "feedbackMessageFirefox_2": {
-    "message": "Complementos de navegador Firefox"
+  "feedbackMessage_2": {
+    "message": "Chrome Web Store"
+  },
+  "encountermessage_1": {
+    "message": "Gracias por tus comentarios. Si encuentras algún problema técnico, "
   },
   "UILanguage": {
     "message": "Idioma de la interfaz"

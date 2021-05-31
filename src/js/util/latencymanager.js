@@ -18,7 +18,6 @@ class LatencyManager {
 
   constructor(app) {
     this.app = app;
-
     this.run = this.run.bind(this);
   }
 
@@ -60,7 +59,6 @@ class LatencyManager {
     if (!region) return Promise.resolve();
     const results = [];
     for (let i = 0; i < LatencyManager.ROUNDS; i++) {
-      // eslint-disable-next-line no-await-in-loop
       results.push(await LatencyManager.round(region));
     }
     const latency = results.sort(compare.byLatency).shift();

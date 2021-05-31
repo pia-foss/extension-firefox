@@ -1,8 +1,7 @@
 import { expect } from 'chai';
-import { Condition, WebElement, error } from 'selenium-webdriver';
+import { WebElementCondition, Condition, WebElement, error } from 'selenium-webdriver';
 
 import { ElementDescriptor, LazyWebElement } from './lazyWebElement';
-import { createSelector } from '../entities/selector';
 import { DriverFactory } from '../driver';
 import { Actions, createActions } from './actions';
 import { getConfig } from '../util/config';
@@ -55,7 +54,32 @@ export abstract class Node {
   }
 
   protected get visibleElement() {
-    return this.getVisibleElement();
+    const { waitTime } = getConfig();
+    const message = `
+      for element:
+
+      ${this}
+
+      to be visible
+    `;
+    const condition = new WebElementCondition(message, async () => {
+      const [first, ...rest] = this.lazyChain;
+      let [target] = await first.seleniumElement.findElements();
+      for (const next of rest) {
+        if (!target) {
+          return false;
+        }
+        ([target] = await next.seleniumElement.findFromWebElement(target));
+      }
+
+      if (target && await target.isDisplayed()) {
+        return target;
+      }
+
+      return false;
+    });
+
+    return this.driver.wait(condition, waitTime);
   }
 
   private get driver() {
@@ -113,11 +137,6 @@ export abstract class Node {
     return messages.join('\n');
   }
 
-  public async click() {
-    const el = await this.getVisibleElement();
-    await el.click();
-  }
-
   public async hasClass(testClassName: string) {
     const el = await this.getElement();
     if (!el) { return false; }
@@ -157,23 +176,8 @@ export abstract class Node {
     expect(actual, `expected ${expected} of ${this} but was ${actual}`).to.eq(expected);
   }
 
-  protected getVisibleElement() {
-    const message = `
-      for element:
-
-      ${this}
-
-      to be visible
-    `;
-    return this.waitFor<WebElement>(message, async () => {
-      const [target] = await this.getElementsWithoutWait();
-      if (target && await target.isDisplayed()) { return target; }
-      return false;
-    });
-  }
-
   /**
-   * Wait for x elements to exist
+   * Wait for x elements to exits
    */
   protected getElements(expected?: number) {
     // Expected - expected # of elements
@@ -324,21 +328,13 @@ export abstract class Node {
   }
 
   protected waitFor<T>(message: string, fn: (this: Node) => Promise<T | false>) {
-    const { WAIT_TIME: timeout } = getConfig();
+    const { waitTime: timeout } = getConfig();
     const condition = new Condition<T>(message, fn);
     return Promise.resolve(this.driver.wait(condition, timeout));
   }
 
   protected async switchToFrame(id: string) {
-    class Frame extends Node {}
-    const frame = new Frame({
-      selector: createSelector({
-        value: `#${id}`,
-      }),
-      name: 'Frame',
-    });
-    const element = await frame.getElement();
-    await this.driver.switchTo().frame(element);
+    await this.driver.switchTo().frame(id as any);
     return async () => {
       await this.driver.switchTo().defaultContent();
     };

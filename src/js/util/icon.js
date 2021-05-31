@@ -15,6 +15,7 @@ const redRobots = {
 };
 
 const pacengine = require('../pacengine');
+// const urlParser = require('../pacengine/url-parser');
 /**
  * Control the icon used to open the foreground
  *
@@ -27,7 +28,6 @@ class Icon {
     this.online = this.online.bind(this);
     this.offline = this.offline.bind(this);
     this.updateTooltip = this.updateTooltip.bind(this);
-
     // init
     this.app = app;
   }
@@ -36,12 +36,13 @@ class Icon {
     const userRulesSmartLoc = this.app.util.smartlocation.getSmartLocationRules('smartLocationRules').map(loc =>{
       return {cc:loc.proxy.id,domain:loc.userRules,country:loc}
     })
-    const state = pacengine.getProxyStateByURL(url, parseUrl.host, userRulesSmartLoc);
+    const rules = typeof browser == 'undefined' ? this.app.proxy.rules : userRulesSmartLoc;
+    const state = pacengine.getProxyStateByURL(url, parseUrl.host, rules);
     // Add booleans indicating the state of a tab.
     const tabState = {
       isDefault: state === 'DEFAULT', // Only occurs if no rule did match
       isLocal: state === 'LOCAL', // Only true on local sites (including config.localDomains)
-      isDirect: state === 'OFF', 
+      isDirect: state === 'OFF',
       isRuleActive: false,
       customCountry: null
     };
@@ -52,44 +53,42 @@ class Icon {
     }
     return tabState;
   }
-  
 
   async upatedOnChangeTab(tabId){
-    //change icon if there is a smart rule or check smart
+    //check if there are rules
     const checkSmartLoc = this.app.util.smartlocation.getSmartLocationRules('checkSmartLocation');
-    this.app.util.smartlocation.saveToStorage('tabId',tabId,true);
     chrome.tabs.get(tabId, (tab) => {
-      this.app.util.smartlocation.setCurrentDomain(tab);
+      this.app.util.smartlocation.setCurrentDomain();
       this.app.util.regionlist.selectedRegionSmartLoc = null;
       this.online(null);
       if(tab.url){
+        //get the parsed url
         const parseUrl =  this.app.helpers.UrlParser.parse(tab.url);
+        //get the state if there are rules
         const tabState = this.getCurrentState(tab.url, parseUrl);
-        this.app.util.smartlocation.saveToStorage('tabState',tabState,true);
-        this.app.util.storage.setItem('tabState', JSON.stringify(tabState));
-        this.app.util.ipManager.updateIpByRegion();
         if(checkSmartLoc){
+          this.app.util.ipManager.updateIpByRegion(tabState);
+          //change icon
           this.getStateAndChangeIcon(tabState)
         }
       }
     })
-    // this.app.util.ipManager.update({ retry: true });
   }
 
-
   getStateAndChangeIcon(tab){
-    //change icon with location
+    //change icon for location
     if(tab.customCountry){
       const location = this.app.util.regionlist.getRegionById(tab.customCountry);
-      this.online(location)
-      this.app.util.regionlist.selectedRegionSmartLoc =  location;
+      this.app.util.regionlist.selectedRegionSmartLoc = location;
+      this.online(location);
     }
   }
 
-  async online(location) {
+  async online() {
+    const regionSelected = this.app.util.regionlist.getSelectedRegion();  
     const imageData = {};
     const imagePromises = [];
-    const region = location ? location : this.app.util.regionlist.getSelectedRegion();
+    let region = regionSelected ? regionSelected : this.app.util.regionlist.getSelectedRegion();
 
     Object.keys(greenRobots).forEach((size) => {
       imagePromises.push(Icon.generateIcon(imageData, size, region));
@@ -125,19 +124,18 @@ class Icon {
       });
   }
 
-  updateTooltip() {
+  updateTooltip(regionIcon = null) {
     let title;
     const { proxy, buildinfo } = this.app;
     const { regionlist, user } = this.app.util;
-    let region = regionlist.getSelectedRegion();
+    const region = regionIcon ? regionIcon : regionlist.getSelectedRegion();
 
     if (region && proxy.enabled()) {
-      title = t('YouAreConnectedTo').replace('%{region}',  region.name);
+      title = t('YouAreConnectedTo');
     }
     else {
       title = user.getLoggedIn() ? t('YouAreNotConnected') : 'Private Internet Access';
     }
-
 
     // Badge
     chrome.browserAction.setTitle({ title });

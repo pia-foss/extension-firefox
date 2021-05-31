@@ -6,10 +6,10 @@ import CurrentRegion from '@component/CurrentRegion';
 
 const RegionTile = (props) => {
   const {
-    region,
     saved,
+    region,
+    regions,
     hideFlag,
-    autoLoading,
     toggleTileSaved,
   } = props;
 
@@ -20,20 +20,21 @@ const RegionTile = (props) => {
       hideFlag={hideFlag}
       toggleTileSaved={toggleTileSaved}
     >
-      <CurrentRegion id="region" region={region} autoLoading={autoLoading} />
+      <CurrentRegion id="region" region={region} regions={regions} />
     </Tile>
   );
 };
 
 RegionTile.propTypes = {
   region: PropTypes.object,
+  regions: PropTypes.array,
   saved: PropTypes.bool.isRequired,
   hideFlag: PropTypes.bool.isRequired,
-  autoLoading: PropTypes.bool.isRequired,
   toggleTileSaved: PropTypes.func.isRequired,
 };
 
 RegionTile.defaultProps = {
+  regions: [],
   region: undefined,
 };
 

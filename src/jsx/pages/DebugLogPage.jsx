@@ -23,15 +23,6 @@ class DebuglogPage extends Component {
     this.handleNewMessage = this.handleNewMessage.bind(this);
   }
 
-  componentDidMount() {
-    this.logger.addEventListener('NewMessage', this.handleNewMessage);
-  }
-
-  componentWillUnmount() {
-    this.logger.removeEventListener('NewMessage', this.handleNewMessage);
-    this.handleNewMessage = null;
-  }
-
   handleNewMessage() {
     this.setState({ entries: this.logger.getEntries() });
   }

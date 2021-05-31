@@ -9,7 +9,6 @@ import {
   createData,
 } from '../data/settings.data';
 import { LoginPage } from '../pages/login';
-import { FingerprintPage } from '../pages/fingerprint';
 import { AuthenticatedPage } from '../pages/authenticated';
 import { createPiaUrl } from '../helpers/url';
 import { SettingsPage } from '../pages/settings';
@@ -67,7 +66,6 @@ function createUrl(baseUrl: string, filterList: QueryType[]) {
 }
 
 idescribe('query parameter settings (fbclid & utm)', function () {
-  let fingerprintPage: FingerprintPage;
   let loginPage: LoginPage;
   let authPage: AuthenticatedPage;
   let baseUrl: string;
@@ -76,7 +74,6 @@ idescribe('query parameter settings (fbclid & utm)', function () {
 
   ibeforeEach(async function () {
     // Init
-    fingerprintPage = new FingerprintPage();
     loginPage = new LoginPage();
     authPage = new AuthenticatedPage();
     baseUrl = 'robots.txt';
@@ -84,7 +81,6 @@ idescribe('query parameter settings (fbclid & utm)', function () {
     settingsData = createData();
 
     await loginPage.navigate();
-    await fingerprintPage.optIn();
     await loginPage.signIn();
   });
 

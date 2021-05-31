@@ -7,19 +7,34 @@ const env = (envVar) => {
 };
 exports.env = env;
 
+/**
+ * Colors used for console statements
+ */
 const Color = {
   blue: '\x1b[34m',
   red: '\x1b[31m',
 };
 exports.Color = Color;
 
+/**
+ * Used to print colors to console
+ */
 // eslint-disable-next-line no-console
 const print = (msg, color = Color.blue) => { console.log(`${color}%s\x1b[0m`, msg); };
 exports.print = print;
 
-const getBrowser = () => { return process.env.BROWSER || 'firefox'; };
+/**
+ * Determine the browser for the build
+ *
+ * Uses environment variable "BROWSER"
+ */
+const getBrowser = () => { 
+  return process.env.BROWSER || 'chrome'; };
 exports.getBrowser = getBrowser;
 
+/**
+ * Possible build types
+ */
 const Build = {
   DEVELOPMENT: 'dev',
   QA: 'qa',
@@ -29,6 +44,11 @@ const Build = {
 };
 exports.Build = Build;
 
+/**
+ * Determines type of build
+ *
+ * Uses environment variable "BUILD"
+ */
 const getBuild = () => {
   const build = process.env.WEBPACK_ENV || Build.DEVELOPMENT;
   switch (build) {
@@ -44,6 +64,9 @@ const getBuild = () => {
 };
 exports.getBuild = getBuild;
 
+/**
+ * Determine from the build whether it is a release build or not
+ */
 const shouldRelease = () => {
   const build = getBuild();
   return (
@@ -53,12 +76,21 @@ const shouldRelease = () => {
 };
 exports.shouldRelease = shouldRelease;
 
+/**
+ * Derive a path from root
+ */
 const root = (...filesOrDirs) => { return path.resolve(__dirname, '..', ...filesOrDirs); };
 exports.root = root;
 
+/**
+ * Derive a path from src
+ */
 const src = (...filesOrDirs) => { return root('src', ...filesOrDirs); };
 exports.src = src;
 
+/**
+ * Determine a path for the build directory
+ */
 const getBuildDirName = () => {
   const browser = getBrowser();
   const build = getBuild();
@@ -66,11 +98,17 @@ const getBuildDirName = () => {
 };
 exports.getBuildDirName = getBuildDirName;
 
+/**
+ * Derive a path from dist
+ */
 const dist = (...filesOrDirs) => {
   return root('builds', getBuildDirName(), ...filesOrDirs);
 };
 exports.dist = dist;
 
+/**
+ * Get the current version of the extension
+ */
 const getVersion = () => {
   if (!getVersion.version) {
     const versionPath = root('VERSION');
@@ -82,6 +120,9 @@ const getVersion = () => {
 };
 exports.getVersion = getVersion;
 
+/**
+ * Get browser-specific file extensions for source files
+ */
 const getExtensions = (config = 'webpack') => {
   let prefixes;
   switch (getBrowser()) {
@@ -141,6 +182,9 @@ const getExtensions = (config = 'webpack') => {
 exports.getExtensions = getExtensions;
 
 
+/**
+ * Determine current git hash
+ */
 const getGitHash = () => {
   return execSync('git rev-parse HEAD', { cwd: root() })
     .toString()
@@ -148,6 +192,9 @@ const getGitHash = () => {
 };
 exports.getGitHash = getGitHash;
 
+/**
+ * Determine current git branch name
+ */
 const getGitBranch = () => {
   return execSync('git rev-parse --abbrev-ref HEAD', { cwd: root() })
     .toString()
@@ -155,8 +202,17 @@ const getGitBranch = () => {
 };
 exports.getGitBranch = getGitBranch;
 
+/**
+ * Determine browser-specific file extension for distributables
+ */
 const getExt = (browser = getBrowser()) => {
   switch (browser) {
+    case 'chrome': {
+      return 'crx';
+    }
+    case 'opera': {
+      return 'crx';
+    }
     case 'firefox': {
       return 'xpi';
     }
@@ -165,6 +221,14 @@ const getExt = (browser = getBrowser()) => {
 };
 exports.getExt = getExt;
 
+/**
+ * Format filename for distributables, filling in variables
+ *
+ * [browser]
+ * [version]
+ * [build]
+ * [ext]
+ */
 const formatFilename = (template) => {
   if (!template) { return ''; }
   const browser = getBrowser();
@@ -176,21 +240,31 @@ const formatFilename = (template) => {
 };
 exports.formatFilename = formatFilename;
 
+/**
+ * Get default filename for distributables
+ */
 const defaultFilename = () => {
   return formatFilename('private_internet_access-[browser]-v[version]-[build].[ext]');
 };
 exports.defaultFilename = defaultFilename;
 
+/**
+ * Get aliases for directories
+ */
 const getAliases = (config = 'webpack') => {
   const aliases = [
+    ['@core', ['src', 'js', 'core']],
     ['@root', []],
     ['@src', ['src']],
     ['@style', ['src', 'scss']],
     ['@images', ['src', 'images']],
     ['@util', ['src', 'js', 'util']],
+    ['@pacengine', ['src', 'js', 'pacengine']],
     ['@helpers', ['src', 'js', 'helpers']],
     ['@popups', ['src', 'js', 'popups']],
     ['@chromesettings', ['src', 'js', 'chromesettings']],
+    ['@firefoxsettings', ['src', 'js', 'firefoxsettings']],
+    ['@contentsettings', ['src', 'js', 'contentsettings']],
     ['@eventhandler', ['src', 'js', 'eventhandler']],
     ['@mockapp', ['src', 'js', 'mockapp']],
     ['@app', ['src', 'jsx', 'app']],

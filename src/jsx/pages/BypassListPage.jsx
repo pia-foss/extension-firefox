@@ -27,7 +27,13 @@ class BypassListPage extends Component {
         <PageTitle text={t('ProxyBypassList')} />
 
         <div className="bypass-wrap">
-          <p className="introtext" dangerouslySetInnerHTML={{ __html: t('BypassWarning') }} />
+          <p className="introtext">
+            { t('BypassWarningLead') }
+            &nbsp;
+            <span className="bold-underline">
+              { t('BypassWarningBold') }
+            </span>
+          </p>
 
           <ImportExportRules />
 

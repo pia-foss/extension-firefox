@@ -1,78 +1,89 @@
 /*
-  Utilities for sending/receiving messages within the PIA application
+  interface Meta {
+    target: string;
+    type: string;
+  }
 
-  @type Listener <T> = (payload: T) => void;
+  type Listener <T> = (payload: T) => void;
 */
+
+const Type = {
+  FOREGROUND_OPEN: '@all/foreground_open',
+};
 
 const Target = {
   ALL: '@all',
   POPUPS: '@popups',
   FOREGROUND: '@foreground',
-  BACKGROUND: '@background'
+  BACKGROUND: '@background',
 };
 
-const Namespace = {
-  REGIONLIST: 'util.regionlist',
-  PROXY: 'proxy',
-  BYPASSLIST: 'util.bypasslist',
-  I18N: 'util.i18n',
-};
-
-const Type = {
-  FOREGROUND_OPEN: 'foreground_open',
-  UPDATE_PAC_INFO: 'update_pac_info',
-  DEBUG: 'debug',
-  SET_SELECTED_REGION: `${Namespace.REGIONLIST}.setSelectedRegion`,
-  IMPORT_REGIONS: `${Namespace.REGIONLIST}.import`,
-  IMPORT_AUTO_REGION: `${Namespace.REGIONLIST}.setAutoRegion`,
-  SET_FAVORITE_REGION: `${Namespace.REGIONLIST}.setFavoriteRegion`,
-  ADD_OVERRIDE_REGION: `${Namespace.REGIONLIST}.addOverrideRegion`,
-  REMOVE_OVERRIDE_REGION: `${Namespace.REGIONLIST}.removeOverrideRegion`,
-  PROXY_ENABLE: `${Namespace.PROXY}.enable`,
-  PROXY_DISABLE: `${Namespace.PROXY}.disable`,
-  PAC_UPDATE: `${Target.PAC}/update`,
-  DOWNLOAD_BYPASS_JSON: `${Namespace.BYPASSLIST}.saveRulesToFile`,
-  IMPORT_RULES: `${Namespace.BYPASSLIST}.importRules`,
-  I18N_TRANSLATE: `${Namespace.I18N}.t`,
-};
-
-async function sendMessage(target, type, data) {
-  if (!Object.values(Target).includes(target)) {
-    throw new Error(`invalid target: ${target}`);
+const validateMeta = (meta) => {
+  if (typeof meta !== 'object') {
+    throw new Error(`expected meta to be object, not ${typeof meta}`);
   }
-  if (!type) {
-    throw new Error('invalid type');
+  if (meta === null) {
+    throw new Error('expected meta to be object, not null');
   }
-  const msg = {
-    type,
+  if (typeof meta.target !== 'string') {
+    throw new Error('expected meta to contain string property "target"');
+  }
+  if (typeof meta.type !== 'string') {
+    throw new Error('expected meta to contain string property "type');
+  }
+};
+
+const isValidTarget = (listenerTarget, senderTarget) => {
+  if (senderTarget === Target.ALL) {
+    return true;
+  }
+  if (senderTarget === listenerTarget) {
+    return true;
+  }
+
+  return false;
+};
+
+/**
+ * Listen for messages
+ *
+ * @template T
+ * @param {Meta} meta Metadata about message
+ * @param {Listener<T>} listener Listener triggered when message is received
+ *
+ * @returns {void}
+ */
+const onMessage = (meta, listener) => {
+  validateMeta(meta);
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message.type === meta.type && isValidTarget(meta.target, message.target)) {
+      listener(message.data);
+    }
+  });
+};
+
+/**
+ * Send a message
+ *
+ * @template T
+ * @param {Meta} meta Metadata about message
+ * @param {T} [data] Payload to send
+ *
+ * @returns {void}
+ */
+const sendMessage = (meta, data) => {
+  validateMeta(meta);
+  const { target, type } = meta;
+  chrome.runtime.sendMessage({
     target,
-    data: data || {},
-  };
-
-  return browser.runtime.sendMessage(msg);
-}
-
-function isTarget(message, target) {
-  if (!message) { return false; }
-  if (!message.target) { return false; }
-  if (message.target !== target && message.target !== Target.ALL) { return false; }
-
-  return true;
-}
-
-function isType(message, type) {
-  if (!message) { return false; }
-  if (!message.type) { return false; }
-  if (!message.type === type) { return false; }
-
-  return true;
-}
+    type,
+    data,
+  });
+};
 
 export {
-  Target,
-  Type,
-  Namespace,
+  onMessage,
   sendMessage,
-  isTarget,
-  isType,
+  Type,
+  Target,
 };

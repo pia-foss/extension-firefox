@@ -1,8 +1,7 @@
-import File from '@helpers/file';
-import { Type } from '@helpers/messaging';
+import { Type } from '@helpers/messagingFirefox';
 
 export default class BypassList {
-  constructor(app, foreground) {
+  constructor(app,foreground) {
     // Bindings
     this.init = this.init.bind(this);
     this.generatePingGateways = this.generatePingGateways.bind(this);
@@ -19,10 +18,11 @@ export default class BypassList {
     this.disablePopularRule = this.disablePopularRule.bind(this);
     this.enabledPopularRules = this.enabledPopularRules.bind(this);
     this.toArray = this.toArray.bind(this);
-    this.resetPopularRules = this.resetPopularRules.bind(this);
     this.saveRulesToFile = this.saveRulesToFile.bind(this);
+    this.resetPopularRules = this.resetPopularRules.bind(this);
     this.importRules = this.importRules.bind(this);
     this.spawnImportTab = this.spawnImportTab.bind(this);
+    this.getRulesSmartLoc = this.getRulesSmartLoc.bind(this);
 
     // Init
     this.app = app;
@@ -88,8 +88,27 @@ export default class BypassList {
 
     if (this.storage.hasItem(poprk) && this.storage.getItem(poprk).length > 0) {
       this.storage.getItem(poprk).split(',').forEach((name) => {
-        this.enablePopularRule(name);
+        return this.enablePopularRule(name);
       });
+    }
+  }
+
+  resetPopularRules() {
+    // turn off all popular rules
+    this.popularRulesByName().map((rule) => {
+      return this.disablePopularRule(rule, true);
+    });
+
+    // turn on popular and user rules from storage
+    const { userrk, poprk } = this.storageKeys;
+    if (this.storage.hasItem(poprk) && this.storage.getItem(poprk).length > 0) {
+      this.storage.getItem(poprk).split(',').forEach((name) => {
+        this.enablePopularRule(name, true);
+      });
+    }
+
+    if (this.storage.hasItem(userrk)) {
+      this.setUserRules(this.storage.getItem(userrk).split(','), true);
     }
   }
 
@@ -126,6 +145,7 @@ export default class BypassList {
   }
 
   async restartProxy(cb = () => {}) {
+
     const { proxy } = this.app;
     if (!proxy) { throw new Error(debug('proxy not ready')); }
     if (proxy.enabled()) { await proxy.enable().then(cb); }
@@ -140,11 +160,23 @@ export default class BypassList {
     const { adapter } = this.app;
     this.storage.setItem(this.storageKeys.userrk, BypassList.trimUserRules(Array.from(rules)).join(','));
     this.enabledRules.set(this.storageKeys.userrk, rules);
-    if (!bridged) { adapter.sendMessage('setUserRules', rules); }
+    if (!bridged && typeof browser != 'undefined') { adapter.sendMessage('setUserRules', rules); }
     return this.getUserRules();
   }
 
-  addUserRule(string, bridged, restartProxy = false) {
+  getRulesSmartLoc(){
+    const { helpers } = app;
+    const bypassRules = this.enabledRules.get(this.storageKeys.userrk);
+
+    const rules = bypassRules.map((v,k) => {
+      if(helpers.UrlParser.parse(v)){
+        return helpers.UrlParser.parse(v).domain
+      }
+    });
+    return rules;
+  };
+
+  addUserRule(string, restartProxy = false) {
     let userString = string;
     if (userString.endsWith('/')) { userString = string.substring(0, string.length - 1); }
     const userRules = this.getUserRules();
@@ -175,7 +207,7 @@ export default class BypassList {
 
       // ensure mock app is aware of this change
       // TODO: send the restartProxy params over to adapter
-      if (!bridged) {
+      if (!bridged && typeof browser != 'undefined') {
         return resolve(adapter.sendMessage('enablePopularRule', { name, restartProxy }));
       }
       return resolve();
@@ -203,7 +235,7 @@ export default class BypassList {
       this.enabledRules.delete(name);
 
       // ensure mock app is aware of this change
-      if (!bridged) {
+      if (!bridged && typeof browser != 'undefined') {
         return resolve(adapter.sendMessage('disablePopularRule', { name, restartProxy }));
       }
       return resolve();
@@ -230,34 +262,15 @@ export default class BypassList {
     return [].concat(...rules.map((r) => { return typeof r === 'function' ? r() : r; }));
   }
 
-  resetPopularRules() {
-    // turn off all popular rules
-    this.popularRulesByName().map((rule) => {
-      return this.disablePopularRule(rule, true);
-    });
-
-    // turn on popular and user rules from storage
-    const { userrk, poprk } = this.storageKeys;
-    if (this.storage.hasItem(poprk) && this.storage.getItem(poprk).length > 0) {
-      this.storage.getItem(poprk).split(',').forEach((name) => {
-        this.enablePopularRule(name, true);
-      });
-    }
-
-    if (this.storage.hasItem(userrk)) {
-      this.setUserRules(this.storage.getItem(userrk).split(','), true);
-    }
-  }
-
   /**
    * Create a file containing the current ruleset and download it on client
    *
    * @returns {void}
    */
-  async saveRulesToFile() {
-    if (this.foreground) {
+  saveRulesToFile() {
+    if (this.foreground && typeof browser != 'undefined') {
       const { adapter } = this.app;
-      await adapter.sendMessage(Type.DOWNLOAD_BYPASS_JSON);
+      adapter.sendMessage(Type.DOWNLOAD_BYPASS_JSON);
     }
     else {
       const payload = JSON.stringify({
@@ -280,14 +293,12 @@ export default class BypassList {
       if (Array.isArray(importedRules)) {
         // Disable rules not in importedRules
         getRules().forEach((rule) => {
-          if (!importedRules.includes(rule)) {
-            disableRule(rule);
-          }
+          if (!importedRules.includes(rule)) { disableRule(rule); }
         });
         // Enable importedRules
         importedRules.forEach(enableRule);
-        // Disable all rules
       }
+      // Disable all rules
       else if (typeof importedRules === 'undefined') {
         getRules().forEach(disableRule);
       }
@@ -303,8 +314,8 @@ export default class BypassList {
       importRuleSet(
         popularRules,
         this.enabledPopularRules,
-        (name) => { return this.enablePopularRule(name, false, false); },
-        (name) => { return this.disablePopularRule(name, false, false); },
+        (name) => { return this.enablePopularRule(name, false); },
+        (name) => { return this.disablePopularRule(name, false); },
       );
       this.restartProxy();
     }
@@ -318,9 +329,9 @@ export default class BypassList {
    *
    * @returns {Promise<void>}
    */
-  async spawnImportTab() { // eslint-disable-line class-methods-use-this
-    await browser.tabs.create({
-      url: browser.runtime.getURL('html/popups/importrules.html'),
+  spawnImportTab() { // eslint-disable-line class-methods-use-this
+    chrome.tabs.create({
+      url: chrome.runtime.getURL('html/popups/importrules.html'),
     });
   }
 }

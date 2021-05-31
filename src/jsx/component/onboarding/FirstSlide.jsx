@@ -13,7 +13,7 @@ class FirstSlide extends Component {
     const {onclick} = this.props;
     const theme = this.props.context.getTheme();
     return (
-      <div className={`first ${theme}`}>
+        <div className={`first ${theme}`}>
           <div className="image-container">
             <img src="../../images/pia-robot.png" alt="" />
           </div>

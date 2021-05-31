@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-
 import Checkbox from '@component/checkbox';
 import listenOnline from '@hoc/listenOnline';
 import withAppContext from '@hoc/withAppContext';
@@ -13,11 +12,12 @@ class SettingItem extends Component {
     this.app = props.context.app;
     this.settings = this.app.util.settings;
 
-    // bindings
+    // Bindings
     this.toggle = this.toggle.bind(this);
     this.buildLabel = this.buildLabel.bind(this);
     this.buildWarningSpan = this.buildWarningSpan.bind(this);
     this.i18n = this.app.util.i18n;
+
   }
 
   async toggle() {
@@ -86,24 +86,22 @@ class SettingItem extends Component {
       learnMore,
       controllable,
       learnMoreHref,
-      component,
       
     } = this.props;
-    const theme = this.props.context.getTheme();
     const WarningSpan = this.buildWarningSpan;
     const target = learnMoreHref === '#' ? undefined : '_blank';
     const classNames = controllable ? 'controllable-setting' : 'uncontrollable-setting';
+    const theme = this.props.context.getTheme();
     const lang = this.i18n.locale ? this.i18n.locale : 'en';
 
     return (
-      <div>
+      <div className={`${settingID}-item ${lang}`}>
         <a href={settingID} className="noselect">
           <label
             htmlFor={settingID}
             className={classNames}
           >
             { label }
-
             <div className={`popover arrow-top ${theme} left-align`}>
               { tooltip }
             </div>
@@ -134,38 +132,39 @@ class SettingItem extends Component {
       available,
       controllable,
       component,
-      
     } = this.props;
+    
+
     const theme = this.props.context.getTheme();
     const lang = this.i18n.locale ? this.i18n.locale : 'en';
-    
+
     return (available)
-    ? (
-      <div className={`setting-item ${theme} noselect ${lang}`}>
-        <div className="setting-item-label">
-          { this.buildLabel() }
+      ? (
+        <div className={`setting-item ${theme} noselect ${lang}`}>
+          <div className="setting-item-label">
+            { this.buildLabel() }
+          </div>
+          {component == 'switch' ? <label className="switch">
+                <input id={settingID}
+                 theme={theme}
+                 checked={checked}
+                 disabled={!controllable}
+                 type="checkbox"
+                 onChange={this.toggle} ></input>
+                <span className="slider round"></span>
+          </label> :
+          <Checkbox
+            id={settingID}
+            theme={theme}
+            checked={checked}
+            disabled={!controllable}
+            onChange={this.toggle}
+          />
+           }
         </div>
-        {component == 'switch' ? <label className="switch">
-              <input id={settingID}
-               theme={theme}
-               checked={checked}
-               disabled={!controllable}
-               type="checkbox"
-               onChange={this.toggle} ></input>
-              <span className="slider round"></span>
-        </label> :
-        <Checkbox
-          id={settingID}
-          theme={theme}
-          checked={checked}
-          disabled={!controllable}
-          onChange={this.toggle}
-        />
-         }
-      </div>
-    
-    )
-    : '';
+      
+      )
+      : '';
   }
 }
 

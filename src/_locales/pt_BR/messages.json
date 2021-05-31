@@ -47,20 +47,20 @@
   "ChangeExtraFeaturesSettings": {
     "message": "Recursos extras"
   },
+  "encounterMessage_2": {
+    "message": "entre em contato com o departamento de suporte "
+  },
   "JustInTimeDisclaimer": {
     "message": "Avalie sua experiência com a PIA"
   },
-  "encounterMessageFirefox_1": {
-    "message": "Obrigado pelo seu feedback! Se você verificar qualquer problema técnico, por favor "
-  },
-  "encounterMessageFirefox_2": {
-    "message": "entre em contato com o departamento de suporte "
-  },
-  "feedbackMessageFirefox_1": {
+  "feedbackMessage_1": {
     "message": "Obrigado pelo seu feedback! Agradeceríamos se você nos avaliasse "
   },
-  "feedbackMessageFirefox_2": {
-    "message": "Extensões do navegador Firefox"
+  "feedbackMessage_2": {
+    "message": "Chrome Web Store"
+  },
+  "encountermessage_1": {
+    "message": "Obrigado pelo seu feedback! Se você verificar qualquer problema técnico, por favor "
   },
   "UILanguage": {
     "message": "Idioma da IU"

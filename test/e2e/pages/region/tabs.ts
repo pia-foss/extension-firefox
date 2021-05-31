@@ -13,7 +13,7 @@ class RegionTabs extends PageObject {
         selector: createSelector({
           value: '.region-sort-selection',
         }),
-        name: 'region tabs',
+        name: 'region sort tabs',
       },
       parent,
     );

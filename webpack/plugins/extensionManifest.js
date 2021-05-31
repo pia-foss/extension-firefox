@@ -72,7 +72,6 @@ class ExtensionManifestPlugin {
       catch (err) {
         print('ExtensionManifestPlugin: Failed with error', Color.red);
         print(err.message || err, Color.red);
-        process.exit(1);
       }
     });
   }

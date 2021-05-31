@@ -35,8 +35,9 @@ describe('@util > HttpsUpgrade', () => {
 
   beforeEach(() => {
     app = new MockApp();
-    app.util.storage.map.set(STORAGE_COUNT_KEY, PARTS_COUNT);
-    app.util.storage.map.set(LAST_TIMESTAMP_KEY, Timestamp.empty);
+    app.util.storage.mockValues.getItem.set(STORAGE_COUNT_KEY, PARTS_COUNT);
+    app.util.storage.mockValues.getItem.set(LAST_TIMESTAMP_KEY, Timestamp.empty);
+    app.util.settings.mockValues.isActive.set('httpsUpgrade', true);
   });
 
   async function setup({
@@ -100,13 +101,13 @@ describe('@util > HttpsUpgrade', () => {
       {
         desc: 'no local timestamp',
         beforeEachFn() {
-          app.util.storage.map.set('LAST_TIMESTAMP_KEY', Timestamp.empty);
+          app.util.storage.mockValues.getItem.set('LAST_TIMESTAMP_KEY', Timestamp.empty);
         },
       },
       {
         desc: 'local timestamp out of date',
         beforeEachFn() {
-          app.util.storage.map.set('LAST_TIMESTAMP_KEY', Timestamp.outOfDate);
+          app.util.storage.mockValues.getItem.set('LAST_TIMESTAMP_KEY', Timestamp.outOfDate);
         },
       },
     ].forEach(({ desc, beforeEachFn }) => {
@@ -137,6 +138,7 @@ describe('@util > HttpsUpgrade', () => {
         test('should report updating', async () => {
           getHostedRulesets.mockImplementation(() => {
             expect(subject.updating).toStrictEqual(true);
+            return Promise.resolve([]);
           });
           await setup({
             mockGetHostedRulesets: false,
@@ -173,13 +175,8 @@ describe('@util > HttpsUpgrade', () => {
       const timestamp = Timestamp.upToDate;
 
       beforeEach(() => {
-        app.util.storage.getItem.mockImplementation((key) => {
-          switch (key) {
-            case LAST_TIMESTAMP_KEY: return Timestamp.upToDate;
-            case STORAGE_COUNT_KEY: return PARTS_COUNT;
-            default: return undefined;
-          }
-        });
+        app.util.storage.mockValues.getItem.set(LAST_TIMESTAMP_KEY, Timestamp.upToDate);
+        app.util.storage.mockValues.getItem.set(STORAGE_COUNT_KEY, PARTS_COUNT);
       });
 
       test('should retrieve stored rulesets', async () => {
@@ -248,7 +245,7 @@ describe('@util > HttpsUpgrade', () => {
 
     describe('setting enabled', () => {
       beforeEach(async () => {
-        app.util.settings.map.set('httpsUpgrade', true);
+        app.util.settings.mockValues.isActive.set('httpsUpgrade', true);
       });
 
       test('should return true', async () => {
@@ -258,7 +255,7 @@ describe('@util > HttpsUpgrade', () => {
 
     describe('setting disabled', () => {
       beforeEach(async () => {
-        app.util.settings.map.set('httpsUpgrade', false);
+        app.util.settings.mockValues.isActive.set('httpsUpgrade', false);
       });
 
       test('should return false', async () => {
@@ -279,13 +276,13 @@ describe('@util > HttpsUpgrade', () => {
 
     describe('setting enabled, then disabled', () => {
       test('should perform cleanup', async () => {
-        app.util.settings.map.set('httpsUpgrade', true);
+        app.util.settings.mockValues.isActive.set('httpsUpgrade', true);
         subject.counter = { clear: jest.fn() };
         subject.cookieCache = { clear: jest.fn() };
         subject.enabled();
         expect(subject.counter.clear).not.toHaveBeenCalled();
         expect(subject.cookieCache.clear).not.toHaveBeenCalled();
-        app.util.settings.map.set('httpsUpgrade', false);
+        app.util.settings.mockValues.isActive.set('httpsUpgrade', false);
         subject.enabled();
         expect(subject.counter.clear).toBeCalledTimes(1);
         expect(subject.cookieCache.clear).toBeCalledTimes(1);
@@ -297,7 +294,7 @@ describe('@util > HttpsUpgrade', () => {
     beforeEach(async () => {
       await setup();
       app.util.settings.enabled.mockReturnValue(true);
-      app.util.settings.map.set('httpsUpgrade', true);
+      app.util.settings.mockValues.isActive.set('httpsUpgrade', true);
     });
 
     test('ignores long domains', async () => {
@@ -336,8 +333,6 @@ describe('@util > HttpsUpgrade', () => {
       const result = subject.onBeforeRequest(details);
       expect(result.redirectUrl).toEqual(url.replace('http', 'https'));
     });
-
-    test.todo('finds multiple results');
 
     test('ignores blacklisted domains', async () => {
       const url = new URL('http://neovim.io/').href;
@@ -396,7 +391,7 @@ describe('@util > HttpsUpgrade', () => {
     beforeEach(async () => {
       await setup();
       app.util.settings.enabled.mockReturnValue(true);
-      app.util.settings.map.set('httpsUpgrade', true);
+      app.util.settings.mockValues.isActive.set('httpsUpgrade', true);
     });
 
     test('ignores unmatched domains', async () => {
@@ -695,7 +690,7 @@ describe('@util > HttpsUpgrade', () => {
       details = createDetails({ url });
       await setup();
       app.util.settings.enabled.mockReturnValue(true);
-      app.util.settings.map.set('httpsUpgrade', true);
+      app.util.settings.mockValues.isActive.set('httpsUpgrade', true);
     });
 
     describe('counter > 0', () => {
@@ -738,7 +733,7 @@ describe('@util > HttpsUpgrade', () => {
       details = createDetails({ url });
       await setup();
       app.util.settings.enabled.mockReturnValue(true);
-      app.util.settings.map.set('httpsUpgrade', true);
+      app.util.settings.mockValues.isActive.set('httpsUpgrade', true);
     });
 
     describe('counter > 0', () => {
@@ -784,7 +779,7 @@ describe('@util > HttpsUpgrade', () => {
       ({ requestId } = createDetails({ url: http }));
       await setup();
       app.util.settings.enabled.mockReturnValue(true);
-      app.util.settings.map.set('httpsUpgrade', true);
+      app.util.settings.mockValues.isActive.set('httpsUpgrade', true);
     });
 
     describe('counter > 0', () => {

@@ -4,9 +4,9 @@
     padding: 3px 25px 3px 6px;
     margin: 0;
     border-radius: 1px;
-    border: none; // needed because of bug on eOS
+    border: none;
     outline: none;
-    -moz-appearance: none;
+    appearance: none;
     cursor: pointer;
     font-size: 9pt;
     color: $grey20;

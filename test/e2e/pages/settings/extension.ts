@@ -4,6 +4,7 @@ import { Checkbox } from '../../elements';
 import { createSelector } from '../../core/entities/selector';
 
 class ExtensionSection extends SectionBase {
+  public allowDesktopNotifications: Checkbox;
   public debugMode: Checkbox;
   public viewDebugLog: Checkbox;
   public uiLanguages: Checkbox;
@@ -17,6 +18,15 @@ class ExtensionSection extends SectionBase {
         name: 'extension settings',
       },
       parent,
+    );
+    this.allowDesktopNotifications = new Checkbox(
+      {
+        selector: createSelector({
+          value: '#allowExtensionNotifications',
+        }),
+        name: 'allowDesktopNotifications',
+      },
+      this,
     );
     this.debugMode = new Checkbox(
       {

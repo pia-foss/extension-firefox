@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
 import ErrorBoundary from '@hoc/errorboundary';
 
 const buildClassName = (postfix, id, ...others) => {
@@ -16,14 +15,16 @@ const buildClassName = (postfix, id, ...others) => {
  * Used to enforce one, accessible style application wide.
  *
  * Use of styled label overtop of <input type="checkbox" />
- * is to prevent styling of native checkbox by GTK theme on
- * Firefox (Linux). Without this, using some GTK themes cause
+ * is to maintain consistency with the Firefox extension.
+ *
+ * On Firefox done to prevent styling of native checkbox by GTK
+ * theme on Linux. Without this, using some GTK themes cause
  * varying appearances for checkboxes, even to the point of
  * them not being visible at all.
  *
  * @param {*} props React props
  *
- * @returns {JSX.Element} Component
+ * @returns {React.StatelessComponent} Component
  */
 const Checkbox = (props) => {
   const {

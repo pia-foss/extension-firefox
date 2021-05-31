@@ -54,7 +54,6 @@ class ZipPlugin {
       catch (err) {
         print('ZipPlugin: failed with error', Color.red);
         print(err.message || err, Color.red);
-        process.exit(1);
       }
     });
   }
@@ -66,6 +65,7 @@ class ZipPlugin {
     }
     else {
       const cmd = `zip -r ${outputPath} ./*`;
+      // Set CWD to source path to avoid zipping all directories
       execSync(cmd, { cwd: sourcePath });
     }
   }

@@ -47,20 +47,20 @@
   "ChangeExtraFeaturesSettings": {
     "message": "追加機能"
   },
+  "encounterMessage_2": {
+    "message": "サポート部門までお問い合わせください"
+  },
   "JustInTimeDisclaimer": {
     "message": "PIAの使用感を評価してください"
   },
-  "encounterMessageFirefox_1": {
-    "message": "フィードバックをありがとうございます！技術的問題に遭遇した場合は"
-  },
-  "encounterMessageFirefox_2": {
-    "message": "サポート部門までお問い合わせください"
-  },
-  "feedbackMessageFirefox_1": {
+  "feedbackMessage_1": {
     "message": "フィードバックをありがとうございます！評価していただければ幸いです:"
   },
-  "feedbackMessageFirefox_2": {
-    "message": "Firefoxブラウザアドオン"
+  "feedbackMessage_2": {
+    "message": "Chromeウェブストア"
+  },
+  "encountermessage_1": {
+    "message": "フィードバックをありがとうございます！技術的問題に遭遇した場合は"
   },
   "UILanguage": {
     "message": "UI言語"

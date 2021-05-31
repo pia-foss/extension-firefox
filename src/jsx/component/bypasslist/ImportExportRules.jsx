@@ -1,6 +1,6 @@
+import File from '@helpers/file';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-
 import withAppContext from '@hoc/withAppContext';
 
 class ImportExportRules extends Component {
@@ -18,13 +18,19 @@ class ImportExportRules extends Component {
     this.onExportClick = this.onExportClick.bind(this);
   }
 
-  async onImportClick() {
-    await this.bypasslist.spawnImportTab();
+  onImportClick() {
+    this.bypasslist.spawnImportTab();
     window.close();
   }
 
-  async onExportClick() {
-    await this.bypasslist.saveRulesToFile();
+  onExportClick() {
+    const payload = JSON.stringify({
+      popularRules: this.bypasslist.enabledPopularRules(),
+      userRules: this.bypasslist.getUserRules(),
+    });
+    const file = new File('application/json', [payload]);
+    file.download('bypass-rules.json');
+
     this.setState({ showCheckmark: true });
     setTimeout(() => {
       this.setState({ showCheckmark: false });

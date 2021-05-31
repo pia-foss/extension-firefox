@@ -2,24 +2,19 @@ import createApplyListener from '@helpers/applyListener';
 
 function newVersionNotification(app) {
   const isNewVersion = (newVersionStr, oldVersionStr) => {
+    // TODO: potentially flawed (increase in # of digits doesn't necessarily mean a higher version)
     const oldVersion = parseInt(oldVersionStr.replace(/\./g, ''));
     const newVersion = parseInt(newVersionStr.replace(/\./g, ''));
     return newVersion > oldVersion;
   };
 
   const notify = async (details) => {
-    await app.util.i18n.worker();
-    const type = 'basic';
+    await app.util.i18n.getWorker();
+    const { contentsettings } = app;
     const title = t('ExtensionUpdated');
-    const message = t('WelcomeToNewVersion', { appVersion: `v${app.buildinfo.version}` });
-    const iconUrl = chrome.extension.getURL('images/icons/icon64.png');
+    const body = t('WelcomeToNewVersion');
     if (isNewVersion(app.buildinfo.version, details.previousVersion)) {
-      chrome.notifications.create('UpdateMessage', {
-        type,
-        title,
-        iconUrl,
-        message,
-      });
+      contentsettings.extensionNotification.create(title, { body });
     }
   };
 

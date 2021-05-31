@@ -15,7 +15,7 @@ abstract class PageObject extends Node {
   private page: LazyWebElement;
   private overriddenUrl: string;
 
-  constructor(page: ElementDescriptor, parent?: PageObject) {
+  constructor(page: ElementDescriptor, parent?: Node) {
     super(page, parent);
     this.page = new LazyWebElement(page);
     this.overriddenUrl = '';
@@ -66,18 +66,7 @@ abstract class PageObject extends Node {
 
   public async navigate(fn?: (url: string) => string): Promise<string> {
     const url = fn ? fn(this.url) : this.url;
-    const timeout = new Promise((resolve) => {
-      setTimeout(
-        () => {
-          resolve();
-        },
-        7000,
-      );
-    });
-    await Promise.race([
-      timeout,
-      this.pageDriver.get(url),
-    ]);
+    await this.pageDriver.get(url);
 
     return url;
   }

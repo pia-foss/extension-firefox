@@ -7,7 +7,6 @@ import { expect } from 'chai';
 import { AuthFailPage } from '../pages/authfail';
 import { ConnFailPage } from '../pages/connfail';
 import { getStorage } from '../scripts/getStorage';
-import { FingerprintPage } from '../pages/fingerprint';
 
 idescribe('the application language', function () {
   let loginPage: LoginPage;
@@ -15,7 +14,6 @@ idescribe('the application language', function () {
   let authPage: AuthenticatedPage;
   let authfailPage: AuthFailPage;
   let connfailPage: ConnFailPage;
-  let fingerprintPage: FingerprintPage;
 
   ibeforeEach(async function () {
     loginPage = new LoginPage();
@@ -23,10 +21,8 @@ idescribe('the application language', function () {
     authPage = new AuthenticatedPage();
     authfailPage = new AuthFailPage();
     connfailPage = new ConnFailPage();
-    fingerprintPage = new FingerprintPage();
 
     await loginPage.navigate();
-    await fingerprintPage.optIn();
     await loginPage.signIn();
     await authPage.menu.toggleDropdown();
     await authPage.menu.settings.click();

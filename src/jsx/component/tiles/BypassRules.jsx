@@ -26,8 +26,9 @@ class BypassRules extends Component {
       active: true,
       lastFocusedWindow: true,
     }, ([tab]) => {
+      if (!tab) { return this.setState({ origin: '' }); }
       const url = new URL(tab.url);
-      this.setState({ origin: url.origin });
+      return this.setState({ origin: url.origin });
     });
   }
 
@@ -45,9 +46,8 @@ class BypassRules extends Component {
   removeRule() {
     const region = this.regionlist.getSelectedRegion();
     if (!region) { return; }
-
     const { origin } = this.state;
-    this.bypasslist.removeUserRule(origin);
+    this.bypasslist.removeUserRule(origin,true);
     this.setState({});
   }
 
@@ -77,23 +77,33 @@ class BypassRules extends Component {
       >
         <div className={`bypass-rules ${theme}`}>
           <div className="bypass-rules-header">
-            <div>
+            <div className="bypass-rules-header-content">
               { t('AddToBypassRules') }
             </div>
 
-            <div className={`bypass-rule-included image ${this.ruleIncluded() ? 'active' : ''}`}>
-              <img
-                alt={t('RuleAlreadyIncluded')}
-                title={t('RuleAlreadyIncluded')}
-                src="/images/selected_2x.png"
-              />
-            </div>
+            {
+              this.ruleIncluded() ? (
+                <div className={`bypass-rule-included image ${this.ruleIncluded() ? 'active' : ''}`}>
+                  <img
+                    alt={t('RuleAlreadyIncluded')}
+                    title={t('RuleAlreadyIncluded')}
+                    src="/images/selected_2x.png"
+                  />
+                </div>
+              )
+                : ''
+            }
 
-            <div className={`bypass-rule-included remove ${this.ruleIncluded() ? 'active' : ''}`}>
-              <button type="button" className="remove-rule" onClick={this.removeRule}>
-                { `- ${t('RemoveRule')}` }
-              </button>
-            </div>
+            {
+              this.ruleIncluded() ? (
+                <div className={`bypass-rule-included remove ${this.ruleIncluded() ? 'active' : ''}`}>
+                  <button type="button" className="remove-rule" onClick={this.removeRule}>
+                    { `- ${t('RemoveRule')}` }
+                  </button>
+                </div>
+              )
+                : ''
+            }
           </div>
 
           <div className="bypass-rules-content">

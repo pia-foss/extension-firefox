@@ -47,20 +47,20 @@
   "ChangeExtraFeaturesSettings": {
     "message": "Ek Özellikler"
   },
+  "encounterMessage_2": {
+    "message": "destek birimiyle iletişime geçin "
+  },
   "JustInTimeDisclaimer": {
     "message": "PIA ile yaşadığınız deneyimi değerlendirin"
   },
-  "encounterMessageFirefox_1": {
-    "message": "Geri bildiriminiz için teşekkürler! Herhangi teknik bir sorunla karşılaşırsanız lütfen "
-  },
-  "encounterMessageFirefox_2": {
-    "message": "destek birimiyle iletişime geçin "
-  },
-  "feedbackMessageFirefox_1": {
+  "feedbackMessage_1": {
     "message": "Geri bildiriminiz için teşekkürler! Bizi şurada değerlendirirseniz seviniriz: "
   },
-  "feedbackMessageFirefox_2": {
-    "message": "Firefox Eklentileri"
+  "feedbackMessage_2": {
+    "message": "Chrome Web Mağazası"
+  },
+  "encountermessage_1": {
+    "message": "Geri bildiriminiz için teşekkürler! Herhangi teknik bir sorunla karşılaşırsanız lütfen "
   },
   "UILanguage": {
     "message": "Arayüz Dili"

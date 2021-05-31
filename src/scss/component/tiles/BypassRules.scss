@@ -25,6 +25,13 @@
     display: flex;
     align-items: center;
 
+    .bypass-rules-header-content {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      flex-grow: 1;
+    }
+
     .bypass-rule-included {
       opacity: 0;
       transition: opacity 0.8s cubic-bezier(0.6, 0, 0.4, 1);
@@ -54,6 +61,10 @@
           background-color: transparent;
           outline: none;
           color: $green-dark50;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+          margin-right: 10px;
         }
       }
     }

@@ -10,7 +10,6 @@ class UpgradePage extends Component {
 
     // properties
     this.app = props.context.app;
-    this.buildinfo = this.app.buildinfo;
     this.settings = this.app.util.settings;
   }
 
@@ -24,7 +23,7 @@ class UpgradePage extends Component {
         <div className="warningicon" />
 
         <p className="warningtext">
-          { t('UpgradeBrowserMessage', { browser: this.buildinfo.browser }) }
+          { t('UpgradeBrowserMessage') }
         </p>
 
         <p className="btn-center">

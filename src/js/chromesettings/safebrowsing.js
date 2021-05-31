@@ -2,7 +2,10 @@ import ChromeSetting from '@chromesettings/chromesetting';
 
 class SafeBrowsing extends ChromeSetting {
   constructor() {
-    super(SafeBrowsing.getSetting());
+    super(chrome.privacy.services.safeBrowsingEnabled);
+
+    // bindings
+    this.onChange = this.onChange.bind(this);
 
     // functions
     this.applySetting = this.createApplySetting(
@@ -15,25 +18,14 @@ class SafeBrowsing extends ChromeSetting {
       'unblock',
     );
 
-    // bindings
-    this.onChange = this.onChange.bind(this);
-
     // init
-    this.settingDefault = false;
-    this.available = Boolean(this.setting);
     this.settingID = 'blocksafebrowsing';
+    this.settingDefault = false;
   }
 
   onChange(details) {
     this.setLevelOfControl(details.levelOfControl);
     this.setBlocked(details.value === false);
-  }
-
-  static getSetting() {
-    if (chrome.privacy && chrome.privacy.services) {
-      return chrome.privacy.services.safeBrowsingEnabled;
-    }
-    return undefined;
   }
 }
 

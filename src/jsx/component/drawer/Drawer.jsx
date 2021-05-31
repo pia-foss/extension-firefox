@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-
 import withAppContext from '@hoc/withAppContext';
 import RegionTile from '@component/tiles/RegionTile';
 import BypassRules from '@component/tiles/BypassRules';
@@ -22,8 +21,8 @@ class Drawer extends Component {
       mode,
       tiles,
       region,
+      regions,
       connection,
-      autoLoading,
       toggleTileSaved,
       onQuickConnect,
     } = this.props;
@@ -35,9 +34,9 @@ class Drawer extends Component {
             <RegionTile
               key={tile.name}
               region={region}
+              regions={regions}
               hideFlag={false}
               saved={tile.saved}
-              autoLoading={autoLoading}
               toggleTileSaved={toggleTileSaved}
             />
           );
@@ -48,10 +47,10 @@ class Drawer extends Component {
               key={tile.name}
               mode={mode}
               region={region}
+              regions={regions}
               hideFlag={false}
               saved={tile.saved}
               connection={connection}
-              autoLoading={autoLoading}
               toggleTileSaved={toggleTileSaved}
               onQuickConnect={onQuickConnect}
             />
@@ -60,16 +59,6 @@ class Drawer extends Component {
         case 'QuickSettings':
           return (
             <QuickSettings
-              key={tile.name}
-              hideFlag={false}
-              saved={tile.saved}
-              toggleTileSaved={toggleTileSaved}
-            />
-          );
-
-        case 'BypassRules':
-          return (
-            <BypassRules
               key={tile.name}
               hideFlag={false}
               saved={tile.saved}
@@ -87,15 +76,25 @@ class Drawer extends Component {
             />
           );
 
-          case 'Ip':
-            return (
-              <Ip
-                key={tile.name}
-                hideFlag={false}
-                saved={tile.saved}
-                toggleTileSaved={toggleTileSaved}
-              />
-            );
+        case 'BypassRules':
+          return (
+            <BypassRules
+              key={tile.name}
+              hideFlag={false}
+              saved={tile.saved}
+              toggleTileSaved={toggleTileSaved}
+            />
+          );
+
+        case 'Ip':
+          return (
+            <Ip
+              key={tile.name}
+              hideFlag={false}
+              saved={tile.saved}
+              toggleTileSaved={toggleTileSaved}
+            />
+          );
 
         default:
           return undefined;
@@ -105,7 +104,7 @@ class Drawer extends Component {
 
   render() {
     const tiles = this.composeTiles();
-    const { context: { theme }, open } = this.props;
+    const { open, context: { theme } } = this.props;
     let drawerStyle = {};
     if (open) { drawerStyle = { maxHeight: `${(tiles.length * 85) + 30}px` }; }
 
@@ -126,18 +125,19 @@ class Drawer extends Component {
 }
 
 Drawer.propTypes = {
+  regions: PropTypes.array,
   region: PropTypes.object,
   open: PropTypes.bool.isRequired,
   mode: PropTypes.string.isRequired,
   tiles: PropTypes.array.isRequired,
   context: PropTypes.object.isRequired,
-  autoLoading: PropTypes.bool.isRequired,
   connection: PropTypes.string.isRequired,
   onQuickConnect: PropTypes.func.isRequired,
   toggleTileSaved: PropTypes.func.isRequired,
 };
 
 Drawer.defaultProps = {
+  regions: [],
   region: undefined,
 };
 

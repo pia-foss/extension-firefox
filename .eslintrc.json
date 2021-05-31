@@ -54,6 +54,7 @@
       "error",
       "single",
       { "allowTemplateLiterals": true }
-    ]
+    ],
+    "no-await-in-loop": 0
   }
 }

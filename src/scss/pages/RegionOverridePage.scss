@@ -8,22 +8,18 @@
   flex-direction: row;
 }
 
-#region-override-page {
+#region-override-template {
   @include flexCol;
   width: 100%;
   background-color: #eae0c8;
   padding: 0 20px 10px 20px;
   margin: 17px 0;
 
-  button {
-    background-color: white;
-  }
-
   .override-heading {
     width: 100%;
     @include flexCol;
     justify-content: center;
-
+    
     .override-title {
       font-size: 20px;
     }
@@ -49,10 +45,6 @@
       @include flexRow;
       justify-content: space-between;
       width: 100%;
-
-      input {
-        background-color: white;
-      }
 
       &.port {
 

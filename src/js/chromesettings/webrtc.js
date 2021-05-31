@@ -1,12 +1,16 @@
 import ChromeSetting from '@chromesettings/chromesetting';
 
-class WebRTC extends ChromeSetting {
+class WebRTCSetting extends ChromeSetting {
   constructor() {
-    super(WebRTC.getSetting());
+    super(chrome.privacy.network.webRTCIPHandlingPolicy);
+
+    // bindings
+    this.init = this.init.bind(this);
+    this.onChange = this.onChange.bind(this);
 
     // functions
     this.applySetting = this.createApplySetting(
-      'proxy_only',
+      'disable_non_proxied_udp',
       'webrtc',
       'block',
     );
@@ -15,29 +19,20 @@ class WebRTC extends ChromeSetting {
       'unblock',
     );
 
-    // bindings
-    this.onChange = this.onChange.bind(this);
-
     // init
-    this.settingDefault = false;
-    this.blockable = Boolean(this.setting);
     this.settingID = 'preventwebrtcleak';
+    this.settingDefault = false;
+  }
+
+  init() {
+    this.blockable = chrome.privacy.network.webRTCIPHandlingPolicy !== undefined;
+    super.init();
   }
 
   onChange(details) {
-    this.setLevelOfControl(details.levelOfControl);
-    this.setBlocked(details.value === 'proxy_only');
-  }
-
-  static getSetting() {
-    if (
-      chrome.privacy
-      && chrome.privacy.network
-    ) {
-      return chrome.privacy.network.webRTCIPHandlingPolicy;
-    }
-    return undefined;
+    this.levelOfControl = details.levelOfControl;
+    this.blocked = (details.value === 'disable_non_proxied_udp');
   }
 }
 
-export default WebRTC;
+export default WebRTCSetting;

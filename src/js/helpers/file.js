@@ -17,6 +17,7 @@ class File {
     // Init
     this.url = '';
     this.blobId = undefined;
+    this.downloadError = 'File: File Could not download file';
     this.filenameRequiredError = 'File: Filename is required';
     this.apiUnavailableError = 'File: Extension Download API Unavailable';
     this.NoDownloadableFileError = 'File: Could Not Create Downloadable Object';
@@ -37,7 +38,7 @@ class File {
 
     debug(`File: initiating download of ${filename}`);
     return new Promise((resolve, reject) => {
-      if (browser && browser.downloads) {
+      if (chrome && chrome.downloads) {
         this.url = URL.createObjectURL(this.blob);
         return this.downloadViaApi(this.url, filename);
       }
@@ -52,7 +53,8 @@ class File {
    *
    * @param {string} filename Name of file
    * @param {string} url Url for file
-   * @returns {Promise<number>} The download promise resolving the id of the download item
+   * @param {function} resolve Promise resolution function
+   * @returns {void}
    */
   downloadViaApi(url, filename) {
     if (!url) {
@@ -60,17 +62,24 @@ class File {
       return Promise.reject(new Error(this.NoDownloadableFileError));
     }
 
-    const { downloads } = browser;
+    const { downloads } = chrome;
     const { download } = downloads;
 
     // handle revoking object url here
     downloads.onChanged.addListener(this.onChangedListener);
-    return download({ url, filename })
-      .then((id) => { this.blobId = id; })
-      .catch((err) => {
-        browser.downloads.onChanged.removeListener(this.onChangedListener);
-        throw err;
-      });
+    return new Promise((resolve) => {
+      download({ url, filename, conflictAction: 'uniquify' },
+        (id) => {
+          if (id) {
+            this.blobId = id;
+            return resolve(id);
+          }
+
+          // if id is undefined, then download failed
+          downloads.onChanged.removeListener(this.onChangedListener);
+          throw new Error(this.downloadError);
+        });
+    });
   }
 
   /**
@@ -84,7 +93,7 @@ class File {
     const isComplete = delta.state && delta.state.current === 'complete';
     if (hasId && isComplete) {
       URL.revokeObjectURL(this.url);
-      browser.downloads.onChanged.removeListener(this.onChangedListener);
+      chrome.downloads.onChanged.removeListener(this.onChangedListener);
     }
   }
 }

@@ -1,3 +1,9 @@
+/**
+ * report an error if debug mode enabled
+ *
+ * @param {string} name context for error
+ * @param {Error} err error
+ */
 function reportError(...args) {
   const [name] = args;
   const act = (err) => {

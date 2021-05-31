@@ -29,22 +29,20 @@
 @import "component/bypasslist/PopularRules";
 @import "component/bypasslist/ImportExportRules";
 @import "component/bypasslist/BypassSettingSection";
-@import "component/smart-location/ManageLocations";
-@import "component/smart-location/SmartLocation";
-@import "component/smart-location/SmartLocationItem";
 @import "component/checkbox/RememberMeCheckbox";
 @import "component/drawer/Drawer";
 @import "component/drawer/DrawerOutlet";
 @import "component/drawer/DrawerHandle";
+@import "component/smart-location/SmartLocation";
+@import "component/smart-location/ManageLocations";
+@import "component/smart-location/SmartLocationItem";
 @import "component/tiles/Tile";
 @import "component/tiles/QuickConnect";
 @import "component/tiles/QuickSettings";
 @import "component/tiles/Subscription";
+@import "component/JustInTime";
 @import "component/tiles/BypassRules";
 @import "component/tiles/Ip";
-@import "component/JustInTime";
-
-
 
 // pages
 @import "pages/AuthenticatedPage";
@@ -53,16 +51,16 @@
 @import "pages/ChangeRegionPage";
 @import "pages/UpgradePage";
 @import "pages/DebugLogPage";
-@import "pages/FingerprintOptInPage";
 @import "pages/LoginPage";
+@import "pages/OnboardingPage";
+@import "pages/FingerprintOptInPage";
 @import "pages/SettingsPage";
 @import "pages/ExtraFeaturesPage";
+@import "pages/OnboardingSettingsPage";
 @import "pages/UncontrollablePage";
 @import "pages/RegionOverridePage";
-@import "pages/PrivateBrowsingPage";
 @import "pages/SmartLocationPage";
-@import "pages/OnboardingPage";
-@import "pages/OnboardingSettingsPage";
+@import "pages/PrivateBrowsingPage";
 
 html {
   margin: 0;
@@ -79,11 +77,19 @@ body {
   display: flex;
   justify-content: center;
   background-color: $grey92;
-  // firefox scrollbars (v64+)
-  scrollbar-width: 6px;
-  scrollbar-color: $grey55 transparent;
 
-  &.dark { background-color: $grey20; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 6px;
+    background: $grey55;
+  }
+
+  &.dark {
+    background-color: $grey20;
+
+    ::-webkit-scrollbar-thumb { background: $grey40; }
+  }
 }
 
 *, *:before, *:after { box-sizing: inherit; }
@@ -143,7 +149,9 @@ input, button, select, textarea {
   padding: 6px 12px;
   line-height: 1.428571429;
   user-select: none;
+  background-color: #1E2025;
 }
+
 
 // this is in all the i18n css files
 // not sure if this is used anywhere
@@ -272,7 +280,7 @@ a, a:active, a:focus, a:hover { color: $green-dark20; }
       height: 11px;
       position: absolute;
       right: 7px;
-      top: 12px;
+      top: 12px; // 9px
       background-image: url(../images/expand_2x.png);
       background-size: 25px;
       background-position: -14px -11px;

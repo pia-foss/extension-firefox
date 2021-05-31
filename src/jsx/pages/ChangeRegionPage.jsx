@@ -19,67 +19,27 @@ class ChangeRegionPage extends Component {
     this.state = {
       search: '',
       mode: 'render',
-      autoLoading: false,
-      regions: this.regionlist.toArray(),
       sortBy: this.storage.getItem('sortby') || 'latency',
-      showFavorites: this.storage.getItem('showFavorites') === 'true',
+      showFavorites: typeof browser == 'undefined' ? !!this.storage.getItem('showFavorites') : this.storage.getItem('showFavorites') === 'true',
     };
 
     // bindings
-    this.pollRegions = this.pollRegions.bind(this);
+    this.syncRegions = this.syncRegions.bind(this);
     this.changeSortBy = this.changeSortBy.bind(this);
     this.onSearchUpdate = this.onSearchUpdate.bind(this);
     this.renderFavorite = this.renderFavorite.bind(this);
     this.toggleFavorites = this.toggleFavorites.bind(this);
-    this.updateRegionsLocally = this.updateRegionsLocally.bind(this);
-    this.updateRegionsRemotely = this.updateRegionsRemotely.bind(this);
-  }
-
-  componentDidMount() {
-    this.mounted = true;
-    this.pollRegions();
-  }
-
-  componentWillUnmount() {
-    this.mounted = false;
   }
 
   onSearchUpdate({ target: { value } }) {
     this.setState({ search: value });
   }
 
-  updateRegionsLocally() {
-    this.setState(() => {
-      return {
-        regions: this.regionlist.toArray(),
-      };
-    });
-  }
-
-  updateRegionsRemotely() {
+  syncRegions() {
     this.setState({ mode: 'loading' });
     this.regionlist.sync().then(() => {
       this.setState({ mode: 'render', regions: this.regionlist.toArray() });
     });
-  }
-
-  pollRegions() {
-    if (!this.mounted) { return; }
-
-    // update regions
-    const regions = this.regionlist.toArray();
-    this.setState({ regions });
-
-    // check if there are still server latency checks ongoing
-    const repoll = regions.some((region) => {
-      return region.latency === 'PENDING';
-    });
-
-    if (repoll) {
-      this.setState({ autoLoading: true });
-      setTimeout(this.pollRegions, 500);
-    }
-    else { this.setState({ autoLoading: false }); }
   }
 
   changeSortBy(event) {
@@ -90,7 +50,7 @@ class ChangeRegionPage extends Component {
   }
 
   toggleFavorites() {
-    const favorite = this.storage.getItem('showFavorites') === 'true';
+    const favorite = typeof browser == 'undefined' ? this.storage.getItem('showFavorites') : this.storage.getItem('showFavorites') === 'true';
     this.storage.setItem('showFavorites', !favorite);
     this.setState({ showFavorites: !favorite });
   }
@@ -107,11 +67,7 @@ class ChangeRegionPage extends Component {
         onClick={this.toggleFavorites}
         onKeyPress={this.toggleFavorites}
       >
-        <img
-          alt="Favorite"
-          className="heart"
-          src={heartUrl}
-        />
+        <img alt="Favorite" className="heart" src={heartUrl} />
       </div>
     );
   }
@@ -121,11 +77,10 @@ class ChangeRegionPage extends Component {
       mode,
       search,
       sortBy,
-      regions,
-      autoLoading,
       showFavorites,
     } = this.state;
     const { context: { theme } } = this.props;
+    const regions = this.regionlist.toArray();
 
     return (
       <div id="change-region-page" className={`row ${theme}`}>
@@ -142,7 +97,6 @@ class ChangeRegionPage extends Component {
           >
             { t('RegionLatency') }
           </button>
-
           <button
             type="button"
             data-value="name"
@@ -161,10 +115,8 @@ class ChangeRegionPage extends Component {
           search={search}
           sortBy={sortBy}
           regions={regions}
-          autoLoading={autoLoading}
           showFavorites={showFavorites}
-          updateRegionsRemotely={this.updateRegionsRemotely}
-          updateRegionsLocally={this.updateRegionsLocally}
+          syncRegions={this.syncRegions}
         />
       </div>
     );

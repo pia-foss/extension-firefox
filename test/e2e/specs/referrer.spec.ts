@@ -2,7 +2,6 @@ import { expect } from 'chai';
 
 import { LoginPage } from '../pages/login';
 import { AuthenticatedPage } from '../pages/authenticated';
-import { FingerprintPage } from '../pages/fingerprint';
 import { ReferrerPage, Frame } from '../pages/referrer';
 import { SettingsPage } from '../pages/settings';
 import { idescribe, iit, ibeforeEach } from '../core';
@@ -10,7 +9,6 @@ import { idescribe, iit, ibeforeEach } from '../core';
 idescribe('http referrer', function () {
   let loginPage: LoginPage;
   let authenticatedPage: AuthenticatedPage;
-  let fingerprintPage: FingerprintPage;
   let settingsPage: SettingsPage;
   let referrerPage: ReferrerPage;
   let strippedText: string;
@@ -18,13 +16,11 @@ idescribe('http referrer', function () {
   ibeforeEach(async function () {
     loginPage = new LoginPage();
     authenticatedPage = new AuthenticatedPage();
-    fingerprintPage = new FingerprintPage();
     settingsPage = new SettingsPage();
     referrerPage = new ReferrerPage();
     strippedText = 'no referrer was sent!';
 
     await loginPage.navigate();
-    await fingerprintPage.optIn();
     await loginPage.signIn();
     await authenticatedPage.waitForLatencyTest();
     await authenticatedPage.switchOn();

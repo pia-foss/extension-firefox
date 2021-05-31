@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import BeatLoader from "react-spinners/BeatLoader";
 import withAppContext from '@hoc/withAppContext';
 import onFlagError from '@eventhandler/pages/changeregion/onFlagError';
+import { css } from "@emotion/core";
+import BeatLoader from "react-spinners/BeatLoader";
 
 class RegionListItem extends Component {
   constructor(props) {
@@ -26,15 +27,15 @@ class RegionListItem extends Component {
     this.onFlagLoadError = this.onFlagLoadError.bind(this);
   }
 
+  onFlagLoadError(event) {
+    return onFlagError(event, this.region);
+  }
+
   async onClick(e) {
     e.stopPropagation();
     this.regionlist.setSelectedRegion(this.region.id);
     await this.app.proxy.enable();
     return this.history.push('/');
-  }
-
-  onFlagLoadError(event) {
-    return onFlagError(event, this.region);
   }
 
   get region() {
@@ -43,10 +44,10 @@ class RegionListItem extends Component {
   }
 
   favorite(e) {
-    const { onRegionUpdate } = this.props;
     e.stopPropagation(); // Stops region from being selected
     this.regionlist.setFavoriteRegion(this.region);
-    onRegionUpdate();
+    const { context } = this.props;
+    context.rebuildApp();
   }
 
   renderClassname() {
@@ -62,7 +63,6 @@ class RegionListItem extends Component {
 
   renderFlag() {
     if (this.region.override) { return <div className="empty-flag" />; }
-
     const { nested } = this.props;
     if (nested) { return ''; }
 
@@ -86,7 +86,6 @@ class RegionListItem extends Component {
     }
 
     const latency = Math.floor(this.region.latency);
-
     const latencyClass = (() => {
       if (latency === 'ERROR' || latency > 500 || latency === 'PENDING') { return 'latency-red'; }
       if (latency <= 150 && latency > 0) { return 'latency-green'; }
@@ -94,7 +93,8 @@ class RegionListItem extends Component {
       debug(`invalid latency: ${latency}`);
       return 'latency-red';
     })();
-    const loading = <BeatLoader
+
+      const loading = <BeatLoader
                           size={5}
                           margin={2}
                           color={"#66ab00"}
@@ -105,8 +105,9 @@ class RegionListItem extends Component {
       if (latency === 'ERROR') { return loading; }
       if (typeof latency === 'number' && latency >= 0) { return `${latency} ms`; }
       debug(`RegionListItem: invalid latency: ${latency}`);
-      return loading;
+      return  loading;
     })();
+
 
     return (
       <div className={`list-item-latency ${latencyClass}`}>
@@ -141,7 +142,7 @@ class RegionListItem extends Component {
     const flag = this.renderFlag();
     const favorite = this.renderFavorite();
     const latencyDiv = this.renderLatency();
-
+  
     return (
       <div
         role="button"
@@ -175,7 +176,6 @@ RegionListItem.propTypes = {
   region: PropTypes.object.isRequired,
   context: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
-  onRegionUpdate: PropTypes.func.isRequired,
 };
 
 RegionListItem.defaultProps = {

@@ -16,7 +16,7 @@ function IpTile(props) {
       },
     },
   } = props;
-  const { realIP, proxyIP } = ipManager ? ipManager.getIPs() : { realIP:null, proxyIP:null};
+  const { realIP, proxyIP } = ipManager.getIPs();
 
   return (
     <Tile

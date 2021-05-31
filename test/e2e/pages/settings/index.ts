@@ -36,7 +36,7 @@ class SettingsPage extends PageObject {
         selector: createSelector({
           value: '.languages',
         }),
-        name: 'LanguageDropdown',
+        name: 'LanguageSelect',
       },
       this,
       SettingsPage.FRENCH,
@@ -96,7 +96,7 @@ class SettingsPage extends PageObject {
   public getSection(sectionName: string): SectionBase {
     const section = (this as any)[`${sectionName}Section`];
     if (!section) {
-      throw new Error(`no such section with name ${sectionName}`);
+      throw new Error(`no such section with name: ${sectionName}`);
     }
     return section;
   }

@@ -1,4 +1,4 @@
-.idea/*
+.idea/
 node_modules/
 bower_components/
 builds/
@@ -17,7 +17,6 @@ todo.txt
 .bundled
 .env
 config/oneskyauthfile.json
-.nyc_output/*
-coverage/*
-*.xpi
+webstore.pem
+coverage/
 yarn.lock

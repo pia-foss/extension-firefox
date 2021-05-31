@@ -69,6 +69,7 @@ class PackPlugin {
         command += ` --api-secret=${apiSecret}`;
         command += ` --source-dir=${source}`;
         command += ` --artifacts-dir=${dist('..')}`;
+        command += `  --timeout=300000`;
         return command;
       }
       case 'chrome':

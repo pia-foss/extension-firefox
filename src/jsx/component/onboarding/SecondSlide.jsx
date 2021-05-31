@@ -14,6 +14,7 @@ class SecondSlide extends Component {
     this.chooseTheme = this.chooseTheme.bind(this);
     this.theme = this.props.context.getTheme();
     this.i18n = this.app.util.i18n;
+
     
     if(this.theme == 'dark'){
         this.state.button = 1;
@@ -40,7 +41,7 @@ class SecondSlide extends Component {
 
   render() {
     const {button}= this.state;
-    //theme for clases
+    //get theme for classes
     const theme = this.props.context.getTheme();
     const lang = this.i18n.locale ? this.i18n.locale : 'en';
 

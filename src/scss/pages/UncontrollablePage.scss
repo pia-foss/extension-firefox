@@ -16,4 +16,10 @@
     padding: 20px;
     font-size: 10pt;
   }
+
+  .btn-center {
+    text-align: center;
+    padding-bottom: 20px;
+    .btn { min-width: 150px; }
+  }
 }

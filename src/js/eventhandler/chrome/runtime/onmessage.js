@@ -29,10 +29,6 @@ function initOnMessage(app) {
         sendResponse({ m });
         break;
       }
-      case 'debug': {
-        debug(msg.msg);
-        break;
-      }
       default: {
         break;
       }

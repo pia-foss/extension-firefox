@@ -8,6 +8,10 @@
   .quick-connect-header {
     font-size: 10pt;
     padding-bottom: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 10px;
   }
 
   .quick-connect-flags {

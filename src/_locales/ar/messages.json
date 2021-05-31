@@ -47,20 +47,20 @@
   "ChangeExtraFeaturesSettings": {
     "message": "الميزات الإضافية"
   },
+  "encounterMessage_1": {
+    "message": "شكرًا لك على ملاحظاتك! إذا واجهت أي مشاكل تقنية يرجى "
+  },
+  "encounterMessage_2": {
+    "message": "الاتصال بقسم الدعم "
+  },
   "JustInTimeDisclaimer": {
     "message": "قيّم تجربتك مع PIA"
   },
-  "encounterMessageFirefox_1": {
-    "message": "شكرًا لك على ملاحظاتك! إذا واجهت أي مشاكل تقنية يرجى "
-  },
-  "encounterMessageFirefox_2": {
-    "message": "الاتصال بقسم الدعم "
-  },
-  "feedbackMessageFirefox_1": {
+  "feedbackMessage_1": {
     "message": "شكرًا لك على ملاحظاتك! سنكون ممتنين إذا منحتنا تقييمًا على "
   },
-  "feedbackMessageFirefox_2": {
-    "message": "ملحقات متصفح Firefox"
+  "feedbackMessage_2": {
+    "message": "متجر Chrome Web"
   },
   "UILanguage": {
     "message": "لغة واجهة المستخدم"

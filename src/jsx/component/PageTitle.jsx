@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
+import withAppContext from '@hoc/withAppContext';
 
 import listenOnline from '@hoc/listenOnline';
-import withAppContext from '@hoc/withAppContext';
 
 class PageTitle extends Component {
   constructor(props) {
@@ -75,4 +75,4 @@ PageTitle.propTypes = {
   history: PropTypes.object.isRequired,
 };
 
-export default withRouter(listenOnline(withAppContext(PageTitle)));
+export default listenOnline(withRouter(withAppContext(PageTitle)));

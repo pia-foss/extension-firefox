@@ -8,9 +8,17 @@ class UncontrollablePage extends Component {
   constructor(props) {
     super(props);
 
-    // properties
+    // Properties
     this.app = props.context.app;
     this.settings = this.app.util.settings;
+    this.extensionsUrl = 'chrome://extensions';
+
+    // Bindings
+    this.openExtensionsPage = this.openExtensionsPage.bind(this);
+  }
+
+  openExtensionsPage() {
+    chrome.tabs.create({ url: this.extensionsUrl });
   }
 
   render() {
@@ -24,6 +32,16 @@ class UncontrollablePage extends Component {
 
         <p className="warningtext">
           { t('CannotUsePIAMessage') }
+        </p>
+
+        <p className="btn-center">
+          <button
+            type="button"
+            className="btn"
+            onClick={this.openExtensionsPage}
+          >
+            { t('ManageExtensions') }
+          </button>
         </p>
       </div>
     );

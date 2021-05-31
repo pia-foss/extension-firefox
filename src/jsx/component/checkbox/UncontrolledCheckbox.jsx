@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-
 import Checkbox from '@component/checkbox';
 import withAppContext from '@hoc/withAppContext';
 

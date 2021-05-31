@@ -29,7 +29,7 @@ class OnboardingSettingsPage extends Component {
 
   changeTheme() {
     // update state
-    const { context: { theme } } = this.props;
+    const theme = this.props.context.getTheme();
     if (theme === 'dark') { this.updateTheme('light'); }
     else { this.updateTheme('dark'); }
   }

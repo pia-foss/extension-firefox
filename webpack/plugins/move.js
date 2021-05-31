@@ -23,7 +23,6 @@ class MovePlugin {
         if (err.message.includes('isFile')) {
           print('The latest LTS of NodeJS is required for this plugin', Color.red);
         }
-        process.exit(1);
       }
     });
   }

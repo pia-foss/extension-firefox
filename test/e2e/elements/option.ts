@@ -17,7 +17,8 @@ class Option extends Node {
   }
 
   async isActive(): Promise<boolean> {
-    const className = await this.getAttribute('class');
+    const element = await this.getElement();
+    const className = await element.getAttribute('class');
     return className.includes('active');
   }
 
@@ -26,8 +27,8 @@ class Option extends Node {
   }
 
   async click() {
-    const el = await this.getElement();
-    await el.click();
+    const option = await this.element;
+    await option.click();
   }
 }
 

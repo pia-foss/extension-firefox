@@ -3,7 +3,7 @@ export * from './checkbox';
 export * from './button';
 export * from './link';
 export * from './text';
-export * from './select';
 export * from './image';
 export * from './container';
 export * from './option';
+export * from './select';

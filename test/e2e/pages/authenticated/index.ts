@@ -50,6 +50,14 @@ class AuthenticatedPage extends PageObject {
     this.tiles = new AuthenticatedTiles(this);
   }
 
+  private async waitForDebounce() {
+    await this.sleep(650);
+  }
+
+  public async wait(value: number) {
+    await this.sleep(value);
+  }
+
   /**
    * Wait for the latency test to complete
    *
@@ -61,23 +69,12 @@ class AuthenticatedPage extends PageObject {
     await this.tiles.getCurrentRegionTile().waitForLatencyTest();
   }
 
-  private async waitForDebounce() {
-    await this.sleep(650);
-  }
-
-  public async wait(value: number) {
-    await this.sleep(value);
-  }
-
   public async toggleSwitch() {
     await this.switch.click();
     await this.waitForDebounce();
   }
 
   public async switchOn() {
-    const error = await this.switch.hasClass('error');
-    if (error) { await this.sleep(4000); }
-
     const disabled = await this.switch.hasClass('disconnected');
     if (disabled) { await this.switch.click(); }
 
@@ -85,9 +82,7 @@ class AuthenticatedPage extends PageObject {
   }
 
   public async switchOff() {
-    const error = await this.switch.hasClass('error');
-    if (error) { await this.sleep(4000); }
-
+    await this.switch.waitForConnected();
     const enabled = await this.switch.hasClass('connected');
     if (enabled) { await this.switch.click(); }
 
@@ -122,10 +117,6 @@ class AuthenticatedPage extends PageObject {
 
   public async waitForConnected() {
     return this.switch.waitForConnected();
-  }
-
-  public async waitForDisconnected() {
-    return this.switch.waitForDisconnected();
   }
 }
 

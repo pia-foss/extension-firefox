@@ -47,20 +47,20 @@
   "ChangeExtraFeaturesSettings": {
     "message": "추가 기능"
   },
+  "encounterMessage_2": {
+    "message": "고객 지원팀에 문의해 주세요 "
+  },
   "JustInTimeDisclaimer": {
     "message": "PIA에 대한 경험 평가하기"
   },
-  "encounterMessageFirefox_1": {
-    "message": "피드백을 제공해 주셔서 감사합니다! 기술적인 문제가 있으면 "
-  },
-  "encounterMessageFirefox_2": {
-    "message": "고객 지원팀에 문의해 주세요 "
-  },
-  "feedbackMessageFirefox_1": {
+  "feedbackMessage_1": {
     "message": "피드백을 제공해 주셔서 감사합니다! 다음 사이트에서 저희를 평가해 주시면 감사하겠습니다: "
   },
-  "feedbackMessageFirefox_2": {
-    "message": "Firefox 브라우저 애드온"
+  "feedbackMessage_2": {
+    "message": "Chrome Web Store"
+  },
+  "encountermessage_1": {
+    "message": "피드백을 제공해 주셔서 감사합니다! 기술적인 문제가 있으면 "
   },
   "UILanguage": {
     "message": "UI 언어"

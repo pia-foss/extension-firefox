@@ -7,42 +7,40 @@ import { getConnected } from '../scripts/getConnected';
 import { RegionPage } from '../pages/region';
 import { SettingsPage } from '../pages/settings';
 import { getStorage } from '../scripts/getStorage';
-import { FingerprintPage } from '../pages/fingerprint';
 
 idescribe('on the authenticated page', function () {
   let authPage: AuthenticatedPage;
   let loginPage: LoginPage;
-  let fingerprintPage: FingerprintPage;
 
   ibeforeEach(async function () {
     authPage = new AuthenticatedPage();
     loginPage = new LoginPage();
-    fingerprintPage = new FingerprintPage();
 
     await loginPage.navigate();
-    await fingerprintPage.optIn();
     await loginPage.signIn();
     await authPage.waitForLatencyTest();
   });
 
   idescribe('the on/off switch', function () {
+    let expectedConnectionMessage: string;
+
+    ibeforeEach(async function () {
+      expectedConnectionMessage = (await translate(this.script, 'Connected')).toUpperCase();
+    });
+
     iit('default state is "off"', async function () {
-      await authPage.waitForDisconnected();
       await authPage.expectSwitchOff();
     });
 
     idescribe('when toggled on', function () {
       ibeforeEach(async function () {
         await authPage.switchOn();
-        await authPage.waitForConnected();
       });
 
       iit('the status text is "CONNECTED"', async function () {
-        const expectedConnectedText = (await translate(this.script, 'Connected')).toUpperCase();
         const actualConnectedText = await authPage.getConnectedText();
-        expect(actualConnectedText).to.eq(expectedConnectedText);
+        expect(actualConnectedText).to.eq(expectedConnectionMessage);
       });
-
       iit('the browser tunnels its traffic through a PIA proxy', async function () {
         const connected = await getConnected(this.script);
         expect(connected).to.be.true;
@@ -51,20 +49,18 @@ idescribe('on the authenticated page', function () {
 
     idescribe('when toggled on then off', function () {
       ibeforeEach(async function () {
-        await authPage.waitForDisconnected();
         await authPage.switchOn();
-        await authPage.waitForConnected();
         await authPage.switchOff();
-        await authPage.waitForDisconnected();
       });
 
       iit('the status text is company logo', async function () {
         const actualAltText = await authPage.getDisconnectedImage();
         expect(actualAltText).to.eq('Private Internet Access Logo');
       });
+
       iit('the browser does not tunnel it\'s traffic through a PIA proxy', async function () {
         const connected = await getConnected(this.script);
-        expect(connected, 'expected to not be connected').to.be.false;
+        expect(connected, 'expected not connected').to.be.false;
       });
     });
   });
@@ -140,23 +136,23 @@ idescribe('on the authenticated page', function () {
         await loginPage.expect.visible;
       });
     });
-  });
 
-  idescribe('drawer', function () {
-    idescribe('open drawer', function () {
-      iit('open the drawer', async function () {
-        await authPage.tiles.handle.click();
-        await authPage.tiles.renderable.waitForVisible();
+    idescribe('drawer', function () {
+      idescribe('open drawer', function () {
+        iit('open the drawer', async function () {
+          await authPage.tiles.handle.click();
+          await authPage.tiles.renderable.waitForVisible();
+        });
       });
-    });
 
-    idescribe('close drawer', function () {
-      iit('close the drawer', async function () {
-        await authPage.tiles.handle.click();
-        await authPage.tiles.renderable.waitForVisible();
-        await authPage.tiles.handle.click();
-        const isOpen = await authPage.tiles.isDrawerOpen();
-        expect(isOpen).to.eq(false);
+      idescribe('close drawer', function () {
+        iit('close the drawer', async function () {
+          await authPage.tiles.handle.click();
+          await authPage.tiles.renderable.waitForVisible();
+          await authPage.tiles.handle.click();
+          const isOpen = await authPage.tiles.isDrawerOpen();
+          expect(isOpen).to.eq(false);
+        });
       });
     });
   });

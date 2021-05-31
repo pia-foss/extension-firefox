@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-
 import withAppContext from '@hoc/withAppContext';
 import BypassItem from '@component/bypasslist/BypassItem';
 
@@ -31,7 +30,7 @@ class UserRules extends Component {
   }
 
   onUserInputChange(e) {
-    return this.setState({ userInput: e.currentTarget.value });
+    this.setState({ userInput: e.currentTarget.value });
   }
 
   save() {
@@ -58,9 +57,9 @@ class UserRules extends Component {
     return (
       <BypassItem
         key={rule}
-        rule={rule}
         theme={theme}
-        onRemoveRule={this.createRemoveRule(rule)}
+        rule={rule}
+        onRemoveItem={this.createRemoveRule(rule)}
       />
     );
   }

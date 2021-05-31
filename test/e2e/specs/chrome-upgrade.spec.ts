@@ -5,20 +5,16 @@ import { LoginPage } from '../pages/login';
 import { BrowserUpgradePage } from '../pages/upgrade';
 import { blockWebRTC } from '../scripts/blockWebRTC';
 import { translate } from '../scripts/translate';
-import { FingerprintPage } from '../pages/fingerprint';
 
-idescribe('the upgrade browser page', function () {
+idescribe('the upgrade chrome page', function () {
   let loginPage: LoginPage;
   let upgradePage: BrowserUpgradePage;
-  let fingerprintPage: FingerprintPage;
 
   ibeforeEach(async function () {
     loginPage = new LoginPage();
     upgradePage = new BrowserUpgradePage();
-    fingerprintPage = new FingerprintPage();
 
     await loginPage.navigate();
-    await fingerprintPage.optIn();
     await blockWebRTC(this.script);
     await this.windows.refresh({ waitForVisible: upgradePage.warningIcon });
   });
@@ -27,7 +23,7 @@ idescribe('the upgrade browser page', function () {
     const expectedText = await translate(
       this.script,
       'UpgradeBrowserMessage',
-      { browser: 'Firefox' },
+      { browser: 'Chrome' },
     );
     await upgradePage.warningIcon.expect.visible;
     await upgradePage.warningText.expect.visible;

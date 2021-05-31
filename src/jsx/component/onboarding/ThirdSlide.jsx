@@ -15,6 +15,7 @@ class ThirdSlide extends Component {
     const theme = this.props.context.getTheme();
     const lang = this.i18n.locale ? this.i18n.locale : 'en';
 
+
     return (
         <div className="third">
            <div className={`top-disclaimers ${theme} ${lang}`}>

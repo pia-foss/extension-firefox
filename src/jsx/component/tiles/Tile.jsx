@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-
 import withAppContext from '@hoc/withAppContext';
 
 class Tile extends Component {
@@ -45,6 +44,11 @@ class Tile extends Component {
     );
   }
 
+  /**
+   * Builds classname for tile container
+   *
+   * @returns {string}
+   */
   buildClassName() {
     const { close } = this.state;
     const { name, saved, context: { theme } } = this.props;
@@ -66,7 +70,6 @@ class Tile extends Component {
       <div className={className}>
         <div className={`${name.toLowerCase()} child noselect`}>
           { this.buildFlag() }
-
           { children }
         </div>
       </div>

@@ -27,7 +27,6 @@ class ChangelogPlugin {
       catch (err) {
         print('ChangelogPlugin: Failed with error', Color.red);
         print(err.message || err, Color.red);
-        process.exit(1);
       }
     });
   }

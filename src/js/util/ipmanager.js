@@ -1,3 +1,18 @@
+/*
+   IMPORTANT
+   =========
+
+   Sending too many requests to `privateinternetaccess.com` results
+   in increased DNS costs.
+
+   Current Approach
+   ----------------
+
+   Run updates:
+   1) before proxy connects (real ip)
+   2) after proxy connects (proxy ip)
+   3) after proxy disconnects (real ip)
+ */
 
 import http from '@helpers/http';
 import reportError from '@helpers/reportError';
@@ -5,18 +20,18 @@ import timer from '@helpers/timer';
 
 class IpManager {
   constructor(app) {
-     // bindings
-     this.getRealIP = this.getRealIP.bind(this);
-     this.getProxyIP = this.getProxyIP.bind(this);
-     this.getIPs = this.getIPs.bind(this);
-     this.updateIpByRegion = this.updateIpByRegion.bind(this);
-     this.updateByCountry = this.updateByCountry.bind(this);
-     // init
-     this.app = app;
-     this.realIP = null;
-     this.proxyIP = null;
+    // bindings
+    this.getRealIP = this.getRealIP.bind(this);
+    this.getProxyIP = this.getProxyIP.bind(this);
+    this.updateIpByRegion = this.updateIpByRegion.bind(this);
+    this.updateByCountry = this.updateByCountry.bind(this);
+
+    // init
+    this.app = app;
+    this.realIP = null;
+    this.proxyIP = null;
   }
-  
+
   getRealIP() {
     return this.realIP;
   }
@@ -32,8 +47,18 @@ class IpManager {
     };
   }
 
-  updateIpByRegion() {
-    this.update();
+  updateIpByRegion(tab){
+    const location = this.app.util.regionlist.getRegionById(tab.customCountry);
+    if(location && this.app.proxy.getEnabled()){
+      this.proxyIP = location.ping;
+    }else{
+      if(typeof browser == 'undefined'){
+        const region = this.app.util.regionlist.getSelectedRegion();
+        this.updateByCountry(region);
+      }else{
+        this.update({ retry: true });
+      }
+    }
   }
 
   updateByCountry(country){
@@ -42,13 +67,23 @@ class IpManager {
       this.app.util.icon.online(country);
     }
   }
-
+  
+  /**
+   * Update an IP
+   *
+   * If proxy currently connected, will update proxyIP
+   * If proxy current disconnected, will update realIP
+   *
+   * Recommended not to await this method if retry is enabled
+   *
+   * @param {*} opts
+   * @param {boolean} retry whether to retry on failure (takes up to 7mins)
+   */
   async update(
     {
       retry = false,
     } = {},
   ) {
-      
     debug('ipmanager: updating ip address');
     let attempt = 0;
     const maxAttempts = retry ? 10 : 0;
@@ -67,6 +102,9 @@ class IpManager {
         this.realIP = ip;
         this.proxyIP = null;
       }
+      if(typeof browser == 'undefined'){
+        this.app.courier.sendMessage('refresh');
+      }
     };
     while (attempt <= maxAttempts) {
       await timer((attempt ** 2) * 1000);
@@ -81,6 +119,5 @@ class IpManager {
     }
   }
 }
-
 
 export default IpManager;

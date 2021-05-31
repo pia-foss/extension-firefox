@@ -7,7 +7,8 @@ type SettingName
   = 'mace'
   | 'http-referrer'
   | 'debug-log'
-  | 'fingerprint'
+  | 'microphone'
+  | 'camera'
   | 'theme';
 
 class QuickSettingsTile extends Tile {
@@ -15,7 +16,8 @@ class QuickSettingsTile extends Tile {
   public httpReferrer: QuickSettingButton;
   public debugLog: QuickSettingButton;
   public theme: QuickSettingButton;
-  public fingerprint: QuickSettingButton;
+  public camera: QuickSettingButton;
+  public microphone: QuickSettingButton;
   public viewAll: Button;
 
   public constructor(descriptor: ElementDescriptor, parent?: Node) {
@@ -41,9 +43,16 @@ class QuickSettingsTile extends Tile {
       },
       this,
     );
-    this.fingerprint = new QuickSettingButton(
+    this.camera = new QuickSettingButton(
       {
-        selector: QuickSettingsTile.createSettingSelector('fingerprintprotection'),
+        selector: QuickSettingsTile.createSettingSelector('blockcamera'),
+        name: 'dark theme quicksetting',
+      },
+      this,
+    );
+    this.microphone = new QuickSettingButton(
+      {
+        selector: QuickSettingsTile.createSettingSelector('blockmicrophone'),
         name: 'dark theme quicksetting',
       },
       this,
@@ -69,7 +78,8 @@ class QuickSettingsTile extends Tile {
       case 'mace': return this.mace;
       case 'http-referrer': return this.httpReferrer;
       case 'debug-log': return this.debugLog;
-      case 'fingerprint': return this.fingerprint;
+      case 'microphone': return this.microphone;
+      case 'camera': return this.camera;
       case 'theme': return this.theme;
       default: throw new Error(`invalid setting name: ${name}`);
     }
@@ -80,7 +90,8 @@ class QuickSettingsTile extends Tile {
       case 'mace': return 'settings:maceprotection';
       case 'http-referrer': return 'settings:blockreferer';
       case 'debug-log': return 'settings:debugmode';
-      case 'fingerprint': return 'settings:fingerprintprotection';
+      case 'microphone': return 'settings:blockmicrophone';
+      case 'camera': return 'settings:blockcamera';
       case 'theme': return 'settings:darkTheme';
       default: throw new Error(`no storage key for ${name}`);
     }

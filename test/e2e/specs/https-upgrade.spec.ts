@@ -3,7 +3,6 @@ import { AuthenticatedPage } from '../pages/authenticated';
 import { SettingsPage } from '../pages/settings';
 import { LoginPage } from '../pages/login';
 import { waitForRules } from '../scripts/waitForRules';
-import { FingerprintPage } from '../pages/fingerprint';
 
 interface Site {
   http: string;
@@ -14,7 +13,6 @@ idescribe('https upgrade', function () {
   let authPage: AuthenticatedPage;
   let settingsPage: SettingsPage;
   let loginPage: LoginPage;
-  let fingerprintPage: FingerprintPage;
 
   const sites: ReadonlyArray<Site> = Object.freeze([
     {
@@ -27,10 +25,8 @@ idescribe('https upgrade', function () {
     authPage = new AuthenticatedPage();
     settingsPage = new SettingsPage();
     loginPage = new LoginPage();
-    fingerprintPage = new FingerprintPage();
 
     await loginPage.navigate();
-    await fingerprintPage.optIn();
     await loginPage.signIn();
     await waitForRules(this.script);
     await authPage.menu.toggleDropdown();

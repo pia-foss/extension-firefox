@@ -1,12 +1,10 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-
 import withAppContext from '@hoc/withAppContext';
 
 class DeleteLogButton extends Component {
   constructor(props) {
     super(props);
-
     // properties
     this.app = props.context.app;
     this.logger = this.app.logger;

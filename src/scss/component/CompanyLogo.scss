@@ -12,6 +12,7 @@
 
   &.connected .connected-gradient { opacity: 1; }
 
+  &.initial,
   &.connecting, &.connected.connecting,
   &.offline, &.error.offline, &.connected.offline {
     color: $grey20;

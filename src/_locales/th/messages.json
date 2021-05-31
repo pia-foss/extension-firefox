@@ -47,20 +47,20 @@
   "ChangeExtraFeaturesSettings": {
     "message": "ฟีเจอร์เพิ่มเติม"
   },
+  "encounterMessage_2": {
+    "message": "ติดต่อฝ่ายสนับสนุนของเรา "
+  },
   "JustInTimeDisclaimer": {
     "message": "ให้คะแนนประสบการณ์ของคุณกับ PIA"
   },
-  "encounterMessageFirefox_1": {
-    "message": "ขอบคุณสำหรับความคิดเห็นของคุณ! หากคุณพบปัญหาทางเทคนิคใดๆ โปรด "
-  },
-  "encounterMessageFirefox_2": {
-    "message": "ติดต่อฝ่ายสนับสนุนของเรา "
-  },
-  "feedbackMessageFirefox_1": {
+  "feedbackMessage_1": {
     "message": "ขอบคุณสำหรับความคิดเห็นของคุณ! เราจะขอบคุณมากถ้าคุณสละเวลาให้คะแนนเราบน "
   },
-  "feedbackMessageFirefox_2": {
-    "message": "ส่วนเสริมเบราว์เซอร์ Firefox"
+  "feedbackMessage_2": {
+    "message": "Chrome Web Store"
+  },
+  "encountermessage_1": {
+    "message": "ขอบคุณสำหรับความคิดเห็นของคุณ! หากคุณพบปัญหาทางเทคนิคใดๆ โปรด "
   },
   "UILanguage": {
     "message": "ภาษา UI"

@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-
 import Tile from '@component/tiles/Tile';
 import withAppContext from '@hoc/withAppContext';
 
@@ -15,7 +14,7 @@ class Subscription extends Component {
     this.state = { plan: '', expiration: undefined };
 
     try {
-      const account = JSON.parse(this.storage.getItem('account'));
+      const account = this.storage.getItem('account');
       this.state.plan = account.plan;
       this.state.expiration = account.expiration_time;
     }
@@ -35,8 +34,7 @@ class Subscription extends Component {
       const now = new Date().getTime();
       const timeDiff = expirationTime - now;
       expirationDays = Math.round(timeDiff / oneDay);
-    }
-    else {
+    } else {
       this.user.updateAccount()
         .then((account) => {
           const accountPlan = account.plan;
@@ -54,7 +52,7 @@ class Subscription extends Component {
           </span>
 
           <span className="subscription-expiration">
-          { ` (${expirationDays} `+t('days_left')+`)` }
+            { ` (${expirationDays} `+t('days_left')+`)` }
           </span>
         </div>
       );

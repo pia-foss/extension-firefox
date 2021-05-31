@@ -12,9 +12,10 @@ import ChangeRegionPage from '@pages/ChangeRegionPage';
 import AuthenticatedPage from '@pages/AuthenticatedPage';
 import UncontrollablePage from '@pages/UncontrollablePage';
 import RegionOverridePage from '@pages/RegionOverridePage';
-import PrivateBrowsingPage from '@pages/PrivateBrowsingPage';
 import PrivateRoute from './PrivateRoute';
 import SmartLocationPage from '@pages/SmartLocationPage';
+import PrivateBrowsingPage from '@pages/PrivateBrowsingPage';
+
 
 export const Path = {
   authenticated: '/',
@@ -31,7 +32,6 @@ export const Path = {
   privateBrowsing: '/private-browsing',
   smartLocation:'/smartlocation'
 };
-
 
 /**
  * Context can be found:

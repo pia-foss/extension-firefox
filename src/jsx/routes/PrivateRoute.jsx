@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Route, Redirect } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 import withAppContext from '@hoc/withAppContext';
 

@@ -56,6 +56,7 @@ function createSectionsData({ t },defaultArray) {
   return sectionsArray;
 }
 
+
 function getSection(sectionKey, sectionData) {
   const sectionName = getSectionName(sectionKey);
   return sectionData.find((section) => {

@@ -47,20 +47,20 @@
   "ChangeExtraFeaturesSettings": {
     "message": "Fonctionnalités supplémentaires"
   },
+  "encounterMessage_2": {
+    "message": "contacter le département d'assistance "
+  },
   "JustInTimeDisclaimer": {
     "message": "Évaluez votre expérience avec PIA"
   },
-  "encounterMessageFirefox_1": {
-    "message": "Merci pour vos commentaires ! Si vous rencontrez des problèmes techniques, veuillez "
-  },
-  "encounterMessageFirefox_2": {
-    "message": "contacter le département d'assistance "
-  },
-  "feedbackMessageFirefox_1": {
+  "feedbackMessage_1": {
     "message": "Merci pour vos commentaires ! Nous vous serions reconnaissants si vous nous évalueriez sur "
   },
-  "feedbackMessageFirefox_2": {
-    "message": "Modules pour Firefox"
+  "feedbackMessage_2": {
+    "message": "le Chrome Web Stor"
+  },
+  "encountermessage_1": {
+    "message": "Merci pour vos commentaires ! Si vous rencontrez des problèmes techniques, veuillez "
   },
   "UILanguage": {
     "message": "Langue de l'interface"

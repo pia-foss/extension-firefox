@@ -3,21 +3,15 @@ import { AuthenticatedPage } from '../pages/authenticated';
 import { idescribe, iit, Context } from '../core';
 import { getStorage } from '../scripts/getStorage';
 import { expect } from 'chai';
-import { StorageType } from '../types';
-import { FingerprintPage } from '../pages/fingerprint';
 
 idescribe('login page', function () {
   let loginPage: LoginPage;
   let authenticatedPage: AuthenticatedPage;
-  let fingerprintPage: FingerprintPage;
 
   beforeEach(async function () {
     loginPage = new LoginPage();
     authenticatedPage = new AuthenticatedPage();
-    fingerprintPage = new FingerprintPage();
-
     await loginPage.navigate();
-    await fingerprintPage.optIn();
   });
 
   idescribe('the login button', function () {
@@ -65,7 +59,7 @@ idescribe('login page', function () {
 
     idescribe('when checked', function () {
       iit('username is present in local storage', async function () {
-        await testStorage(this, 'localStorage', false);
+        await testStorage(this, false);
       });
     });
 
@@ -75,17 +69,17 @@ idescribe('login page', function () {
       });
 
       iit('username is not present in local storage', async function () {
-        await testStorage(this, 'localStorage', true);
+        await testStorage(this, true);
       });
     });
 
-    async function testStorage(context: Context, storage: StorageType, expectNull: boolean) {
+    async function testStorage(context: Context, expectNull: boolean) {
       // Arrange
       const expectedUsername = 'test-username';
 
       // Act
       await loginPage.username.setValue(expectedUsername);
-      const username = await getStorage(context.script, 'form:username', storage);
+      const username = await getStorage(context.script, 'form:username');
 
       // Assert
       expect(username).to.eq(expectNull ? '' : expectedUsername);

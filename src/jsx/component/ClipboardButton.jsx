@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-
 import withAppContext from '@hoc/withAppContext';
 
 class ClipboardButton extends Component {
@@ -42,12 +41,12 @@ class ClipboardButton extends Component {
     btn.innerHTML = t('CopiedToClipboard');
     window.setTimeout(() => {
       btn.innerHTML = t('CopyToClipboard');
-    }, 500);
+    }, 5000);
   }
 
   render() {
     return (
-      <button type="button" className="btn copy" onClick={this.onClick}>
+      <button type="button" className="btn copy noselect" onClick={this.onClick}>
         { t('CopyToClipboard') }
       </button>
     );

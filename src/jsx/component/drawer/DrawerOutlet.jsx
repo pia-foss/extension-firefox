@@ -21,9 +21,9 @@ class DrawerOutlet extends Component {
       mode,
       tiles,
       region,
+      regions,
       connection,
       drawerOpen,
-      autoLoading,
       toggleTileSaved,
       onQuickConnect,
     } = this.props;
@@ -35,9 +35,9 @@ class DrawerOutlet extends Component {
             <RegionTile
               key={tile.name}
               region={region}
+              regions={regions}
               saved={tile.saved}
               hideFlag={!drawerOpen}
-              autoLoading={autoLoading}
               toggleTileSaved={toggleTileSaved}
             />
           );
@@ -48,11 +48,10 @@ class DrawerOutlet extends Component {
               key={tile.name}
               mode={mode}
               region={region}
+              regions={regions}
               saved={tile.saved}
               hideFlag={!drawerOpen}
               connection={connection}
-              autoLoading={autoLoading}
-              region={region}
               toggleTileSaved={toggleTileSaved}
               onQuickConnect={onQuickConnect}
             />
@@ -68,9 +67,9 @@ class DrawerOutlet extends Component {
             />
           );
 
-        case 'BypassRules':
+        case 'Subscription':
           return (
-            <BypassRules
+            <Subscription
               key={tile.name}
               saved={tile.saved}
               hideFlag={!drawerOpen}
@@ -78,9 +77,9 @@ class DrawerOutlet extends Component {
             />
           );
 
-        case 'Subscription':
+        case 'BypassRules':
           return (
-            <Subscription
+            <BypassRules
               key={tile.name}
               saved={tile.saved}
               hideFlag={!drawerOpen}
@@ -117,10 +116,10 @@ class DrawerOutlet extends Component {
 
 DrawerOutlet.propTypes = {
   region: PropTypes.object,
+  regions: PropTypes.array,
   tiles: PropTypes.array.isRequired,
   context: PropTypes.object.isRequired,
   drawerOpen: PropTypes.bool.isRequired,
-  autoLoading: PropTypes.bool.isRequired,
   toggleTileSaved: PropTypes.func.isRequired,
   onQuickConnect: PropTypes.func.isRequired,
   mode: PropTypes.string.isRequired,
@@ -128,6 +127,7 @@ DrawerOutlet.propTypes = {
 };
 
 DrawerOutlet.defaultProps = {
+  regions: [],
   region: undefined,
 };
 

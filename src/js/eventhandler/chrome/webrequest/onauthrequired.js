@@ -15,11 +15,14 @@ function authenticate(app) {
 
   const active = (details) => {
     const { proxy, util: { regionlist } } = app;
-    const proxyEnabled = proxy.enabled();
+    let proxyEnabled;
+    proxyEnabled = proxy.enabled();
     const isValidHost = regionlist.testHost(details.challenger.host);
     const isValidPort = regionlist.testPort(details.challenger.port);
-    const isActive = proxyEnabled
-      && details.isProxy
+
+    const isActive = 
+    // proxyEnabled && 
+         details.isProxy
       && hostR.test(details.challenger.host)
       && isValidHost
       && isValidPort;
@@ -31,15 +34,13 @@ function authenticate(app) {
     debug(`challenger port: ${details.challenger.port}`);
     debug(`possible hosts: ${JSON.stringify(regionlist.getPotentialHosts())}`);
     debug(`possible ports: ${JSON.stringify(regionlist.getPotentialPorts())}`);
-    debug(`is active: ${isActive}`);
+    debug(`isActive: ${isActive}`);
     debug('onauthrequired.js: end test');
 
     return isActive;
   };
 
   return function handle(details) {
-
-
     try {
       debug('onauthrequired.js: servicing request for authentication');
       if (!active(details)) { return debug('onAuthRequired/1: refused.'); }
@@ -47,7 +48,6 @@ function authenticate(app) {
       const { counter, user } = app.util;
 
       counter.inc(details.requestId);
-
       if (counter.get(details.requestId) > 1) {
         debug('onAuthRequired/1: failed.');
         counter.del(details.requestId);
@@ -56,16 +56,12 @@ function authenticate(app) {
         return { cancel: true };
       }
 
-     
-
-
       if (user.getLoggedIn()) {
         debug('onAuthRequired/1: allowed.');
 
         const username = user.getUsername();
         const password = user.getPassword();
         const token = user.getAuthToken();
-  
 
         let credentials = { cancel: true };
         if (username && password) {
@@ -76,7 +72,6 @@ function authenticate(app) {
           const tokenPass = token.substring(token.length / 2);
           credentials = { authCredentials: { username: tokenUser, password: tokenPass } };
         }
-  
         return credentials;
       }
 
@@ -84,11 +79,9 @@ function authenticate(app) {
       user.logout();
       chrome.tabs.reload(details.tabId);
       return { cancel: true };
-    }
-    catch (err) {
+    } catch (err) {
       debug('onAuthRequired/1: refused due to error');
-      const errMessage = err.message || JSON.stringify(err, Object.getOwnPropertyNames(err));
-      debug(`error: ${errMessage}`);
+      debug(`error: ${JSON.stringify(err, Object.getOwnPropertyNames(err))}`);
       return { cancel: true };
     }
   };
